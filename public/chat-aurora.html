@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Aurora</title>
+    <link rel="stylesheet" href="styles/chat-aurora.css">
+    <link rel="stylesheet" href="styles/popupmenu.css">
+</head>
+<body>
+    
+
+    <div class="menu-container" id="menu">
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <span>Usuário #1234</span>
+        </div>
+        <div class="menu-items">
+            <div class="menu-item">Início</div>
+            <div class="menu-item">Configurações</div>
+            <div class="menu-item">Notificações</div>
+            <div class="menu-item">Ajuda</div>
+        </div>
+        <div class="footer">Versão 1.0</div>
+    </div>
+
+    <div class="chat-container">
+        <header>
+            <h1>Chat Aurora</h1>
+            <button id="open-menu-button">Abrir Menu</button>
+            <button id="toggle-theme">Alternar Tema</button>
+        </header>
+        <div class="chat-box" id="chat-box">
+            <!-- Mensagens do chat serão exibidas aqui -->
+        </div>
+        <div class="input-container">
+            <input type="text" id="message-input" placeholder="Digite sua mensagem...">
+            <button id="send-button">Enviar</button>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="scripts/chat-aurora.js"></script>
+</body>
+</html>

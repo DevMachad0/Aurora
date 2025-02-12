@@ -1,0 +1,85 @@
+/* Estilo do botão de abrir o menu */
+#open-menu-button, #toggle-theme {
+    position: relative;
+    background-color: #333;
+    color: white;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+#open-menu-button {
+    margin-left: 10px; /* Separação entre os botões */
+}
+
+/* Estilo do menu pop-up */
+.menu-container {
+    position: fixed;
+    left: -250px; /* Inicialmente fora da tela */
+    top: 0;
+    height: 100%;
+    width: 250px;
+    background-color: #333;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.3);
+    transition: left 0.3s ease; /* Transição suave */
+}
+
+.menu-container.open {
+    left: 0; /* Mostra o menu quando a classe "open" é adicionada */
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.user-info i {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.user-info span {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.menu-items {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-item {
+    padding: 12px;
+    margin: 10px 0;
+    background-color: #444;
+    text-align: center;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.menu-item:hover {
+    background-color: #555;
+}
+
+.footer {
+    margin-top: auto;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    background-color: #222;
+    border-radius: 4px;
+}
+
+.chat-container { /* Espaço para o menu */
+    padding: 20px;
+}
