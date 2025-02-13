@@ -6,48 +6,66 @@ if (!token) {
   window.location.href = 'index.html';
 }
 
-// Se o token existir, a página será carregada normalmente
-// Seleção dos elementos principais
-const toggleThemeButton = document.getElementById('toggle-theme');
-const chatBox = document.getElementById('chat-box');
-const body = document.body;
-const messageInput = document.getElementById('message-input');
-const sendButton = document.getElementById('send-button');
+document.addEventListener("DOMContentLoaded", () => {
+    const menuToggle = document.getElementById("menu-toggle");
+    const sidebar = document.getElementById("sidebar");
+    const themeToggle = document.getElementById("theme-toggle");
 
-// Função para alternar o tema
-function toggleTheme() {
-    // Alterna a classe de modo escuro no corpo
-    body.classList.toggle('dark-mode');
-    // Alterna a cor do botão de tema conforme o tema ativo
-    if (body.classList.contains('dark-mode')) {
-        toggleThemeButton.textContent = '🌞';
-    } else {
-        toggleThemeButton.textContent = '🌑';
-    }
-}
-// Função para abrir e fechar o menu
-const menu = document.getElementById('menu');
-const openMenuButton = document.getElementById('open-menu-button');
+    // Alternar menu lateral
+    menuToggle.addEventListener("click", (event) => {
+        sidebar.classList.toggle("active");
+        event.stopPropagation(); // Impede que o clique no botão feche o menu imediatamente
+    });
 
-openMenuButton.addEventListener('click', () => {
-    menu.classList.toggle('open'); // Alterna a classe "open" para abrir/fechar o menu
+    // Fechar menu ao clicar fora
+    document.addEventListener("click", (event) => {
+        if (sidebar.classList.contains("active") && !sidebar.contains(event.target) && event.target !== menuToggle) {
+            sidebar.classList.remove("active");
+        }
+    });
+
+    // Alternar tema escuro/claro
+    themeToggle.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+    });
 });
+document.addEventListener("DOMContentLoaded", function () {
+    const messageInput = document.getElementById("message-input");
+    const sendButton = document.getElementById("send-button");
+    const chatBox = document.querySelector(".chat-box");
 
-// Aumenta o tamanho do campo de chat no mobile
-function adjustChatInputForMobile() {
-    if (window.innerWidth <= 767) {
-        // Aumenta o tamanho do chat box para dispositivos móveis
-        chatBox.style.height = 'calc(100% - 120px)';
-        messageInput.style.height = '60px';
-    } else {
-        chatBox.style.height = 'auto'; // Tamanho padrão no desktop
-        messageInput.style.height = '40px'; // Tamanho padrão no desktop
+    function appendMessage(sender, text) {
+        const messageElement = document.createElement("div");
+        messageElement.classList.add(sender);
+        messageElement.textContent = text;
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
-}
 
-// Adiciona o evento de alternância de tema ao botão
-toggleThemeButton.addEventListener('click', toggleTheme);
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
 
-// Ajusta o campo de chat no carregamento e ao redimensionar a janela
-window.addEventListener('resize', adjustChatInputForMobile);
-window.addEventListener('load', adjustChatInputForMobile);
+        appendMessage("user-message", `Você: ${message}`);
+        messageInput.value = "";
+
+        try {
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message }),
+            });
+
+            const data = await response.json();
+            appendMessage("bot-message", `Aurora: ${data.message}`);
+        } catch (error) {
+            console.error("Erro ao enviar mensagem:", error);
+            appendMessage("bot-message", "Erro ao se comunicar com o servidor.");
+        }
+    }
+
+    sendButton.addEventListener("click", sendMessage);
+    messageInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") sendMessage();
+    });
+});

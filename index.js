@@ -4,6 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require("./src/routes/userRoutes");
+const chatRoutes = require("./src/routes/chatRoutes");
 
 const app = express();
 app.use(express.json());
@@ -33,6 +34,7 @@ app.get("/", (req, res) => {
 app.use("/users", userRoutes);
 app.use('/api', authRoutes); // Definir rota para login
 
+app.use("/api", chatRoutes);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
