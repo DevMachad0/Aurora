@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
 const { createUser, getUserByEmail } = require("../services/userService");
 
 // Rota para criar usuário
