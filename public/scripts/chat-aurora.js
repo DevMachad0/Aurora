@@ -1,15 +1,24 @@
 // Verifica se o usuário tem um token de autenticação
-const token = localStorage.getItem('token');
+const token = localStorage.getItem("token");
+const userName = localStorage.getItem("userName"); // Obtém o nome do usuário do localStorage
+const userEmail = localStorage.getItem("userEmail"); // Obtém o e-mail do usuário
+const userEmpresa = localStorage.getItem("userEmpresa"); // Obtém a empresa do usuário
 
 if (!token) {
   // Redireciona para a página de login caso o token não exista
-  window.location.href = 'index.html';
+  window.location.href = "index.html";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const menuToggle = document.getElementById("menu-toggle");
     const sidebar = document.getElementById("sidebar");
     const themeToggle = document.getElementById("theme-toggle");
+    const userInfo = document.querySelector(".user-info p");
+
+    // Atualiza o nome do usuário na interface
+    if (userInfo && userName) {
+        userInfo.textContent = `👤 ${userName}`;
+    }
 
     // Alternar menu lateral
     menuToggle.addEventListener("click", (event) => {
@@ -29,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.toggle("dark-mode");
     });
 });
+
 document.addEventListener("DOMContentLoaded", function () {
     const messageInput = document.getElementById("message-input");
     const sendButton = document.getElementById("send-button");
@@ -52,8 +62,18 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             const response = await fetch("/api/chat", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message }),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // Token enviado no cabeçalho
+                },
+                body: JSON.stringify({
+                    message,
+                    user: {
+                        nome: userName,
+                        email: userEmail,
+                        empresa: userEmpresa
+                    }
+                }),
             });
 
             const data = await response.json();

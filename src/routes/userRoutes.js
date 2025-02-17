@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/userModel");
-const jwt = require("jsonwebtoken");
-const { createUser, getUserByEmail } = require("../services/userService");
+const { createUser, getUserByEmail, getUserById } = require("../services/userService");
+const verifyToken = require("../middleware/verifyToken");
 
 // Rota para criar usuário
 router.post("/", async (req, res) => {
@@ -26,5 +25,7 @@ router.get("/:email", async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
+
 
 module.exports = router;

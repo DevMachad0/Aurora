@@ -23,8 +23,15 @@ const login = async (req, res) => {
       token,
       user: {
         nome: user.nome,
+        usuario: user.usuario,
         email: user.email,
         empresa: user.empresa,
+        licenca: user.licenca,
+        plano: user.plano,
+        dados: user.dados,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        // Adicione outras informações do usuário aqui, exceto a senha
       },
     });
   } catch (error) {

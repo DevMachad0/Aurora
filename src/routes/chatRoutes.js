@@ -21,21 +21,24 @@ const chat = model.startChat({
         }
     ],
     generationConfig: {
-        maxOutputTokens: 100,  // Limitar o tamanho da resposta
-        temperature: 0.3,  // Menos criativo, mais objetivo
+        maxOutputTokens: 100,
+        temperature: 0.3,
     },
 });
 
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
     try {
-        const userMessage = req.body.message;
-        if (!userMessage) {
+        const { message, user } = req.body;
+        if (!message) {
             return res.status(400).json({ error: "Mensagem não pode ser vazia" });
         }
 
-        // Envia a mensagem para o Gemini
-        const result = await chat.sendMessage(userMessage);
+        // Criando um contexto para o modelo entender quem está falando
+        const userContext = `Usuário autenticado: Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}.`;
+
+        // Envia a mensagem com contexto para a IA
+        const result = await chat.sendMessage(`${userContext}\n\nUsuário: ${message}`);
         const response = await result.response;
         const botMessage = response.text();
 
