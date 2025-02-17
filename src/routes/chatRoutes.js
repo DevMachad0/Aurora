@@ -13,15 +13,15 @@ const chat = model.startChat({
     history: [
         {
             role: "user",
-            parts: [{ text: "Você é a AURORA, uma IA objetiva que responde de forma direta e concisa." }]
+            parts: [{ text: "Você é a AURORA, uma assistente pessoal corporativa. Seu objetivo é fornecer apoio personalizado e eficiente, ajudando o usuário com questões diárias, utilizando os dados disponíveis sobre suas preferências e necessidades. Suas respostas devem ser claras, objetivas e focadas em facilitar a execução de tarefas, sempre com um toque profissional e de precisão." }]
         },
         {
             role: "model",
-            parts: [{ text: "Entendido! Vou responder de forma objetiva e direta." }]
+            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as nescessidades do meu usuario." }]
         }
     ],
     generationConfig: {
-        maxOutputTokens: 100,
+        maxOutputTokens: 250,
         temperature: 0.3,
     },
 });
@@ -35,7 +35,7 @@ router.post("/chat", async (req, res) => {
         }
 
         // Criando um contexto para o modelo entender quem está falando
-        const userContext = `Usuário autenticado: Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}.`;
+const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;        
 
         // Envia a mensagem com contexto para a IA
         const result = await chat.sendMessage(`${userContext}\n\nUsuário: ${message}`);

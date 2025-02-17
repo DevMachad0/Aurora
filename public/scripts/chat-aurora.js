@@ -3,6 +3,11 @@ const token = localStorage.getItem("token");
 const userName = localStorage.getItem("userName"); // Obtém o nome do usuário do localStorage
 const userEmail = localStorage.getItem("userEmail"); // Obtém o e-mail do usuário
 const userEmpresa = localStorage.getItem("userEmpresa"); // Obtém a empresa do usuário
+const userLicenca = localStorage.getItem("userLicenca"); // Obtém a licença do usuário
+const userPlano = localStorage.getItem("userPlano"); // Obtém o plano do usuário
+const userDados = JSON.parse(localStorage.getItem("userDados")); // Obtém os dados do usuário
+const userCreatedAt = localStorage.getItem("userCreatedAt"); // Obtém a data de criação do usuário
+const userUpdatedAt = localStorage.getItem("userUpdatedAt"); // Obtém a data de atualização do usuário
 
 if (!token) {
   // Redireciona para a página de login caso o token não exista
@@ -71,7 +76,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     user: {
                         nome: userName,
                         email: userEmail,
-                        empresa: userEmpresa
+                        empresa: userEmpresa,
+                        licenca: userLicenca,
+                        plano: userPlano,
+                        dados: userDados,
+                        createdAt: userCreatedAt,
+                        updatedAt: userUpdatedAt
                     }
                 }),
             });
