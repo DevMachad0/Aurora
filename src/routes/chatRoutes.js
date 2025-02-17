@@ -17,7 +17,7 @@ const chat = model.startChat({
         },
         {
             role: "model",
-            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as nescessidades do meu usuario." }]
+            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as nescessidades do meu usuario com textos planos." }]
         }
     ],
     generationConfig: {
