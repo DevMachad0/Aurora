@@ -57,6 +57,11 @@ document.addEventListener("DOMContentLoaded", function () {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
+    function saveChatHistory() {
+        const chatHistory = chatBox.innerHTML;
+        localStorage.setItem("chatHistory", chatHistory);
+    }
+
     async function sendMessage() {
         const message = messageInput.value.trim();
         if (!message) return;
@@ -88,6 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await response.json();
             appendMessage("bot-message", `Aurora: ${data.message}`);
+            saveChatHistory();
         } catch (error) {
             console.error("Erro ao enviar mensagem:", error);
             appendMessage("bot-message", "Erro ao se comunicar com o servidor.");

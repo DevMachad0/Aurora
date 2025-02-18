@@ -1,5 +1,7 @@
 const express = require("express");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const ChatHistory = require("../models/chatHistoryModel");
+const { getChatHistory } = require("../services/chatService");
 require("dotenv").config();
 
 const router = express.Router();
@@ -26,6 +28,12 @@ const chat = model.startChat({
     },
 });
 
+const planLimits = {
+    MK1: 1000,
+    MK2: 2000,
+    MK3: 6000,
+};
+
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
     try {
@@ -34,13 +42,40 @@ router.post("/chat", async (req, res) => {
             return res.status(400).json({ error: "Mensagem não pode ser vazia" });
         }
 
-        // Criando um contexto para o modelo entender quem está falando
-const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;        
+        // Obtém o histórico de conversas do usuário
+        const chatHistory = await getChatHistory(user.email);
 
-        // Envia a mensagem com contexto para a IA
-        const result = await chat.sendMessage(`${userContext}\n\nUsuário: ${message}`);
+        // Cria um contexto para o modelo entender quem está falando
+        const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
+
+        // Adiciona o histórico de conversas ao contexto
+        const historyContext = chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n");
+
+        // Verifica o limite de caracteres baseado no plano do usuário
+        const charLimit = planLimits[user.plano] || 1000;
+
+        // Instrução para a IA respeitar o limite de caracteres
+        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres.`;
+
+        // Envia a mensagem com contexto e instrução para a IA
+        const result = await chat.sendMessage(`${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nUsuário: ${message}`);
         const response = await result.response;
-        const botMessage = response.text();
+        let botMessage = response.text();
+
+        // Salva o histórico de conversas no banco de dados
+        let chatHistoryRecord = await ChatHistory.findOne({ email: user.email });
+        if (!chatHistoryRecord) {
+            chatHistoryRecord = new ChatHistory({
+                user: user.nome,
+                email: user.email,
+                chat: [],
+            });
+        }
+
+        chatHistoryRecord.chat.push({ sender: "user", message });
+        chatHistoryRecord.chat.push({ sender: "bot", message: botMessage });
+        chatHistoryRecord.updatedAt = Date.now();
+        await chatHistoryRecord.save();
 
         res.json({ message: botMessage });
     } catch (error) {
