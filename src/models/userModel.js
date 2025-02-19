@@ -35,6 +35,29 @@ const userSchema = new mongoose.Schema({
     type: [String],
     required: true,
   },
+  numero: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["online", "offline"],
+    default: "offline",
+  },
+  tipo: {
+    type: String,
+    enum: ["setor", "pessoal"],
+    required: true,
+  },
+  statusLicenca: {
+    type: String,
+    enum: ["Ativo", "Em atraso", "Inativo"],
+    default: "Ativo",
+  },
+  database: {
+    type: String,
+    required: true,
+  },
 }, { timestamps: true });
 
 // Função para criptografar a senha antes de salvar o usuário

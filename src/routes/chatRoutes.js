@@ -1,7 +1,6 @@
 const express = require("express");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const ChatHistory = require("../models/chatHistoryModel");
-const { getChatHistory } = require("../services/chatService");
+const { getChatHistory, saveChatHistory } = require("../services/chatService");
 require("dotenv").config();
 
 const router = express.Router();
@@ -43,7 +42,7 @@ router.post("/chat", async (req, res) => {
         }
 
         // Obtém o histórico de conversas do usuário
-        const chatHistory = await getChatHistory(user.email);
+        const chatHistory = await getChatHistory(user.email, user.empresa);
 
         // Cria um contexto para o modelo entender quem está falando
         const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
@@ -63,19 +62,8 @@ router.post("/chat", async (req, res) => {
         let botMessage = response.text();
 
         // Salva o histórico de conversas no banco de dados
-        let chatHistoryRecord = await ChatHistory.findOne({ email: user.email });
-        if (!chatHistoryRecord) {
-            chatHistoryRecord = new ChatHistory({
-                user: user.nome,
-                email: user.email,
-                chat: [],
-            });
-        }
-
-        chatHistoryRecord.chat.push({ sender: "user", message });
-        chatHistoryRecord.chat.push({ sender: "bot", message: botMessage });
-        chatHistoryRecord.updatedAt = Date.now();
-        await chatHistoryRecord.save();
+        await saveChatHistory(user.email, user.empresa, { sender: "user", message });
+        await saveChatHistory(user.email, user.empresa, { sender: "bot", message: botMessage });
 
         res.json({ message: botMessage });
     } catch (error) {

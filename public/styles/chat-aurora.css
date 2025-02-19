@@ -57,15 +57,34 @@ header {
     color: white;
     transition: left 0.3s ease;
     padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 #sidebar.active {
     left: 0;
 }
 
+/* User info at the top */
+#sidebar .user-info {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #444;
+}
+
 /* Navegação do menu */
+nav {
+    flex-grow: 1;
+}
+
 nav ul {
     list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 nav ul li {
@@ -75,6 +94,13 @@ nav ul li {
 nav ul li a {
     color: white;
     text-decoration: none;
+}
+
+/* Version info at the bottom */
+#sidebar .version-info {
+    padding: 10px;
+    text-align: center;
+    border-top: 1px solid #444;
 }
 
 /* Input */
@@ -90,6 +116,10 @@ nav ul li a {
     padding: 8px;
     border-radius: 20px;
     border: 1px solid #ddd;
+    height: 46px; /* Altura fixa */
+    max-height: 46px; /* Altura máxima */
+    overflow-y: auto; /* Adiciona barra de rolagem vertical se necessário */
+    white-space: pre-wrap; /* Mantém as quebras de linha */
 }
 
 /* Botão enviar */
@@ -143,6 +173,7 @@ nav ul li a {
     overflow-y: auto; /* Adiciona barra de rolagem se necessário */
     max-height: 400px; /* Define a altura máxima do chat */
     padding: 20px;
+    padding-block-start: 200px;
     background-color: #f1f1f1;
     border-radius: 8px;
     border: 1px solid #ddd;

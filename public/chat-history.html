@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Conversas</title>
+    <link rel="stylesheet" href="styles/chat-history-desktop.css" media="screen and (min-width: 768px)">
+    <link rel="stylesheet" href="styles/chat-history-mobile.css" media="screen and (max-width: 767px)">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Histórico de Conversas</h1>
+            <div class="filters">
+                <input type="date" id="filter-date">
+                <input type="time" id="filter-time">
+                <input type="text" id="filter-text" placeholder="Filtrar por texto">
+                <button id="filter-button">Filtrar</button>
+            </div>
+        </header>
+        <main id="chat-history">
+            <!-- Histórico de conversas será exibido aqui -->
+        </main>
+        <button id="back-button" class="back-button">Voltar ao Chat</button>
+    </div>
+    <script src="scripts/chat-history.js"></script>
+</body>
+</html>

@@ -14,6 +14,34 @@ if (!token) {
   window.location.href = "index.html";
 }
 
+let logoutTimer;
+let inactivityTimer;
+
+// Função para deslogar o usuário
+function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "index.html";
+}
+
+// Função para resetar o timer de inatividade
+function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(logout, 10 * 60 * 1000); // 10 minutos
+}
+
+// Função para iniciar o timer de logout
+function startLogoutTimer() {
+    logoutTimer = setTimeout(logout, 60 * 60 * 1000); // 1 hora
+}
+
+// Eventos para resetar o timer de inatividade
+document.addEventListener("mousemove", resetInactivityTimer);
+document.addEventListener("keypress", resetInactivityTimer);
+
+// Inicia os timers
+startLogoutTimer();
+resetInactivityTimer();
+
 document.addEventListener("DOMContentLoaded", async () => {
     const menuToggle = document.getElementById("menu-toggle");
     const sidebar = document.getElementById("sidebar");
@@ -68,6 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         appendMessage("user-message", `Você: ${message}`);
         messageInput.value = "";
+        messageInput.style.height = "46px"; // Reseta a altura do campo de entrada
 
         try {
             const response = await fetch("/api/chat", {
@@ -102,6 +131,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     sendButton.addEventListener("click", sendMessage);
     messageInput.addEventListener("keypress", function (event) {
-        if (event.key === "Enter") sendMessage();
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    messageInput.addEventListener("input", function () {
+        messageInput.style.height = "auto";
+        messageInput.style.height = `${messageInput.scrollHeight}px`;
     });
 });
