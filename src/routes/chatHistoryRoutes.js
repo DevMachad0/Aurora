@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/chat-history", verifyToken, async (req, res) => {
     try {
-        const { date, time, text } = req.query;
+        const { date, text } = req.query;
         const email = req.headers["user-email"];
         const empresa = req.headers["user-empresa"];
 
@@ -18,10 +18,6 @@ router.get("/chat-history", verifyToken, async (req, res) => {
 
         if (date) {
             chatHistory = chatHistory.filter(chat => new Date(chat.timestamp).toISOString().split("T")[0] === date);
-        }
-
-        if (time) {
-            chatHistory = chatHistory.filter(chat => new Date(chat.timestamp).toISOString().split("T")[1].slice(0, 5) === time);
         }
 
         if (text) {

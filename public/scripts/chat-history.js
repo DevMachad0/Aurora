@@ -8,14 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function fetchChatHistory() {
         const date = document.getElementById("filter-date").value;
-        const time = document.getElementById("filter-time").value;
         const text = document.getElementById("filter-text").value;
         const email = localStorage.getItem("userEmail");
         const empresa = localStorage.getItem("userEmpresa");
 
         const query = new URLSearchParams();
         if (date) query.append("date", date);
-        if (time) query.append("time", time);
         if (text) query.append("text", text);
 
         console.log("Query:", query.toString()); // Log para depuração
