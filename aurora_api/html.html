@@ -1,0 +1,161 @@
+<!-- Botão de Chat (círculo com ícone) -->
+<div id="chat-toggle">
+    <img src="https://img.icons8.com/material-outlined/24/ffffff/speech-bubble.png" alt="Chat">
+  </div>
+  
+  <!-- Caixa de Chat -->
+  <div id="chat-box">
+    <div id="chat-header">Suporte</div>
+    <div id="chat-messages"></div>
+    <div id="chat-input">
+      <input type="text" id="chat-message-input" placeholder="Digite sua mensagem...">
+      <button id="chat-send-button">Enviar</button>
+    </div>
+  </div>
+  
+  <style>
+    /* Botão de Chat */
+    #chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0073aa;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+  
+    #chat-toggle img {
+      width: 30px;
+      height: 30px;
+    }
+  
+    /* Caixa de Chat */
+    #chat-box {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 320px;
+      max-height: 400px;
+      background: #fff;
+      border-radius: 8px;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+      overflow: hidden;
+    }
+  
+    #chat-header {
+      background: #0073aa;
+      color: #fff;
+      padding: 10px;
+      font-weight: bold;
+      text-align: center;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+  
+    #chat-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      max-height: 300px;
+      display: flex;
+      flex-direction: column;
+    }
+  
+    /* Estilização das mensagens */
+    .chat-message {
+      max-width: 80%;
+      padding: 8px 12px;
+      margin: 5px 0;
+      border-radius: 15px;
+      font-size: 14px;
+      word-wrap: break-word;
+    }
+  
+    .user-message {
+      background: #0073aa;
+      color: #fff;
+      align-self: flex-end;
+      text-align: right;
+    }
+  
+    .bot-message {
+      background: #f1f1f1;
+      color: #333;
+      align-self: flex-start;
+      text-align: left;
+    }
+  
+    #chat-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+  
+    #chat-message-input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+  
+    #chat-send-button {
+      background: #0073aa;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+    }
+  </style>
+  
+  <script>
+    // Exibir/Ocultar Chat
+    document.getElementById('chat-toggle').addEventListener('click', function() {
+      var chatBox = document.getElementById('chat-box');
+      chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+    });
+  
+    // Função para adicionar mensagens ao chat
+    function addMessage(sender, message) {
+      var messagesContainer = document.getElementById('chat-messages');
+      var msgElem = document.createElement('div');
+      msgElem.classList.add('chat-message');
+      
+      if (sender === 'user') {
+        msgElem.classList.add('user-message');
+      } else {
+        msgElem.classList.add('bot-message');
+      }
+  
+      msgElem.textContent = message;
+      messagesContainer.appendChild(msgElem);
+      
+      // Scroll automático para a última mensagem
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  
+    // Enviar Mensagem
+    document.getElementById('chat-send-button').addEventListener('click', function() {
+      var input = document.getElementById('chat-message-input');
+      var message = input.value.trim();
+      
+      if (message !== "") {
+        addMessage('user', message);
+        input.value = "";
+        
+        // Simular resposta da IA (remova isso e conecte à sua API)
+        setTimeout(() => {
+          addMessage('bot', "Estou aqui para ajudar!");
+        }, 1000);
+      }
+    });
+  </script>
+  

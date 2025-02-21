@@ -22,6 +22,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     localStorage.setItem('userLicenca', data.user.licenca); // Licença do usuário
     localStorage.setItem('userPlano', data.user.plano); // Plano do usuário
     localStorage.setItem('userDados', JSON.stringify(data.user.dados)); // Dados do usuário
+    localStorage.setItem('userDatabase', data.user.database); // Database do usuário
     localStorage.setItem('userCreatedAt', data.user.createdAt); // Data de criação do usuário
     localStorage.setItem('userUpdatedAt', data.user.updatedAt); // Data de atualização do usuário
 

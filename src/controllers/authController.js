@@ -29,6 +29,7 @@ const login = async (req, res) => {
         licenca: user.licenca,
         plano: user.plano,
         dados: user.dados,
+        database: user.database, // Certifique-se de incluir o database aqui
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         // Adicione outras informações do usuário aqui, exceto a senha

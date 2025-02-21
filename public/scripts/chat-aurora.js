@@ -8,7 +8,9 @@ const userPlano = localStorage.getItem("userPlano"); // Obtém o plano do usuár
 const userDados = JSON.parse(localStorage.getItem("userDados")); // Obtém os dados do usuário
 const userCreatedAt = localStorage.getItem("userCreatedAt"); // Obtém a data de criação do usuário
 const userUpdatedAt = localStorage.getItem("userUpdatedAt"); // Obtém a data de atualização do usuário
+const database = localStorage.getItem("userDatabase");
 
+console.log(database)
 if (!token) {
   // Redireciona para a página de login caso o token não exista
   window.location.href = "index.html";
