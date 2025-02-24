@@ -53,8 +53,8 @@ router.post("/chat", async (req, res) => {
         // Verifica o limite de caracteres baseado no plano do usuário
         const charLimit = planLimits[user.plano] || 1000;
 
-        // Instrução para a IA respeitar o limite de caracteres
-        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres.`;
+        // Instrução para a IA respeitar o limite de caracteres e destacar títulos
+        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>.`;
 
         // Envia a mensagem com contexto e instrução para a IA
         const result = await chat.sendMessage(`${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nUsuário: ${message}`);
