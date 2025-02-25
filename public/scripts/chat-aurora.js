@@ -28,7 +28,7 @@ function logout() {
 // Função para resetar o timer de inatividade
 function resetInactivityTimer() {
     clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(logout, 20 * 60 * 1000); // 20 minutos
+    inactivityTimer = setTimeout(logout, 10 * 60 * 1000); // 10 minutos
 }
 
 // Função para iniciar o timer de logout

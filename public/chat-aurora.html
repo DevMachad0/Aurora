@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="styles/chat-aurora.css">
 </head>
 <body>
+
+<!-- Sidebar -->
 <aside id="sidebar">
     <div class="user-info">
         <p>👤 USER</p>
@@ -23,23 +25,26 @@
     </nav>
     <div class="version">Versão 1.0.1</div>
 </aside>
-</body>
-<body>
-    <div class="chat-container">
-        <header>
-            <button id="menu-toggle" class="menu-button">☰</button>
-            <h1>Chat Aurora</h1>
-            <button id="theme-toggle" class="theme-button">🌙</button>
-        </header>
 
-        <main class="chat-box">
-            <!-- Área de mensagens -->
-        </main>
-        <div class="input-container">
-            <textarea id="message-input" placeholder="Digite sua mensagem..."></textarea>
-            <button id="send-button">Enviar</button>
-        </div>
+<!-- Container principal do chat -->
+<div class="chat-container">
+    <header>
+        <button id="menu-toggle" class="menu-button">☰</button>
+        <h1>Chat Aurora</h1>
+        <button id="theme-toggle" class="theme-button">🌙</button>
+    </header>
+
+    <main class="chat-box">
+        <!-- Mensagens do chat vão aparecer aqui -->
+    </main>
+
+    <div class="input-container">
+        <textarea id="message-input" placeholder="Digite sua mensagem..."></textarea>
+        <button id="send-button">Enviar</button>
     </div>
-    <script src="scripts/chat-aurora.js"></script>
+</div>
+
+<script src="scripts/chat-aurora.js"></script>
+
 </body>
 </html>

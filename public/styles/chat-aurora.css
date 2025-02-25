@@ -8,34 +8,36 @@
 /* Corpo da página */
 body {
     font-family: Arial, sans-serif;
-    background-color: #ccc;
+    background: linear-gradient(135deg, #1e1e2e, #282a36);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     transition: background 0.3s ease;
+    color: white;
 }
 
 /* Container do chat */
 .chat-container {
-    width: 90%;
-    max-width: 600px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
+    width: 98%;
+    max-width: 750px;
+    background-color: #2b2d42;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 /* Header */
 header {
-    background-color: #005c99;
-    color: #fff;
-    padding: 10px;
+    background-color: #44475a;
+    color: white;
+    padding: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 18px;
 }
 
 /* Botões */
@@ -43,17 +45,17 @@ header {
     background: none;
     border: none;
     color: white;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     cursor: pointer;
 }
 
 /* Sidebar */
 #sidebar {
-    position: absolute;
-    left: -250px;
-    width: 250px;
+    position: fixed;
+    left: -260px;
+    width: 260px;
     height: 100%;
-    background-color: black;
+    background-color: #0e0e1d;
     color: white;
     transition: left 0.3s ease;
     padding-top: 20px;
@@ -66,14 +68,15 @@ header {
     left: 0;
 }
 
-/* User info at the top */
+/* User info */
 #sidebar .user-info {
-    padding: 10px;
+    padding: 15px;
     text-align: center;
     border-bottom: 1px solid #444;
+    font-size: 18px;
 }
 
-/* Navegação do menu */
+/* Navegação */
 nav {
     flex-grow: 1;
 }
@@ -82,89 +85,31 @@ nav ul {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 nav ul li {
-    padding: 10px;
+    padding: 12px;
+    text-align: center;
 }
 
 nav ul li a {
     color: white;
     text-decoration: none;
+    font-size: 16px;
+    display: block;
+    transition: 0.3s;
 }
 
-/* Version info at the bottom */
-#sidebar .version-info {
-    padding: 10px;
+nav ul li a:hover {
+    background-color: #44475a;
+}
+
+/* Versão */
+.version {
+    padding: 12px;
     text-align: center;
+    font-size: 14px;
     border-top: 1px solid #444;
-}
-
-/* Input */
-.input-container {
-    display: flex;
-    padding: 10px;
-    background-color: white;
-    border-top: 1px solid #ddd;
-}
-
-#message-input {
-    flex-grow: 1;
-    padding: 8px;
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    height: 46px; /* Altura fixa */
-    max-height: 46px; /* Altura máxima */
-    overflow-y: auto; /* Adiciona barra de rolagem vertical se necessário */
-    white-space: pre-wrap; /* Mantém as quebras de linha */
-}
-
-/* Botão enviar */
-#send-button {
-    background-color: #0f0;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 20px;
-    margin-left: 5px;
-    cursor: pointer;
-}
-
-/* Tema escuro */
-.dark-mode {
-    background-color: #222;
-    color: white;
-}
-
-.dark-mode .chat-container {
-    background-color: #333;
-}
-
-.dark-mode .chat-box {
-    background-color: #444;
-}
-
-.dark-mode header {
-    background-color: #111;
-}
-
-.dark-mode #send-button {
-    background-color: #0a0;
-}
-
-/* 📌 Responsividade: no desktop o chat será maior */
-@media (min-width: 768px) {
-    .chat-container {
-        max-width: 800px;
-    }
-
-    #sidebar {
-        width: 250px;
-        left: -250px;
-    }
 }
 
 /* Estilo geral do chat */
@@ -175,28 +120,18 @@ nav ul li a {
     padding: 20px;
     padding-block-start: 200px;
     background-color: #f1f1f1;
-    border-radius: 8px;
     border: 1px solid #ddd;
     display: flex;
     flex-direction: column;
 }
 
-/* Mensagens do usuário */
-.user-message {
-    align-self: flex-end; /* Posiciona à direita */
-    background-color: #007bff;
-    color: white;
-    padding: 12px 18px;
-    margin: 8px 0;
-    border-radius: 20px;
-    max-width: 75%;
-    word-wrap: break-word;
-    display: inline-block;
-    font-size: 14px;
-    line-height: 1.4;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Input */
+.input-container {
+    display: flex;
+    padding: 10px;
+    background-color: #44475a;
+    border-top: 1px solid #444;
 }
-
 /* Mensagens do bot */
 .bot-message {
     align-self: flex-start; /* Posiciona à esquerda */
@@ -212,13 +147,87 @@ nav ul li a {
     line-height: 1.4;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
-/* Ajuste de alinhamento e espaçamento */
-.chat-box > div {
-    margin-bottom: 10px;
+.user-message {
+    align-self: flex-end; /* Posiciona à direita */
+    background-color: #007bff;
+    color: white;
+    padding: 12px 18px;
+    margin: 8px 0;
+    border-radius: 20px;
+    max-width: 75%;
+    word-wrap: break-word;
+    display: inline-block;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+#message-input {
+    flex-grow: 1;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    height: 46px; /* Altura fixa */
+    max-height: 46px; /* Altura máxima */
+    overflow-y: auto; /* Adiciona barra de rolagem vertical se necessário */
+    white-space: pre-wrap; /* Mantém as quebras de linha */
 }
 
-.chat-box .user-message,
-.chat-box .bot-message {
-    transition: all 0.3s ease;
+#send-button {
+    background-color: #6e8efb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    margin-left: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#send-button:hover {
+    background-color: #5a75e6;
+}
+
+/* Tema escuro */
+.dark-mode {
+    background: linear-gradient(135deg, #121212, #1a1a2e);
+}
+
+.dark-mode .chat-container {
+    background-color: #222;
+}
+
+.dark-mode .chat-box {
+    background-color: #333;
+}
+
+.dark-mode header {
+    background-color: #111;
+}
+
+.dark-mode #send-button {
+    background-color: #0a0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .chat-container {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        justify-content: center;
+
+    }
+
+    #sidebar {
+        width: 220px;
+        left: -220px;
+    }
+
+    header {
+        font-size: 16px;
+    }
+
+    #message-input {
+        font-size: 14px;
+    }
 }

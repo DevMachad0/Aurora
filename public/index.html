@@ -8,17 +8,34 @@
   <link rel="stylesheet" href="Styles/mobile.css" media="screen and (max-width: 767px)">
 </head>
 <body>
-  <div id="login-container">
-    <h2>Login</h2>
-    <form id="loginForm">
-      <label for="email">Email:</label>
-      <input type="email" id="email" required>
-      
-      <label for="senha">Senha:</label>
-      <input type="password" id="senha" required>
+  <div id="container">
+    <div id="login-box">
+      <div id="login-container">
+        <h2>Login</h2>
+        <p>Bem-vindo ao Chat Aurora! Faça login para continuar.</p>
+        <form id="loginForm">
+          <label for="email">E-mail:</label>
+          <input type="email" id="email" required placeholder="Digite seu e-mail">
+          
+          <label for="senha">Senha:</label>
+          <input type="password" id="senha" required placeholder="Digite sua senha">
 
-      <button type="submit">Login</button>
-    </form>
+          <div class="remember">
+            <input type="checkbox" id="remember-me">
+            <label for="remember-me">Lembrar-me</label>
+          </div>
+
+          <button type="submit">Login</button>
+        </form>
+        <div class="additional-buttons">
+          <button id="forgot-password">Esqueci a senha</button>
+          <button id="request-profile">Solicitar novo perfil</button>
+        </div>
+      </div>
+    </div>
+    <div id="illustration">
+      <img src="illustration.png" alt="Ilustração de login">
+    </div>
   </div>
 
   <script src="scripts/login.js"></script>
