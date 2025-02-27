@@ -19,7 +19,7 @@ async function run() {
       licenca: 'premium',
       plano: 'MK3',
       dados: ['dados do cliente', 'informações extras'],
-      numero: '123456789',
+      telefone: '123456789',
       status: 'online',
       tipo: 'setor',
       statusLicenca: 'Ativo',

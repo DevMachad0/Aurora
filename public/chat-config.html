@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações</title>
+    <link rel="stylesheet" href="styles/chat-config.css">
+</head>
+<body>
+    <div class="config-container">
+        <h1>Configurações</h1>
+        
+        <!-- Informações do Usuário -->
+        <div class="info-box">
+            <h2>Informações:</h2>
+            <p><strong>Nome:</strong> </p>
+            <p><strong>E-mail:</strong> </p>
+            <p><strong>Telefone:</strong> </p>
+            <p><strong>Plano:</strong> </p>
+            <p><strong>Tipo:</strong> </p>
+
+        </div>
+
+        <!-- Armazenamento -->
+        <div class="storage-section">
+            <h2>Armazenamento</h2>
+            <div class="storage-content">
+                <div class="storage-chart">
+                    <div class="circle">
+                        <div class="inner-circle"></div>
+                    </div>
+                </div>
+                <div class="storage-info">
+                    <p><span class="dot blue"></span> Em Uso: 3GB</p>
+                    <p><span class="dot cyan"></span> Atual: 8GB</p>
+                    <p><strong>Total:</strong> 10GB</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Token do Painel -->
+        <div class="token-box">
+            <label for="token">Token do painel:</label>
+            <input type="password" id="token" value="****************">
+        </div>
+
+        <!-- Informações do Perfil -->
+        <div class="profile-info">
+            <h2>Informações do Perfil:</h2>
+            <input type="text" value="Esse perfil pertence ao setor financeiro">
+            <input type="text" value="Possui cerca de 12 funcionários">
+            <input type="text" value="Outros dados">
+            <input type="text" value="Outros dados">
+        </div>
+
+        <!-- Botões -->
+        <div class="buttons">
+            <button class="back-button">Voltar</button>
+            <button class="save-button">Salvar</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userName = localStorage.getItem("userName");
+            const userEmail = localStorage.getItem("userEmail");
+            const userTelefone = localStorage.getItem("userTelefone");
+            const userPlano = localStorage.getItem("userPlano");
+            const userTipo = localStorage.getItem("userTipo");
+
+            document.querySelector(".info-box p:nth-child(2)").innerHTML = `<strong>Nome:</strong> ${userName}`;
+            document.querySelector(".info-box p:nth-child(3)").innerHTML = `<strong>E-mail:</strong> ${userEmail}`;
+            document.querySelector(".info-box p:nth-child(4)").innerHTML = `<strong>Telefone:</strong> ${userTelefone}`;
+            document.querySelector(".info-box p:nth-child(5)").innerHTML = `<strong>Plano:</strong> ${userPlano}`;
+            document.querySelector(".info-box p:nth-child(6)").innerHTML = `<strong>Tipo:</strong> ${userTipo}`;
+        });
+    </script>
+    <script src="scripts/config.js"></script>
+</body>
+</html>

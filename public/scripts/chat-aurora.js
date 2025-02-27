@@ -9,6 +9,9 @@ const userDados = JSON.parse(localStorage.getItem("userDados")); // Obtém os da
 const userCreatedAt = localStorage.getItem("userCreatedAt"); // Obtém a data de criação do usuário
 const userUpdatedAt = localStorage.getItem("userUpdatedAt"); // Obtém a data de atualização do usuário
 const database = localStorage.getItem("userDatabase");
+const userNome = localStorage.getItem("userNome"); // Obtém o nome do usuário
+const userTelefone = localStorage.getItem("userTelefone"); // Obtém o telefone do usuário
+const userTipo = localStorage.getItem("userTipo"); // Obtém o tipo do usuário   
 
 console.log(database)
 if (!token) {
@@ -82,11 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function appendMessage(sender, text) {
         const messageElement = document.createElement("div");
         messageElement.classList.add(sender);
-        if (sender === "bot-message") {
-            messageElement.innerHTML = formatMarkdown(text); // Formata o texto em Markdown apenas para mensagens da IA
-        } else {
-            messageElement.textContent = text; // Não formata o texto para mensagens do usuário
-        }
+        messageElement.innerHTML = formatMarkdown(text); // Formata o texto em Markdown
         chatBox.appendChild(messageElement);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -154,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let i = 0; i < text.length; i++) {
             messageElement.innerHTML = formatMarkdown(text.slice(0, i + 1)); // Formata o texto em Markdown
             chatBox.scrollTop = chatBox.scrollHeight;
-            await new Promise(resolve => setTimeout(resolve, 30)); // Ajuste o tempo conforme necessário
+            await new Promise(resolve => setTimeout(resolve, 50)); // Ajuste o tempo conforme necessário
         }
     }
 
@@ -164,31 +163,31 @@ document.addEventListener("DOMContentLoaded", function () {
         text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
         text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
         text = text.replace(/_(.*?)_/g, '<em>$1</em>');
-
+    
         // Formata cabeçalhos (de 1 a 6 níveis)
-        text = text.replace(/######(.*?)######/g, '<h6>$1</h6>');
-        text = text.replace(/#####(.*?)#####/g, '<h5>$1</h5>');
-        text = text.replace(/####(.*?)####/g, '<h4>$1</h4>');
-        text = text.replace(/###(.*?)###/g, '<h3>$1</h3>');
-        text = text.replace(/##(.*?)##/g, '<h2>$1</h2>');
-        text = text.replace(/#(.*?)#/g, '<h1>$1</h1>');
-
+        text = text.replace(/^###### (.*$)/gim, '<h6>$1</h6>');
+        text = text.replace(/^##### (.*$)/gim, '<h5>$1</h5>');
+        text = text.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
+        text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+        text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+        text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+    
         // Formata listas não ordenadas
         text = text.replace(/^\s*[-*] (.*$)/gim, '<ul><li>$1</li></ul>');
-
+    
         // Formata listas ordenadas
         text = text.replace(/^\s*\d+\.\s(.*$)/gim, '<ol><li>$1</li></ol>');
-
+    
         // Formata código inline
         text = text.replace(/`(.*?)`/g, '<code>$1</code>');
-
+    
         // Garante que listas não sejam aninhadas incorretamente
         text = text.replace(/<\/ul>\s*<ul>/g, '');
         text = text.replace(/<\/ol>\s*<ol>/g, '');
-
+    
         // Retira possíveis quebras de linha após cabeçalhos
         text = text.replace(/<\/h1>\s*<h1>/g, '</h1><h1>');
-
+    
         return text.trim();
     }
     

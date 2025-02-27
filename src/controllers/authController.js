@@ -25,8 +25,11 @@ const login = async (req, res) => {
         nome: user.nome,
         usuario: user.usuario,
         email: user.email,
+        telefone: user.telefone,
         empresa: user.empresa,
         licenca: user.licenca,
+        tipo: user.tipo,
+        status: user.status,
         plano: user.plano,
         dados: user.dados,
         database: user.database, // Certifique-se de incluir o database aqui

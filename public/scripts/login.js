@@ -16,11 +16,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
   if (res.ok) {
     localStorage.setItem('token', data.token);
+    localStorage.setItem('userNome', data.user.nome); // Nome do usuário
     localStorage.setItem('userName', data.user.usuario); // Nome do usuário
     localStorage.setItem('userEmail', data.user.email); // E-mail do usuário
+    localStorage.setItem('userTelefone', data.user.telefone); // Telefone do usuário
     localStorage.setItem('userEmpresa', data.user.empresa); // Empresa do usuário
     localStorage.setItem('userLicenca', data.user.licenca); // Licença do usuário
     localStorage.setItem('userPlano', data.user.plano); // Plano do usuário
+    localStorage.setItem('userTipo', data.user.tipo); // Tipo do usuário
+    localStorage.setItem('userStatus', data.user.status); // Status do usuário
     localStorage.setItem('userDados', JSON.stringify(data.user.dados)); // Dados do usuário
     localStorage.setItem('userDatabase', data.user.database); // Database do usuário
     localStorage.setItem('userCreatedAt', data.user.createdAt); // Data de criação do usuário
