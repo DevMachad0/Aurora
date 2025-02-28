@@ -22,6 +22,10 @@ body {
   width: 100%;
 }
 
+#illustration {
+  display: none;
+}
+
 h2 {
   margin-bottom: 10px;
   color: #333;

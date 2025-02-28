@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const planStorageLimits = {
     MK1: 2147483648, // 2 GB
@@ -43,4 +44,21 @@ const getUserById = async (id) => {
   }
 };
 
-module.exports = { createUser, getUserByEmail, getUserById };
+const updateUserDados = async (email, dados) => {
+    try {
+        await User.findOneAndUpdate({ email }, { dados });
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+const updateUserTokenAdmin = async (email, tokenAdmin) => {
+    try {
+        const encryptedTokenAdmin = btoa(tokenAdmin); // Criptografar o token
+        await User.findOneAndUpdate({ email }, { tokenAdmin: encryptedTokenAdmin });
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+module.exports = { createUser, getUserByEmail, getUserById, updateUserDados, updateUserTokenAdmin };

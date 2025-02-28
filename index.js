@@ -6,6 +6,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require("./src/routes/userRoutes");
 const chatRoutes = require("./src/routes/chatRoutes");
 const chatHistoryRoutes = require("./src/routes/chatHistoryRoutes");
+const storageRoutes = require("./src/routes/storageRoutes");
 
 const app = express();
 app.use(express.json());
@@ -20,12 +21,9 @@ if (!mongoUri) {
   process.exit(1);
 }
 
-mongoose.connect(mongoUri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log("MongoDB conectado!"))
-.catch(err => console.error("Erro ao conectar ao MongoDB:", err));
+mongoose.connect(mongoUri)
+  .then(() => console.log("MongoDB conectado!"))
+  .catch(err => console.error("Erro ao conectar ao MongoDB:", err));
 
 // Rota raiz que serve o index.html da pasta public
 app.get("/", (req, res) => {
@@ -37,6 +35,7 @@ app.use('/api', authRoutes); // Definir rota para login
 
 app.use("/api", chatRoutes);
 app.use("/api", chatHistoryRoutes);
+app.use("/api", storageRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

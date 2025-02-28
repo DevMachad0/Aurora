@@ -16,6 +16,7 @@ const userTipo = localStorage.getItem("userTipo"); // Obtém o tipo do usuário
 console.log(database)
 if (!token) {
   // Redireciona para a página de login caso o token não exista
+  localStorage.clear();
   window.location.href = "index.html";
 }
 
@@ -24,6 +25,7 @@ let inactivityTimer;
 
 // Função para deslogar o usuário
 function logout() {
+    localStorage.clear();
     localStorage.removeItem("token");
     window.location.href = "index.html";
 }

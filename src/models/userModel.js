@@ -58,6 +58,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  tokenAdmin: {
+    type: String,
+    default: "",
+  },
 }, { timestamps: true });
 
 // Função para criptografar a senha antes de salvar o usuário

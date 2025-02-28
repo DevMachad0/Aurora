@@ -215,7 +215,7 @@ nav ul li a:hover {
         height: 100vh;
         border-radius: 0;
         justify-content: center;
-
+        padding: 10px;
     }
 
     #sidebar {

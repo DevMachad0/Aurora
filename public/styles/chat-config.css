@@ -8,23 +8,23 @@
 
 /* Fundo da página */
 body {
-    background: linear-gradient(135deg, #1e1e2e, #282a36);
+    background: #282a36;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     color: white;
 }
 
 /* Container principal */
 .config-container {
-    width: 90%;
+    width: 100%;
     max-width: 600px;
     background-color: #2b2d42;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     text-align: center;
+    overflow: hidden; /* Adicionado para evitar crescimento infinito */
 }
 
 /* Título */
@@ -60,7 +60,7 @@ h2 {
     position: relative;
     width: 80px;
     height: 80px;
-    background: conic-gradient(#00bcd4 30%, #007bff 30% 100%);
+    background: conic-gradient(#007bff 0%, #00bcd4 0% 100%);
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -108,6 +108,17 @@ h2 {
 }
 
 /* Informações do Perfil */
+.profile-info {
+    max-height: 200px; /* Limite de altura para o container */
+    overflow-y: auto; /* Adiciona barra de rolagem vertical */
+    padding-right: 10px; /* Espaço para a barra de rolagem */
+    background: #44475a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
 .profile-info input {
     width: 100%;
     padding: 10px;
@@ -149,6 +160,38 @@ h2 {
 
 .save-button:hover {
     background-color: #5a75e6;
+}
+
+/* Botão para adicionar nova linha de texto */
+.add-button {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #6e8efb;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.add-button:hover {
+    background-color: #5a75e6;
+}
+
+/* Botão para excluir linha de texto */
+.delete-button {
+    margin-left: 10px;
+    padding: 5px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.delete-button:hover {
+    background-color: #e60000;
 }
 
 /* Responsividade */
