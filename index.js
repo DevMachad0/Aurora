@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 // Servindo arquivos estáticos da pasta 'public'
-app.use(express.static("public"));
+app.use(express.static("public/styles"));
 
 const mongoUri = process.env.MONGO_URI;
 
