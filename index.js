@@ -41,5 +41,5 @@ app.use("/api", storageRoutes);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
-  console.log("Acesse o sistema em: http://localhost:3000/");
+  console.log("Acesse o sistema em: https://aurora-7j74.onrender.com/");
 });
