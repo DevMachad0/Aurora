@@ -13,7 +13,7 @@ const userNome = localStorage.getItem("userNome"); // Obtém o nome do usuário
 const userTelefone = localStorage.getItem("userTelefone"); // Obtém o telefone do usuário
 const userTipo = localStorage.getItem("userTipo"); // Obtém o tipo do usuário   
 
-console.log(database)
+
 if (!token) {
   // Redireciona para a página de login caso o token não exista
   localStorage.clear();
