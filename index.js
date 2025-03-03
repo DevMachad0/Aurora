@@ -18,8 +18,8 @@ app.use(cors({
         if (!origin) return callback(null, true); // Permite solicitações sem origem (como Postman)
 
         try {
-            const domain = await AuthenticatedDomain.findOne({ dominios: origin });
-            if (domain) {
+            const domains = await AuthenticatedDomain.find().distinct('dominios');
+            if (domains.includes(origin)) {
                 return callback(null, true); // Permite o acesso se o domínio estiver autenticado
             } else {
                 return callback(new Error('Not allowed by CORS')); // Bloqueia o acesso se o domínio não estiver autenticado
@@ -29,8 +29,15 @@ app.use(cors({
         }
     },
     methods: ['GET', 'POST'], // Métodos permitidos
-    allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
+    allowedHeaders: ['Content-Type'], // Cabeçalhos permitidos
+    credentials: true // Permite envio de cookies
 }));
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*"); // Permite acesso de qualquer origem
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
 // Servindo arquivos estáticos da pasta 'public'
 app.use(express.static("public"));
