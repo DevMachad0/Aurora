@@ -255,5 +255,8 @@ nav ul li a:hover {
 
     #message-input {
         font-size: 14px;
+        width: 100%; /* Deixa o input ocupar toda a largura disponível */
+        height: 40px; /* Ajusta a altura para dispositivos móveis */
+        margin-bottom: 10px; /* Espaço entre o input e o botão */
     }
 }
