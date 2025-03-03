@@ -22,6 +22,7 @@ if (!token) {
 
 let logoutTimer;
 let inactivityTimer;
+let stopGeneration = false;
 
 // Função para deslogar o usuário
 function logout() {
@@ -83,6 +84,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const messageInput = document.getElementById("message-input");
     const sendButton = document.getElementById("send-button");
     const chatBox = document.querySelector(".chat-box");
+    const stopButton = document.getElementById("stop-button");
+
+    stopButton.addEventListener("click", function () {
+        stopGeneration = true;
+    });
 
     function appendMessage(sender, text) {
         const messageElement = document.createElement("div");
@@ -153,6 +159,10 @@ document.addEventListener("DOMContentLoaded", function () {
         chatBox.appendChild(messageElement);
 
         for (let i = 0; i < text.length; i++) {
+            if (stopGeneration) {
+                stopGeneration = false;
+                break;
+            }
             messageElement.innerHTML = formatMarkdown(text.slice(0, i + 1)); // Formata o texto em Markdown
             chatBox.scrollTop = chatBox.scrollHeight;
             await new Promise(resolve => setTimeout(resolve, 50)); // Ajuste o tempo conforme necessário

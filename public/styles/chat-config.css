@@ -198,7 +198,7 @@ h2 {
 @media (max-width: 768px) {
     .config-container {
         width: 100%;
-        height: 100vh;
+        height: auto; /* Alterado de 100vh para auto */
         border-radius: 0;
         padding: 15px;
     }

@@ -128,10 +128,61 @@ nav ul li a:hover {
 /* Input */
 .input-container {
     display: flex;
+    flex-direction: column; /* Alterado para coluna */
     padding: 10px;
     background-color: #44475a;
     border-top: 1px solid #444;
 }
+
+#message-input {
+    flex-grow: 1;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    height: 46px; /* Altura fixa */
+    width: 733px; /* Largura fixa */
+    overflow-y: auto; /* Adiciona barra de rolagem vertical se necessário */
+    white-space: pre-wrap; /* Mantém as quebras de linha */
+    margin-bottom: 10px; /* Espaço entre o input e o container de ação */
+    resize: none; /* Impede o redimensionamento manual */
+}
+
+/* Container de ação */
+.action-container {
+    display: flex;
+    justify-content: flex-end; /* Alinha os itens à esquerda */
+    align-items: center; /* Alinha os itens verticalmente ao centro */
+    gap: 10px; /* Adiciona um espaçamento entre os itens */
+}
+
+#send-button {
+    background-color: #6e8efb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#send-button:hover {
+    background-color: #5a75e6;
+}
+
+#stop-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#stop-button:hover {
+    background-color: #e60000;
+}
+
 /* Mensagens do bot */
 .bot-message {
     align-self: flex-start; /* Posiciona à esquerda */
@@ -161,33 +212,7 @@ nav ul li a:hover {
     line-height: 1.4;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-#message-input {
-    flex-grow: 1;
-    padding: 8px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    height: 46px; /* Altura fixa */
-    max-height: 46px; /* Altura máxima */
-    overflow-y: auto; /* Adiciona barra de rolagem vertical se necessário */
-    white-space: pre-wrap; /* Mantém as quebras de linha */
-}
 
-#send-button {
-    background-color: #6e8efb;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    margin-left: 8px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#send-button:hover {
-    background-color: #5a75e6;
-}
-
-/* Tema escuro */
 .dark-mode {
     background: linear-gradient(135deg, #121212, #1a1a2e);
 }
@@ -221,6 +246,7 @@ nav ul li a:hover {
     #sidebar {
         width: 220px;
         left: -220px;
+        top: 0; /* Adicionado para fixar no topo */
     }
 
     header {
