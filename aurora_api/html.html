@@ -1,185 +1,198 @@
 <!-- Botão de Chat (círculo com ícone) -->
 <div id="chat-toggle">
-    <img src="https://img.icons8.com/material-outlined/24/ffffff/speech-bubble.png" alt="Chat">
-  </div>
-  
-  <!-- Caixa de Chat -->
-  <div id="chat-box">
-    <div id="chat-header">Suporte</div>
-    <div id="chat-messages"></div>
-    <div id="chat-input">
+  <img src="https://img.icons8.com/material-outlined/24/ffffff/speech-bubble.png" alt="Chat">
+</div>
+
+<!-- Caixa de Chat -->
+<div id="chat-box">
+  <div id="chat-header">Suporte</div>
+  <div id="chat-messages"></div>
+  <div id="chat-input">
       <input type="text" id="chat-message-input" placeholder="Digite sua mensagem...">
       <button id="chat-send-button">Enviar</button>
-    </div>
   </div>
-  
-  <style>
-   /* Botão de Chat */
+</div>
+
+<style>
+ /* Botão de Chat */
 #chat-toggle {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #5a75e6;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    transition: background 0.3s ease;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #5a75e6;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: background 0.3s ease;
 }
 
 #chat-toggle:hover {
-    background: #3f5bc9;
+  background: #3f5bc9;
 }
 
 #chat-toggle img {
-    width: 30px;
-    height: 30px;
+  width: 30px;
+  height: 30px;
 }
 
 /* Caixa de Chat */
 #chat-box {
-    position: fixed;
-    bottom: 90px;
-    right: 20px;
-    width: 340px;
-    max-height: 450px;
-    background: #2b2d42;
-    border-radius: 12px;
-    display: none;
-    flex-direction: column;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    overflow: hidden;
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 340px;
+  max-height: 450px;
+  background: #2b2d42;
+  border-radius: 12px;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  overflow: hidden;
 }
 
 /* Header do Chat */
 #chat-header {
-    background: #5a75e6;
-    color: white;
-    padding: 12px;
-    font-weight: bold;
-    text-align: center;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+  background: #5a75e6;
+  color: white;
+  padding: 12px;
+  font-weight: bold;
+  text-align: center;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
 /* Área de Mensagens */
 #chat-messages {
-    flex: 1;
-    padding: 10px;
-    overflow-y: auto;
-    max-height: 350px;
-    display: flex;
-    flex-direction: column;
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  max-height: 350px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Estilização das mensagens */
 .chat-message {
-    max-width: 80%;
-    padding: 10px 14px;
-    margin: 5px 0;
-    border-radius: 15px;
-    font-size: 14px;
-    word-wrap: break-word;
-    display: inline-block;
+  max-width: 80%;
+  padding: 10px 14px;
+  margin: 5px 0;
+  border-radius: 15px;
+  font-size: 14px;
+  word-wrap: break-word;
+  display: inline-block;
 }
 
 /* Mensagem do usuário */
 .user-message {
-    background: #5a75e6;
-    color: white;
-    align-self: flex-end;
-    text-align: right;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background: #5a75e6;
+  color: white;
+  align-self: flex-end;
+  text-align: right;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Mensagem do bot */
 .bot-message {
-    background: #44475a;
-    color: white;
-    align-self: flex-start;
-    text-align: left;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background: #44475a;
+  color: white;
+  align-self: flex-start;
+  text-align: left;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Campo de Input */
 #chat-input {
-    display: flex;
-    border-top: 1px solid #444;
-    background: #222;
+  display: flex;
+  border-top: 1px solid #444;
+  background: #222;
 }
 
 #chat-message-input {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    outline: none;
-    background: #333;
-    color: white;
-    border-bottom-left-radius: 12px;
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  background: #333;
+  color: white;
+  border-bottom-left-radius: 12px;
 }
 
 /* Botão de Enviar */
 #chat-send-button {
-    background: #5a75e6;
-    color: white;
-    border: none;
-    padding: 12px;
-    cursor: pointer;
-    border-bottom-right-radius: 12px;
+  background: #5a75e6;
+  color: white;
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+  border-bottom-right-radius: 12px;
 }
 
 #chat-send-button:hover {
-    background: #3f5bc9;
+  background: #3f5bc9;
 }
 
-  </style>
-  
-  <script>
-    // Exibir/Ocultar Chat
-    document.getElementById('chat-toggle').addEventListener('click', function() {
-      var chatBox = document.getElementById('chat-box');
-      chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
-    });
-  
-    // Função para adicionar mensagens ao chat
-    function addMessage(sender, message) {
-      var messagesContainer = document.getElementById('chat-messages');
-      var msgElem = document.createElement('div');
-      msgElem.classList.add('chat-message');
-      
-      if (sender === 'user') {
-        msgElem.classList.add('user-message');
-      } else {
-        msgElem.classList.add('bot-message');
-      }
-  
-      msgElem.textContent = message;
-      messagesContainer.appendChild(msgElem);
-      
-      // Scroll automático para a última mensagem
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-  
-    // Enviar Mensagem
-    document.getElementById('chat-send-button').addEventListener('click', function() {
-      var input = document.getElementById('chat-message-input');
-      var message = input.value.trim();
-      
-      if (message !== "") {
-        addMessage('user', message);
-        input.value = "";
-        
-        // Simular resposta da IA (remova isso e conecte à sua API)
-        setTimeout(() => {
-          addMessage('bot', "Estou aqui para ajudar!");
-        }, 1000);
-      }
-    });
-  </script>
-  
+</style>
+
+<script>
+// Exibir/Ocultar Chat
+document.getElementById('chat-toggle').addEventListener('click', function() {
+  var chatBox = document.getElementById('chat-box');
+  chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+});
+
+// Função para adicionar mensagens ao chat
+function addMessage(sender, message) {
+  var messagesContainer = document.getElementById('chat-messages');
+  var msgElem = document.createElement('div');
+  msgElem.classList.add('chat-message');
+
+  if (sender === 'user') {
+      msgElem.classList.add('user-message');
+  } else {
+      msgElem.classList.add('bot-message');
+  }
+
+  msgElem.textContent = message;
+  messagesContainer.appendChild(msgElem);
+
+  // Scroll automático para a última mensagem
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Enviar Mensagem para a API do Chat
+document.getElementById('chat-send-button').addEventListener('click', function() {
+  var input = document.getElementById('chat-message-input');
+  var message = input.value.trim();
+
+  if (message !== "") {
+      addMessage('user', message); // Exibe a mensagem do usuário no chat
+      input.value = "";
+
+      // Envia a mensagem para a API do Chat
+      fetch('https://aurora-7j74.onrender.com/api/chat-support', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: message }) // Enviando a mensagem no corpo da requisição
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.reply) {
+              addMessage('bot', data.reply); // Exibe a resposta da API no chat
+          } else {
+              addMessage('bot', "Erro ao receber resposta da IA.");
+          }
+      })
+      .catch(error => {
+          console.error('Erro ao enviar mensagem:', error);
+          addMessage('bot', "Ocorreu um erro ao conectar com o servidor.");
+      });
+  }
+});
+</script>
