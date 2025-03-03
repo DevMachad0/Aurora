@@ -8,12 +8,22 @@ const chatRoutes = require("./src/routes/chatRoutes");
 const chatHistoryRoutes = require("./src/routes/chatHistoryRoutes");
 const storageRoutes = require("./src/routes/storageRoutes");
 const chatSupportRoutes = require('./src/routes/chat_support'); 
+const fs = require('fs');
+
+// Carregar domínios permitidos de um arquivo JSON
+const allowedDomains = JSON.parse(fs.readFileSync('./allowedDomains.json', 'utf8'));
 
 const app = express();
 app.use(express.json());
 // Configuração do CORS (deve ser feita antes de definir as rotas)
 app.use(cors({
-    origin: 'https://aurorati.tech', // Permite todas as origens
+    origin: function (origin, callback) {
+        if (allowedDomains.indexOf(origin) !== -1 || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST'], // Métodos permitidos
     allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
 }));
