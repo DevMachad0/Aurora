@@ -1,6 +1,8 @@
 const express = require("express");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { getChatHistory, saveChatHistory } = require("../services/chatService");
+const { getAuroraCoreData } = require("../services/auroraCoreService");
+const AuroraCore = require("../models/auroraCoreModel"); // Adicione esta linha
 require("dotenv").config();
 
 const router = express.Router();
@@ -43,6 +45,9 @@ router.post("/chat", async (req, res) => {
         // Obtém o histórico de conversas do usuário
         const chatHistory = await getChatHistory(user.email, user.empresa);
 
+        // Obtém as instruções e restrições do AuroraCore
+        const auroraCoreData = await getAuroraCoreData();
+
         // Cria um contexto para o modelo entender quem está falando
         const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
 
@@ -55,8 +60,12 @@ router.post("/chat", async (req, res) => {
         // Instrução para a IA respeitar o limite de caracteres e destacar títulos
         const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>.`;
 
+        // Adiciona as instruções e restrições do AuroraCore ao contexto
+        const coreInstructions = auroraCoreData.instructions.join("\n");
+        const coreRestrictions = auroraCoreData.restrictions.join("\n");
+
         // Envia a mensagem com contexto e instrução para a IA
-        const result = await chat.sendMessage(`${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nUsuário: ${message}`);
+        const result = await chat.sendMessage(`${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\nUsuário: ${message}`);
         const response = await result.response;
         let botMessage = response.text();
 

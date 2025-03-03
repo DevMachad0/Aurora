@@ -107,7 +107,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const message = messageInput.value.trim();
         if (!message) return;
 
-        appendMessage("user-message", `Você: ${message}`);
+        // Impede que o usuário envie HTML
+        const sanitizedMessage = message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        appendMessage("user-message", `Você: ${sanitizedMessage}`);
         messageInput.value = "";
         messageInput.style.height = "46px"; // Reseta a altura do campo de entrada
 
@@ -124,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Authorization": `Bearer ${token}` // Token enviado no cabeçalho
                 },
                 body: JSON.stringify({
-                    message,
+                    message: sanitizedMessage,
                     user: {
                         nome: userName,
                         email: userEmail,
@@ -158,19 +161,22 @@ document.addEventListener("DOMContentLoaded", function () {
         messageElement.classList.add(sender);
         chatBox.appendChild(messageElement);
 
-        for (let i = 0; i < text.length; i++) {
+        // Remove o código HTML e exibe apenas a tabela formatada
+        const sanitizedText = text.replace(/`html\s*([\s\S]*?)\s*`/g, '$1');
+
+        for (let i = 0; i < sanitizedText.length; i++) {
             if (stopGeneration) {
                 stopGeneration = false;
                 break;
             }
-            messageElement.innerHTML = formatMarkdown(text.slice(0, i + 1)); // Formata o texto em Markdown
+            messageElement.innerHTML = formatMarkdown(sanitizedText.slice(0, i + 1)); // Formata o texto em Markdown
             chatBox.scrollTop = chatBox.scrollHeight;
             await new Promise(resolve => setTimeout(resolve, 50)); // Ajuste o tempo conforme necessário
         }
     }
 
-function formatMarkdown(text) {
-// Formata negrito e itálico
+    function formatMarkdown(text) {
+        // Formata negrito e itálico
         text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
         text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
@@ -193,6 +199,16 @@ function formatMarkdown(text) {
         // Formata código inline
         text = text.replace(/`(.*?)`/g, '<code>$1</code>');
 
+        // Formata blocos de código
+        text = text.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+
+        // Formata tabelas
+        text = text.replace(/^\|(.+?)\|$/gm, '<tr><td>$1</td></tr>');
+        text = text.replace(/<\/tr>\s*<tr>/g, '</tr><tr>');
+        text = text.replace(/<tr><td>(.+?)<\/td><\/tr>/g, '<table><tbody><tr><td>$1</td></tr></tbody></table>');
+        text = text.replace(/<td>\s*\|\s*/g, '<td>');
+        text = text.replace(/\s*\|\s*<\/td>/g, '</td>');
+
         // Garante que listas não sejam aninhadas incorretamente
         text = text.replace(/<\/ul>\s*<ul>/g, '');
         text = text.replace(/<\/ol>\s*<ol>/g, '');
@@ -201,8 +217,7 @@ function formatMarkdown(text) {
         text = text.replace(/<\/h1>\s*<h1>/g, '</h1><h1>');
 
         return text.trim();
-}
-    
+    }
 
     sendButton.addEventListener("click", sendMessage);
     messageInput.addEventListener("keypress", function (event) {
