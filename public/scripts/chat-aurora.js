@@ -169,39 +169,39 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function formatMarkdown(text) {
-        // Formata negrito e itálico
+function formatMarkdown(text) {
+// Formata negrito e itálico
         text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
         text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
         text = text.replace(/_(.*?)_/g, '<em>$1</em>');
-    
+
         // Formata cabeçalhos (de 1 a 6 níveis)
-        text = text.replace(/^###### (.*$)/gim, '<h6>$1</h6>');
-        text = text.replace(/^##### (.*$)/gim, '<h5>$1</h5>');
-        text = text.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
-        text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-        text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-        text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-    
+        text = text.replace(/######(.*?)######/g, '<h6>$1</h6>');
+        text = text.replace(/#####(.*?)#####/g, '<h5>$1</h5>');
+        text = text.replace(/####(.*?)####/g, '<h4>$1</h4>');
+        text = text.replace(/###(.*?)###/g, '<h3>$1</h3>');
+        text = text.replace(/##(.*?)##/g, '<h2>$1</h2>');
+        text = text.replace(/#(.*?)#/g, '<h1>$1</h1>');
+
         // Formata listas não ordenadas
         text = text.replace(/^\s*[-*] (.*$)/gim, '<ul><li>$1</li></ul>');
-    
+
         // Formata listas ordenadas
         text = text.replace(/^\s*\d+\.\s(.*$)/gim, '<ol><li>$1</li></ol>');
-    
+
         // Formata código inline
         text = text.replace(/`(.*?)`/g, '<code>$1</code>');
-    
+
         // Garante que listas não sejam aninhadas incorretamente
         text = text.replace(/<\/ul>\s*<ul>/g, '');
         text = text.replace(/<\/ol>\s*<ol>/g, '');
-    
+
         // Retira possíveis quebras de linha após cabeçalhos
         text = text.replace(/<\/h1>\s*<h1>/g, '</h1><h1>');
-    
+
         return text.trim();
-    }
+}
     
 
     sendButton.addEventListener("click", sendMessage);
