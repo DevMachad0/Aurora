@@ -1,4 +1,4 @@
 [
-    "https://aurorati.tech",
-    "https://outrodominio.com"
+    ["https://aurorati.tech", "Empresa X"],
+    ["https://outrodominio.com", "Empresa Y"]
 ]
