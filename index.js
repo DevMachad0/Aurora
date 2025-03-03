@@ -8,25 +8,11 @@ const chatRoutes = require("./src/routes/chatRoutes");
 const chatHistoryRoutes = require("./src/routes/chatHistoryRoutes");
 const storageRoutes = require("./src/routes/storageRoutes");
 const chatSupportRoutes = require('./src/routes/chat_support'); 
+const domainRoutes = require("./src/routes/domainRoutes");
 const fs = require('fs');
-const Domain = require('./src/models/Domain');
 
 // Carregar domínios permitidos de um arquivo JSON
 const allowedDomains = JSON.parse(fs.readFileSync('./allowedDomains.json', 'utf8'));
-
-// Registrar domínios e empresas no banco de dados
-allowedDomains.forEach(async (entry) => {
-    const [domain, company] = entry;
-    try {
-        await Domain.findOneAndUpdate(
-            { domain },
-            { domain, company },
-            { upsert: true, new: true, setDefaultsOnInsert: true }
-        );
-    } catch (error) {
-        console.error(`Erro ao registrar domínio ${domain}:`, error);
-    }
-});
 
 const app = express();
 app.use(express.json());
@@ -69,6 +55,7 @@ app.use('/api', chatSupportRoutes);
 app.use("/api", chatRoutes);
 app.use("/api", chatHistoryRoutes);
 app.use("/api", storageRoutes);
+app.use("/api", domainRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
