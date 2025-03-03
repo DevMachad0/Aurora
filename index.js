@@ -12,26 +12,32 @@ const AuthenticatedDomain = require('./src/models/authenticatedDomainsModel');
 
 const app = express();
 app.use(express.json());
-// Configuração do CORS (deve ser feita antes de definir as rotas)
-app.use(cors({
-    origin: async (origin, callback) => {
-        if (!origin) return callback(null, true); // Permite solicitações sem origem (como Postman)
 
-        try {
-            const domains = await AuthenticatedDomain.find().distinct('dominios');
-            if (domains.includes(origin)) {
-                return callback(null, true); // Permite o acesso se o domínio estiver autenticado
+async function getAuthenticatedDomains() {
+    try {
+        const domains = await AuthenticatedDomain.find().distinct('dominios');
+        return domains;
+    } catch (error) {
+        console.error('Erro ao buscar domínios autenticados:', error);
+        return [];
+    }
+}
+
+app.use(async (req, res, next) => {
+    const allowedOrigins = await getAuthenticatedDomains();
+    cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
             } else {
-                return callback(new Error('Not allowed by CORS')); // Bloqueia o acesso se o domínio não estiver autenticado
+                callback(new Error('Not allowed by CORS'));
             }
-        } catch (error) {
-            return callback(new Error('Error checking domain authentication'));
-        }
-    },
-    methods: ['GET', 'POST'], // Métodos permitidos
-    allowedHeaders: ['Content-Type'], // Cabeçalhos permitidos
-    credentials: true // Permite envio de cookies
-}));
+        },
+        methods: ['GET', 'POST'], // Métodos permitidos
+        allowedHeaders: ['Content-Type'], // Cabeçalhos permitidos
+        credentials: true // Permite envio de cookies
+    })(req, res, next);
+});
 
 // Servindo arquivos estáticos da pasta 'public'
 app.use(express.static("public"));
