@@ -33,12 +33,6 @@ app.use(cors({
     credentials: true // Permite envio de cookies
 }));
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*"); // Permite acesso de qualquer origem
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
-
 // Servindo arquivos estáticos da pasta 'public'
 app.use(express.static("public"));
 app.use('/styles', express.static('public/styles'));
