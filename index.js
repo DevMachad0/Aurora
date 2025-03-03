@@ -7,6 +7,7 @@ const userRoutes = require("./src/routes/userRoutes");
 const chatRoutes = require("./src/routes/chatRoutes");
 const chatHistoryRoutes = require("./src/routes/chatHistoryRoutes");
 const storageRoutes = require("./src/routes/storageRoutes");
+const chatSupportRoutes = require('./src/routes/chat_support'); 
 
 const app = express();
 app.use(express.json());
@@ -33,7 +34,7 @@ app.get("/", (req, res) => {
 
 app.use("/users", userRoutes);
 app.use('/api', authRoutes); // Definir rota para login
-
+app.use('/api', chatSupportRoutes);
 app.use("/api", chatRoutes);
 app.use("/api", chatHistoryRoutes);
 app.use("/api", storageRoutes);
