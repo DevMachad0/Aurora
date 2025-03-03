@@ -8,12 +8,26 @@ const chatRoutes = require("./src/routes/chatRoutes");
 const chatHistoryRoutes = require("./src/routes/chatHistoryRoutes");
 const storageRoutes = require("./src/routes/storageRoutes");
 const chatSupportRoutes = require('./src/routes/chat_support'); 
+const AuthenticatedDomain = require('./src/models/authenticatedDomainsModel');
 
 const app = express();
 app.use(express.json());
 // Configuração do CORS (deve ser feita antes de definir as rotas)
 app.use(cors({
-    origin: 'https://aurorati.tech', // Permite todas as origens
+    origin: async (origin, callback) => {
+        if (!origin) return callback(null, true); // Permite solicitações sem origem (como Postman)
+
+        try {
+            const domain = await AuthenticatedDomain.findOne({ dominios: origin });
+            if (domain) {
+                return callback(null, true); // Permite o acesso se o domínio estiver autenticado
+            } else {
+                return callback(new Error('Not allowed by CORS')); // Bloqueia o acesso se o domínio não estiver autenticado
+            }
+        } catch (error) {
+            return callback(new Error('Error checking domain authentication'));
+        }
+    },
     methods: ['GET', 'POST'], // Métodos permitidos
     allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
 }));
