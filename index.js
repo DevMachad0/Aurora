@@ -39,7 +39,7 @@ app.use("/api", chatRoutes);
 app.use("/api", chatHistoryRoutes);
 app.use("/api", storageRoutes);
 app.use(cors({
-    origin: '*', // Permite todas as origens
+    origin: 'https://aurorati.tech', // Permite todas as origens
     methods: ['GET', 'POST'], // Métodos permitidos
     allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
 }));
