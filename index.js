@@ -11,6 +11,12 @@ const chatSupportRoutes = require('./src/routes/chat_support');
 
 const app = express();
 app.use(express.json());
+// Configuração do CORS (deve ser feita antes de definir as rotas)
+app.use(cors({
+    origin: 'https://aurorati.tech', // Permite todas as origens
+    methods: ['GET', 'POST'], // Métodos permitidos
+    allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
+}));
 
 // Servindo arquivos estáticos da pasta 'public'
 app.use(express.static("public"));
@@ -38,11 +44,7 @@ app.use('/api', chatSupportRoutes);
 app.use("/api", chatRoutes);
 app.use("/api", chatHistoryRoutes);
 app.use("/api", storageRoutes);
-app.use(cors({
-    origin: 'https://aurorati.tech', // Permite todas as origens
-    methods: ['GET', 'POST'], // Métodos permitidos
-    allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
-}));
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
