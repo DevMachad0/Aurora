@@ -13,6 +13,7 @@ const AuthenticatedDomain = require('./src/models/authenticatedDomainsModel');
 const app = express();
 app.use(express.json());
 
+// Função para carregar domínios autenticados
 async function getAuthenticatedDomains() {
     try {
         const domains = await AuthenticatedDomain.find().distinct('dominios');
@@ -23,21 +24,27 @@ async function getAuthenticatedDomains() {
     }
 }
 
-app.use(async (req, res, next) => {
+// Configuração de CORS
+async function configureCors() {
     const allowedOrigins = await getAuthenticatedDomains();
-    cors({
+    
+    app.use(cors({
         origin: (origin, callback) => {
+            // Se não houver origem ou se a origem estiver na lista de domínios permitidos, permite o acesso
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
-                callback(new Error('Not allowed by CORS'));
+                callback(new Error('Not allowed by CORS')); // Bloqueia a origem se não estiver na lista
             }
         },
         methods: ['GET', 'POST'], // Métodos permitidos
         allowedHeaders: ['Content-Type'], // Cabeçalhos permitidos
         credentials: true // Permite envio de cookies
-    })(req, res, next);
-});
+    }));
+}
+
+// Executa a configuração do CORS após carregar os domínios
+configureCors();
 
 // Servindo arquivos estáticos da pasta 'public'
 app.use(express.static("public"));
