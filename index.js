@@ -1,5 +1,5 @@
 require("dotenv").config(); // Importa variáveis do .env
-
+const cors = require('cors');
 const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require('./src/routes/authRoutes');
