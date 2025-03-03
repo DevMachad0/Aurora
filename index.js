@@ -7,7 +7,7 @@ const userRoutes = require("./src/routes/userRoutes");
 const chatRoutes = require("./src/routes/chatRoutes");
 const chatHistoryRoutes = require("./src/routes/chatHistoryRoutes");
 const storageRoutes = require("./src/routes/storageRoutes");
-const chatSupportRoutes = require('./src/routes/chat_support'); 
+const chatSupportRoutes = require('./src/routes/chat_support');
 const AuthenticatedDomain = require('./src/models/authenticatedDomainsModel');
 
 const app = express();
@@ -24,23 +24,32 @@ async function getAuthenticatedDomains() {
     }
 }
 
-// Configuração de CORS
+// Configuração de CORS (agora com tratamento explícito para requisições OPTIONS)
 async function configureCors() {
-    const allowedOrigins = await getAuthenticatedDomains();
+    const allowedOrigins = await getAuthenticatedDomains(); // Pega os domínios autenticados
     
-    app.use(cors({
-        origin: (origin, callback) => {
-            // Se não houver origem ou se a origem estiver na lista de domínios permitidos, permite o acesso
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error('Not allowed by CORS')); // Bloqueia a origem se não estiver na lista
-            }
-        },
-        methods: ['GET', 'POST'], // Métodos permitidos
-        allowedHeaders: ['Content-Type'], // Cabeçalhos permitidos
-        credentials: true // Permite envio de cookies
-    }));
+    app.use((req, res, next) => {
+        const origin = req.headers.origin;
+
+        if (!origin || allowedOrigins.includes(origin)) {
+            // Permite a origem se ela estiver na lista de domínios autenticados
+            res.setHeader('Access-Control-Allow-Origin', origin);
+        } else {
+            // Bloqueia a origem se não estiver na lista
+            res.setHeader('Access-Control-Allow-Origin', ''); // Bloqueia a origem
+        }
+
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST'); // Métodos permitidos
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Cabeçalhos permitidos
+        res.setHeader('Access-Control-Allow-Credentials', 'true'); // Permite cookies
+
+        // Responde às requisições OPTIONS (preflight request)
+        if (req.method === 'OPTIONS') {
+            return res.status(200).end();
+        }
+
+        next(); // Continua para o próximo middleware
+    });
 }
 
 // Executa a configuração do CORS após carregar os domínios
@@ -66,6 +75,7 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/index.html"); // Envia o arquivo index.html
 });
 
+// Definindo as rotas
 app.use("/users", userRoutes);
 app.use('/api', authRoutes); // Definir rota para login
 app.use('/api', chatSupportRoutes);
