@@ -1,16 +1,38 @@
 const express = require('express');
 const router = express.Router();
 
+// Variável para armazenar as informações do usuário
+let userInfo = {};
+
 // Rota para receber mensagens do chat
 router.post('/chat-support', (req, res) => {
-    const userMessage = req.body.message;
+    const { message, firstName, lastName, cpf, email } = req.body;
 
-    console.log("📩 Mensagem recebida do usuário:", userMessage);
+    // Se os dados do usuário ainda não estiverem preenchidos, armazenamos na variável
+    if (firstName && !userInfo.firstName) {
+        userInfo.firstName = firstName;
+    }
+    if (lastName && !userInfo.lastName) {
+        userInfo.lastName = lastName;
+    }
+    if (cpf && !userInfo.cpf) {
+        userInfo.cpf = cpf;
+    }
+    if (email && !userInfo.email) {
+        userInfo.email = email;
+    }
 
-    // Aqui você pode processar a mensagem e integrar com IA (ex: Gemini, OpenAI, Deepseek)
-    const botReply = `Recebi sua mensagem: "${userMessage}"`;
-
-    res.json({ reply: botReply });
+    // Verifica se todos os campos do formulário foram preenchidos
+    if (userInfo.firstName && userInfo.lastName && userInfo.cpf && userInfo.email) {
+        res.json({
+            reply: `Obrigado, ${userInfo.firstName}! Como posso te ajudar?`
+        });
+    } else {
+        // Processa a mensagem, aqui você pode adicionar lógica para IA ou outro processamento
+        res.json({
+            reply: `Recebi sua mensagem: "${message}"`
+        });
+    }
 });
 
 module.exports = router;
