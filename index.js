@@ -38,7 +38,11 @@ app.use('/api', chatSupportRoutes);
 app.use("/api", chatRoutes);
 app.use("/api", chatHistoryRoutes);
 app.use("/api", storageRoutes);
-
+app.use(cors({
+    origin: '*', // Permite todas as origens
+    methods: ['GET', 'POST'], // Métodos permitidos
+    allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
+}));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
