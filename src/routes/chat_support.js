@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
+const Domain = require('../models/domainModel'); // Importar o modelo de domínio
 
 // Variável para armazenar as informações do usuário
 let userInfo = {};
@@ -16,9 +16,13 @@ router.post('/chat-support', async (req, res) => {
 
         // Obter informações do domínio e da empresa
         try {
-            const response = await axios.get('/get-domain-info', { params: { domain } });
-            const { empresa } = response.data;
-            console.log(`Empresa associada ao domínio: ${empresa}`);
+            const domainData = await Domain.findOne({ domains: domain });
+            if (domainData) {
+                userInfo.empresa = domainData.empresa;
+                console.log(`Empresa associada ao domínio: ${userInfo.empresa}`);
+            } else {
+                console.log('Domínio não encontrado');
+            }
         } catch (error) {
             console.error('Erro ao obter informações do domínio:', error.message);
         }
