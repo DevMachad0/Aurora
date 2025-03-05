@@ -238,10 +238,18 @@ function handleQuestionnaire(message) {
 
 // Função para enviar dados para a API
 function sendUserDataToAPI() {
+    const domain = window.location.hostname; // Obtém o domínio do site
+
+    // Inclui o domínio junto aos dados do usuário
+    const dataToSend = {
+        ...userInfo,
+        domain: domain // Adiciona o domínio
+    };
+
     fetch('https://aurora-7j74.onrender.com/api/chat-support', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userInfo) // Envia os dados do usuário para a API
+        body: JSON.stringify(dataToSend) // Envia os dados do usuário e o domínio
     })
     .then(response => response.json())
     .then(data => {
@@ -294,5 +302,4 @@ document.getElementById('chat-send-button').addEventListener('click', function()
 
 // Inicia o questionário quando o cliente envia a primeira mensagem
 startQuestionnaire();
-
 </script>
