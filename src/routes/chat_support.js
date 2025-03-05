@@ -44,7 +44,7 @@ router.post('/chat-support', async (req, res) => {
     } else {
         // Processa a mensagem normalmente
         res.json({
-            reply: `Recebi sua mensagem: "${message}"`,
+            reply: `Recebi sua mensagem: "${message}". Nome: ${userInfo.firstName || 'não informado'}, Domínio: ${userInfo.domain}, Empresa: ${userInfo.empresa || 'não encontrada'}`,
             domainValidation: `Domínio recebido: ${userInfo.domain}, Empresa associada: ${userInfo.empresa || 'não encontrada'}`
         });
     }
