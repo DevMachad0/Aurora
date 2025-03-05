@@ -42,7 +42,7 @@ router.post('/chat-support', async (req, res) => {
 
         // Se tudo estiver preenchido, retornamos a resposta correta
         return res.json({
-            reply: `Obrigado, ${userInfo.firstName}! Empresa: ${userInfo.empresa || 'Não encontrada'}. Como posso te ajudar?`,
+            reply: `Obrigado, ${userInfo.firstName}!, ${userInfo.domain} Empresa: ${userInfo.empresa || 'Não encontrada'}. Como posso te ajudar?`,
             domainValidation: `Domínio recebido: ${userInfo.domain}, Empresa associada: ${userInfo.empresa || 'não encontrada'}`,
             userInfo
         });
