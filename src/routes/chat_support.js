@@ -15,11 +15,12 @@ async function getEmpresaByDomain(domain) {
         return null;
     }
 }
+console.log('Empresa encontrada:', domainData.empresa);
 
 
 router.post('/chat-support', async (req, res) => {
     const { message, firstName, lastName, cpf, email, domain } = req.body;
-
+    console.log('Empresa encontrada:', domainData.empresa);
     try {
         // Se ainda não temos um domínio armazenado, buscamos a empresa associada
         if (domain && !userInfo.domain) {
@@ -33,7 +34,7 @@ router.post('/chat-support', async (req, res) => {
             }
             console.log(`Empresa associada ao domínio: ${userInfo.empresa || 'não encontrada'}`);
         }
-
+        
         // Armazena os dados do usuário caso ainda não estejam preenchidos
         if (firstName && !userInfo.firstName) userInfo.firstName = firstName;
         if (lastName && !userInfo.lastName) userInfo.lastName = lastName;
