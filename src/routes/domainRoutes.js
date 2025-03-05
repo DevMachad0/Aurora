@@ -21,7 +21,7 @@ router.get("/get-domain-info", async (req, res) => {
 
   try {
     // Consulta no banco de dados para verificar se o domínio está na lista de domains
-    const domainData = await Domain.findOne({ domains: { $in: [domain] } });
+    const domainData = await Domain.findOne({ domains: domain });
 
     // Se o domínio for encontrado
     if (domainData) {

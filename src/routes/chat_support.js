@@ -8,7 +8,7 @@ let userInfo = {};
 // Função para obter empresa pelo domínio
 async function getEmpresaByDomain(domain) {
     try {
-        const domainData = await Domain.findOne({ domains: domain });
+        const domainData = await Domain.findOne({ domains: { $in: [domain] } });
         return domainData ? domainData.empresa : null;
     } catch (error) {
         console.error('Erro ao obter informações do domínio:', error.message);
@@ -16,7 +16,6 @@ async function getEmpresaByDomain(domain) {
     }
 }
 
-// ...existing code...
 router.post('/chat-support', async (req, res) => {
     const { message, firstName, lastName, cpf, email, domain } = req.body;
 
@@ -25,7 +24,12 @@ router.post('/chat-support', async (req, res) => {
         if (domain && !userInfo.domain) {
             userInfo.domain = domain;
             console.log(`Domínio recebido: ${domain}`);
+
             userInfo.empresa = await getEmpresaByDomain(domain);
+            if (!userInfo.empresa) {
+                console.log('Empresa associada ao domínio não encontrada. Tentando novamente...');
+                userInfo.empresa = await getEmpresaByDomain(domain);
+            }
             console.log(`Empresa associada ao domínio: ${userInfo.empresa || 'não encontrada'}`);
         }
 
