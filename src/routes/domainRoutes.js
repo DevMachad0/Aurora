@@ -15,28 +15,20 @@ router.post("/add-domain", async (req, res) => {
   }
 });
 
-// Rota para obter informações do domínio e a empresa a que ele pertence
-router.get("/get-domain-info", async (req, res) => {
-  const { domain } = req.query; // Obtém o domínio da query string
+// Rota para buscar a empresa pelo domínio
+router.get("/empresa/:domain", async (req, res) => {
+    try {
+        const { domain } = req.params;
+        const domainData = await Domain.findOne({ domains: domain });
 
-  try {
-    // Consulta no banco de dados para verificar se o domínio está na lista de domains
-    const domainData = await Domain.findOne({ domains: domain });
+        if (!domainData) {
+            return res.status(404).json({ message: "Empresa não encontrada para este domínio." });
+        }
 
-    // Se o domínio for encontrado
-    if (domainData) {
-      res.status(200).json({
-        empresa: domainData.empresa,   // Retorna a empresa associada ao domínio
-        domains: domainData.domains    // Retorna a lista de domínios associados à empresa
-      });
-    } else {
-      // Se o domínio não for encontrado na lista
-      res.status(404).json({ message: "Domínio não encontrado" });
+        return res.json({ empresa: domainData.empresa });
+    } catch (error) {
+        console.error("Erro ao buscar empresa pelo domínio:", error.message);
+        return res.status(500).json({ error: "Erro interno no servidor." });
     }
-  } catch (error) {
-    // Em caso de erro no processo (erro no banco de dados, por exemplo)
-    res.status(500).json({ error: error.message });
-  }
 });
-
 module.exports = router;
