@@ -16,6 +16,7 @@ async function getEmpresaByDomain(domain) {
     }
 }
 
+// ...existing code...
 router.post('/chat-support', async (req, res) => {
     const { message, firstName, lastName, cpf, email, domain } = req.body;
 
@@ -24,7 +25,6 @@ router.post('/chat-support', async (req, res) => {
         if (domain && !userInfo.domain) {
             userInfo.domain = domain;
             console.log(`Domínio recebido: ${domain}`);
-
             userInfo.empresa = await getEmpresaByDomain(domain);
             console.log(`Empresa associada ao domínio: ${userInfo.empresa || 'não encontrada'}`);
         }
