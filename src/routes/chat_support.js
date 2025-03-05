@@ -45,7 +45,7 @@ router.post('/chat-support', async (req, res) => {
     // Verifica se todos os campos do formulário foram preenchidos
     if (userInfo.firstName && userInfo.lastName && userInfo.cpf && userInfo.email) {
         res.json({
-            reply: `Obrigado, ${userInfo.firstName}! Como posso te ajudar?`,
+            reply: `Obrigado, ${userInfo.firstName, userInfo.domain, userInfo.empresa}! Como posso te ajudar?`,
             domainValidation: `Domínio recebido: ${userInfo.domain}, Empresa associada: ${userInfo.empresa || 'não encontrada'}`
         });
     } else {
