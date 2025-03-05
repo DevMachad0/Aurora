@@ -16,14 +16,24 @@ const allowedDomains = JSON.parse(fs.readFileSync('./allowedDomains.json', 'utf8
 
 const app = express();
 app.use(express.json());
+
 // Configuração do CORS (deve ser feita antes de definir as rotas)
 app.use(cors({
     origin: function (origin, callback) {
-        if (allowedDomains.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
+        // Se origin não for fornecido (caso de uma requisição de um cliente não-browser), permite
+        if (!origin) {
+            return callback(null, true);
         }
+
+        // Remover o "https://" ou "http://" e a barra final se presente
+        const originWithoutProtocol = origin.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+        // Verifique se o domínio sem protocolo e barra final está na lista de domínios permitidos
+        if (allowedDomains.includes(originWithoutProtocol)) {
+            return callback(null, true);
+        }
+
+        callback(new Error('Not allowed by CORS'));
     },
     methods: ['GET', 'POST'], // Métodos permitidos
     allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
@@ -36,8 +46,8 @@ app.use('/styles', express.static('public/styles'));
 const mongoUri = process.env.MONGO_URI;
 
 if (!mongoUri) {
-  console.error("Erro: MONGO_URI não está definido no arquivo .env");
-  process.exit(1);
+    console.error("Erro: MONGO_URI não está definido no arquivo .env");
+    process.exit(1);
 }
 
 mongoose.connect(mongoUri)
