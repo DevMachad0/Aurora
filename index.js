@@ -25,14 +25,15 @@ app.use(cors({
             return callback(null, true);
         }
 
-        // Remover o "https://" ou "http://" e a barra final se presente
+        // Remover o protocolo (https:// ou http://) e a barra final
         const originWithoutProtocol = origin.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
-        // Verifique se o domínio sem protocolo e barra final está na lista de domínios permitidos
+        // Verificar se o domínio sem protocolo e barra final está na lista de domínios permitidos
         if (allowedDomains.includes(originWithoutProtocol)) {
             return callback(null, true);
         }
 
+        // Se o domínio não for permitido, retorna erro
         callback(new Error('Not allowed by CORS'));
     },
     methods: ['GET', 'POST'], // Métodos permitidos
