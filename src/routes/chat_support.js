@@ -8,7 +8,7 @@ let userInfo = {};
 // Função para obter empresa pelo domínio
 async function getEmpresaByDomain(domain) {
     try {
-        const domainData = await Domain.findOne({ domains: domain }); // Busca pelo domínio como string
+        const domainData = await Domain.findOne({ domains: { $in: [domain] } }); // Busca no array de domínios
         return domainData ? domainData.empresa : null;
     } catch (error) {
         console.error("Erro ao obter informações do domínio:", error.message);
@@ -17,9 +17,19 @@ async function getEmpresaByDomain(domain) {
 }
 
 router.post('/chat-support', async (req, res) => {
-    const { message, firstName, lastName, cpf, email, domain } = req.body;
+    const { message, firstName, lastName, cpf, email, perfil_email, domain } = req.body; // Adicionado perfil_email
 
     try {
+        // Se for uma mensagem do usuário após o formulário, apenas responde normalmente
+        if (message && email) {
+            console.log(`Nova mensagem de ${email}: ${message}`);
+            
+            // Simulação de resposta do assistente de IA
+            const botResponse = `Recebi sua mensagem: "${message}". Estamos analisando sua solicitação.`;
+
+            return res.json({ reply: botResponse });
+        }
+
         // Se ainda não temos um domínio armazenado, buscamos a empresa associada
         if (domain) {
             console.log(`Domínio recebido: ${domain}`);
@@ -41,16 +51,17 @@ router.post('/chat-support', async (req, res) => {
         if (lastName) userInfo.lastName = lastName;
         if (cpf) userInfo.cpf = cpf;
         if (email) userInfo.email = email;
+        if (perfil_email) userInfo.perfil_email = perfil_email; // Adicionando o perfil_email
         userInfo.domain = domain;
 
         // Verifica se todas as informações foram coletadas antes de responder
-        if (!userInfo.firstName || !userInfo.lastName || !userInfo.cpf || !userInfo.email || !userInfo.empresa) {
+        if (!userInfo.firstName || !userInfo.lastName || !userInfo.cpf || !userInfo.email || !userInfo.empresa || !userInfo.perfil_email) {
             return res.json({ reply: "Por favor, forneça todas as informações antes de continuar." });
         }
 
         // Se tudo estiver preenchido, retornamos a resposta correta
         return res.json({
-            reply: `Obrigado, ${userInfo.firstName}! Seu e-mail é ${userInfo.email}, seu CPF é ${userInfo.cpf}, sua empresa é ${userInfo.empresa} e seu domínio é ${userInfo.domain}. Por favor, descreva seu problema.`,
+            reply: `Obrigado, ${userInfo.firstName}! Sua empresa é ${userInfo.empresa}. Como posso ajudá-lo hoje?`,
             userInfo
         });
 

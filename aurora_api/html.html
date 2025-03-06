@@ -14,7 +14,7 @@
 </div>
 
 <style>
- /* Botão de Chat */
+/* Estilos do chat (permanecem os mesmos) */
 #chat-toggle {
   position: fixed;
   bottom: 20px;
@@ -41,7 +41,6 @@
   height: 30px;
 }
 
-/* Caixa de Chat */
 #chat-box {
   position: fixed;
   bottom: 90px;
@@ -56,7 +55,6 @@
   z-index: 1000;
 }
 
-/* Header do Chat */
 #chat-header {
   background: #5a75e6;
   color: white;
@@ -67,7 +65,6 @@
   border-top-right-radius: 12px;
 }
 
-/* Área de Mensagens */
 #chat-messages {
   flex: 1;
   padding: 10px;
@@ -77,7 +74,6 @@
   flex-direction: column;
 }
 
-/* Estilização geral das mensagens */
 .chat-message {
   max-width: 80%;
   padding: 12px 16px;
@@ -90,7 +86,6 @@
   animation: fadeInMessage 0.5s forwards;
 }
 
-/* Animação de mensagens */
 @keyframes fadeInMessage {
   from {
     opacity: 0;
@@ -100,7 +95,6 @@
   }
 }
 
-/* Mensagem do usuário */
 .user-message {
   background: #5a75e6;
   color: white;
@@ -109,18 +103,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes userMessage {
-  from {
-    transform: translateX(10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Mensagem do bot */
 .bot-message {
   background: #44475a;
   color: white;
@@ -129,18 +111,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes botMessage {
-  from {
-    transform: translateX(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Campo de Input */
 #chat-input {
   display: flex;
   border-top: 1px solid #444;
@@ -155,14 +125,12 @@
   background: #333;
   color: white;
   border-bottom-left-radius: 12px;
-  transition: background 0.3s ease;
 }
 
 #chat-message-input:focus {
   background: #444;
 }
 
-/* Botão de Enviar */
 #chat-send-button {
   background: #5a75e6;
   color: white;
@@ -176,9 +144,7 @@
 #chat-send-button:hover {
   background: #3f5bc9;
 }
-
 </style>
-
 
 <script>
 // Variáveis para armazenar as respostas do usuário
@@ -187,8 +153,11 @@ let userInfo = {
     lastName: "",
     cpf: "",
     email: "",
-    domain: window.location.hostname // Obtém o domínio do site
+    perfil_email: "finalo@gmail.com" //inseira o e-mail para atendimento
 };
+
+// Estado do formulário (para controlar as etapas do questionário)
+let formStep = 0;
 
 // Exibir/Ocultar Chat
 document.getElementById('chat-toggle').addEventListener('click', function() {
@@ -196,53 +165,128 @@ document.getElementById('chat-toggle').addEventListener('click', function() {
   chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
 });
 
-// Função para adicionar mensagens ao chat
+// Função para adicionar mensagens ao chat com animação
 function addMessage(sender, message) {
   var messagesContainer = document.getElementById('chat-messages');
   var msgElem = document.createElement('div');
   msgElem.classList.add('chat-message');
-  msgElem.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+
+  if (sender === 'user') {
+      msgElem.classList.add('user-message');
+  } else {
+      msgElem.classList.add('bot-message');
+  }
+
   msgElem.textContent = message;
   messagesContainer.appendChild(msgElem);
+
+  // Scroll automático para a última mensagem
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Enviar dados para a API
+// Função para iniciar o questionário (formulário)
+function startQuestionnaire() {
+    addMessage('bot', 'Olá! Vamos começar. Qual é o seu nome?');
+}
+
+// Função para continuar o questionário com base nas respostas
+function handleQuestionnaire(message) {
+    if (formStep === 0) {
+        userInfo.firstName = message;
+        formStep++;
+        addMessage('bot', 'Agora, por favor, me diga o seu sobrenome.');
+    } else if (formStep === 1) {
+        userInfo.lastName = message;
+        formStep++;
+        addMessage('bot', 'Agora, por favor, informe o seu CPF.');
+    } else if (formStep === 2) {
+        userInfo.cpf = message;
+        formStep++;
+        addMessage('bot', 'Agora, por favor, informe o seu E-mail.');
+    } else if (formStep === 3) {
+        userInfo.email = message;
+        formStep++;
+        // Agradece e envia os dados para a API após o preenchimento completo
+        addMessage('bot', `Obrigado, ${userInfo.firstName}! Em breve iniciaremos o atendimento.`);
+        sendUserDataToAPI();
+    }
+}
+
+// Modifica a função sendUserDataToAPI para não exibir mensagem extra no frontend
 function sendUserDataToAPI() {
+    if (userInfo.firstName && userInfo.lastName && userInfo.cpf && userInfo.email && userInfo.perfil_email) {
+        const domain = window.location.hostname; // Obtém o domínio do site
+
+        const dataToSend = {
+            ...userInfo,
+            domain: domain
+        };
+
+        fetch('https://aurora-7j74.onrender.com/api/chat-support', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataToSend)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.reply) {
+                addMessage('bot', data.reply); // Exibe a resposta do backend
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao enviar dados para a API:', error);
+            addMessage('bot', "Ocorreu um erro ao conectar com o servidor.");
+        });
+    }
+}
+
+// Modifica a função sendMessage para sempre enviar a mensagem ao backend após o formulário ser preenchido
+function sendMessage() {
+    var input = document.getElementById('chat-message-input');
+    var message = input.value.trim();
+
+    if (message !== "") {
+        addMessage('user', message);
+        input.value = "";
+
+        if (formStep < 4) {
+            handleQuestionnaire(message);
+        } else {
+            sendMessageToAPI(message);
+        }
+    }
+}
+
+// Função para enviar mensagens do usuário ao backend
+function sendMessageToAPI(message) {
     fetch('https://aurora-7j74.onrender.com/api/chat-support', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userInfo)
+        body: JSON.stringify({ message, email: userInfo.email })
     })
     .then(response => response.json())
     .then(data => {
-        addMessage('bot', data.reply || 'Erro ao receber resposta da IA.');
+        if (data.reply) {
+            addMessage('bot', data.reply); // Exibe a resposta da IA vinda do backend
+        }
     })
     .catch(error => {
-        console.error('Erro ao enviar dados para a API:', error);
-        addMessage('bot', 'Ocorreu um erro ao conectar com o servidor.');
+        console.error('Erro ao enviar mensagem:', error);
+        addMessage('bot', "Erro ao comunicar com o servidor.");
     });
 }
 
-// Enviar Mensagem para a API
-document.getElementById('chat-send-button').addEventListener('click', function() {
-  var input = document.getElementById('chat-message-input');
-  var message = input.value.trim();
-  if (!message) return;
-  addMessage('user', message);
-  input.value = "";
-  fetch('https://aurora-7j74.onrender.com/api/chat-support', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, domain: userInfo.domain })
-  })
-  .then(response => response.json())
-  .then(data => {
-      addMessage('bot', data.reply || 'Erro ao receber resposta da IA.');
-  })
-  .catch(error => {
-      console.error('Erro ao enviar mensagem:', error);
-      addMessage('bot', 'Ocorreu um erro ao conectar com o servidor.');
-  });
+// Enviar com o clique no botão
+document.getElementById('chat-send-button').addEventListener('click', sendMessage);
+
+// Enviar com a tecla Enter
+document.getElementById('chat-message-input').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Evita o envio do formulário
+        sendMessage();
+    }
 });
+
+// Inicia o questionário quando o cliente envia a primeira mensagem
+startQuestionnaire();
 </script>
