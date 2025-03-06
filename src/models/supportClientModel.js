@@ -9,6 +9,10 @@ const supportClientSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  tipo: {	
+    type: String,
+    default: "chamado",
+  },
   cpf: {
     type: String,
     required: true,

@@ -2,15 +2,16 @@ const express = require("express");
 const router = express.Router();
 const SupportClient = require("../models/supportClientModel");
 
-// Rota para cadastrar um novo cliente de suporte
+// Rota para cadastrar um novo chamado de cliente de suporte
 router.post("/add-support-client", async (req, res) => {
-  const { firstName, lastName, cpf, email, domain, protocolNumber, status, observacao, messages } = req.body;
+  const { firstName, lastName, tipo, cpf, email, domain, protocolNumber, status, observacao, messages } = req.body;
 
   try {
     const newSupportClient = new SupportClient({
       firstName,
       lastName,
       cpf,
+      tipo,
       email,
       domain,
       protocolNumber,

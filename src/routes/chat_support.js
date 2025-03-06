@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Domain = require('../models/domainModel'); // Importar o modelo de domínio
+const SupportClient = require('../models/supportClientModel'); // Importar o modelo de suporte ao cliente
+const mongoose = require('mongoose');
 
 // Variável para armazenar as informações do usuário
 let userInfo = {};
@@ -14,6 +16,22 @@ async function getEmpresaByDomain(domain) {
         console.error("Erro ao obter informações do domínio:", error.message);
         return null;
     }
+}
+
+// Função para gerar um número de protocolo único
+async function generateProtocolNumber() {
+    const date = new Date();
+    const formattedDate = date.toISOString().replace(/[-:.TZ]/g, '');
+    const randomDigits = Math.floor(100 + Math.random() * 900); // Gera 3 dígitos aleatórios
+    const protocolNumber = `${formattedDate}${randomDigits}`;
+
+    // Verifica se o número de protocolo já existe no banco de dados
+    const existingProtocol = await SupportClient.findOne({ protocolNumber });
+    if (existingProtocol) {
+        return generateProtocolNumber(); // Gera um novo número se já existir
+    }
+
+    return protocolNumber;
 }
 
 router.post('/chat-support', async (req, res) => {
@@ -59,9 +77,27 @@ router.post('/chat-support', async (req, res) => {
             return res.json({ reply: "Por favor, forneça todas as informações antes de continuar." });
         }
 
-        // Se tudo estiver preenchido, retornamos a resposta correta
+        // Gera um número de protocolo único
+        const protocolNumber = await generateProtocolNumber();
+
+        // Cria um novo chamado no banco de dados da empresa
+        const collectionName = `data_${userInfo.empresa}`;
+        const db = mongoose.connection.useDb(collectionName);
+        const newSupportClient = new SupportClient({
+            firstName: userInfo.firstName,
+            lastName: userInfo.lastName,
+            cpf: userInfo.cpf,
+            email: userInfo.email,
+            domain: userInfo.domain,
+            protocolNumber,
+            status: "Em atendimento(Aurora)",
+            messages: []
+        });
+        await newSupportClient.save();
+
+        // Responde com o número de protocolo
         return res.json({
-            reply: `Obrigado, ${userInfo.firstName}! Sua empresa é ${userInfo.empresa}. Como posso ajudá-lo hoje?`,
+            reply: `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${protocolNumber}. Como posso te ajudar?`,
             userInfo
         });
 
