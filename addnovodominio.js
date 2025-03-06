@@ -10,14 +10,14 @@ mongoose.connect(uri)
 
 async function run() {
   try {
-    const dominios = ['example.com', 'example.org']; // Array de domínios
+    const dominio = 'aurorati.tech'; // String de domínio
     const empresa = 'Empresa X';
 
-    const domain = new Domain({ domains: dominios, empresa: empresa });
+    const domain = new Domain({ domains: dominio, empresa: empresa });
     const savedDomain = await domain.save();
-    console.log('Domínios cadastrados com sucesso:', savedDomain);
+    console.log('Domínio cadastrado com sucesso:', savedDomain);
   } catch (err) {
-    console.error('Erro ao cadastrar domínios:', err);
+    console.error('Erro ao cadastrar domínio:', err);
   } finally {
     mongoose.connection.close();
   }

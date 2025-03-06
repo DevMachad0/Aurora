@@ -4,10 +4,10 @@ const Domain = require("../models/domainModel");
 
 // Rota para cadastrar um novo domínio
 router.post("/add-domain", async (req, res) => {
-  const { empresa, domain } = req.body;
+  const { empresa, domains } = req.body;
 
   try {
-    const newDomain = new Domain({ empresa, domain });
+    const newDomain = new Domain({ empresa, domains });
     await newDomain.save();
     res.status(201).json({ message: "Domínio cadastrado com sucesso!" });
   } catch (error) {
@@ -31,4 +31,5 @@ router.get("/empresa/:domain", async (req, res) => {
         return res.status(500).json({ error: "Erro interno no servidor." });
     }
 });
+
 module.exports = router;

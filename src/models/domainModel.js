@@ -6,7 +6,7 @@ const domainSchema = new mongoose.Schema({
     required: true,
   },
   domains: {
-    type: [String], // Modificado para ser um array de strings
+    type: String, // Modificado para ser uma string comum
     required: true,
   },
 });

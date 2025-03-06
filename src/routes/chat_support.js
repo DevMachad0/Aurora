@@ -8,7 +8,7 @@ let userInfo = {};
 // Função para obter empresa pelo domínio
 async function getEmpresaByDomain(domain) {
     try {
-        const domainData = await Domain.findOne({ domains: { $in: [domain] } }); // Busca no array de domínios
+        const domainData = await Domain.findOne({ domains: domain }); // Busca pelo domínio como string
         return domainData ? domainData.empresa : null;
     } catch (error) {
         console.error("Erro ao obter informações do domínio:", error.message);
