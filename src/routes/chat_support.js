@@ -80,10 +80,11 @@ router.post('/chat-support', async (req, res) => {
         // Gera um número de protocolo único
         const protocolNumber = await generateProtocolNumber();
 
-        // Cria um novo chamado no banco de dados da empresa
+        // Cria um novo chamado na coleção da empresa
         const collectionName = `data_${userInfo.empresa}`;
         const db = mongoose.connection.useDb(collectionName);
-        const newSupportClient = new SupportClient({
+        const SupportClientModel = db.model('SupportClient', SupportClient.schema);
+        const newSupportClient = new SupportClientModel({
             firstName: userInfo.firstName,
             lastName: userInfo.lastName,
             cpf: userInfo.cpf,
