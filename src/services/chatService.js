@@ -96,4 +96,20 @@ const getChatHistoryByDatabase = async (email, database) => {
   }
 };
 
-module.exports = { getChatHistory, saveChatHistory, getChatHistoryByDatabase };
+// Função para obter dados da empresa com base no tipo e nome da empresa
+const getEmpresaData = async (empresa, tipo) => {
+  try {
+    const collectionName = `data_${empresa}`;
+    const empresaData = await mongoose.connection.collection(collectionName).findOne({ tipo });
+
+    if (!empresaData) {
+      throw new Error("Dados da empresa não encontrados.");
+    }
+
+    return empresaData;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+module.exports = { getChatHistory, saveChatHistory, getChatHistoryByDatabase, getEmpresaData };
