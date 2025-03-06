@@ -79,9 +79,11 @@ router.post('/chat-support', async (req, res) => {
         // Gera um número de protocolo único
         const protocolNumber = await generateProtocolNumber();
 
-        // Cria um novo documento na coleção da empresa
+        // Conecta ao banco de dados principal
+        const db = mongoose.connection.useDb('aurora_db');
         const collectionName = `data_${userInfo.empresa.replace(/\s+/g, '_')}`;
-        const db = mongoose.connection.useDb(collectionName);
+
+        // Cria um novo documento na coleção da empresa
         const newSupportClient = {
             firstName: userInfo.firstName,
             lastName: userInfo.lastName,
@@ -92,7 +94,7 @@ router.post('/chat-support', async (req, res) => {
             status: "Em atendimento(Aurora)",
             messages: []
         };
-        await db.collection('supportclients').insertOne(newSupportClient);
+        await db.collection(collectionName).insertOne(newSupportClient);
 
         // Responde com o número de protocolo
         return res.json({
