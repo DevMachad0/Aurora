@@ -81,7 +81,7 @@ router.post('/chat-support', async (req, res) => {
 
         // Conecta ao banco de dados principal
         const db = mongoose.connection.useDb('aurora_db');
-        const collectionName = `data_${userInfo.empresa.replace(/\s+/g, '_')}`;
+        const collectionName = `data_${userInfo.empresa}`;
 
         // Cria um novo documento na coleção da empresa
         const newSupportClient = {
