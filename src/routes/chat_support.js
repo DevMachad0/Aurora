@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Domain = require('../models/domainModel'); // Importar o modelo de domínio
+const SupportClient = require('../models/supportClientModel'); // Importar o modelo de suporte ao cliente
 const mongoose = require('mongoose');
 
 // Variável para armazenar as informações do usuário
@@ -25,7 +26,7 @@ async function generateProtocolNumber() {
     const protocolNumber = `${formattedDate}${randomDigits}`;
 
     // Verifica se o número de protocolo já existe no banco de dados
-    const existingProtocol = await mongoose.connection.collection('supportclients').findOne({ protocolNumber });
+    const existingProtocol = await SupportClient.findOne({ protocolNumber });
     if (existingProtocol) {
         return generateProtocolNumber(); // Gera um novo número se já existir
     }
@@ -83,18 +84,21 @@ router.post('/chat-support', async (req, res) => {
         const db = mongoose.connection.useDb('aurora_db');
         const collectionName = `data_${userInfo.empresa}`;
 
-        // Cria um novo documento na coleção da empresa
-        const newSupportClient = {
+        // Cria um novo documento na coleção da empresa conforme o modelo
+        const SupportClientModel = db.model('SupportClient', SupportClient.schema);
+        const newSupportClient = new SupportClientModel({
             firstName: userInfo.firstName,
             lastName: userInfo.lastName,
             cpf: userInfo.cpf,
+            tipo:"chamado",
             email: userInfo.email,
             domain: userInfo.domain,
             protocolNumber,
             status: "Em atendimento(Aurora)",
+            observacao: "",
             messages: []
-        };
-        await db.collection(collectionName).insertOne(newSupportClient);
+        });
+        await newSupportClient.save();
 
         // Responde com o número de protocolo
         return res.json({
