@@ -48,9 +48,9 @@ router.post('/chat-support', async (req, res) => {
             // Envia a mensagem com os dados do usuário para a IA Aurora
             const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
             const empresaData = await getEmpresaData(userInfo.empresa, "documento");
-            const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
+            const empresaContext = empresaData ? `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}` : "Dados da empresa não encontrados.";
             const userProfileData = await getUserProfileData(userInfo.email);
-            const profileContext = `Ultilizar dados do perfil: ${userProfileData.join(", ")}, que se referem ao atendimento ao cliente via (API)`;
+            const profileContext = userProfileData ? `Ultilizar dados do perfil: ${userProfileData.join(", ")}, que se referem ao atendimento ao cliente via (API)` : "Dados do perfil não encontrados.";
             const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${profileContext}\n\n${message}`);
 
             return res.json({ reply: botResponse });
@@ -124,9 +124,9 @@ router.post('/chat-support', async (req, res) => {
         const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${protocolNumber}. Como posso te ajudar?`;
         const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
         const empresaData = await getEmpresaData(userInfo.empresa, "documento");
-        const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
+        const empresaContext = empresaData ? `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}` : "Dados da empresa não encontrados.";
         const userProfileData = await getUserProfileData(userInfo.email);
-        const profileContext = `Dados do perfil: ${userProfileData.join(", ")}`;
+        const profileContext = userProfileData ? `Dados do perfil: ${userProfileData.join(", ")}` : "Dados do perfil não encontrados.";
         await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${profileContext}\n\n${initialMessage}`);
 
     } catch (error) {
