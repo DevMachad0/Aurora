@@ -44,6 +44,16 @@ const getUserById = async (id) => {
   }
 };
 
+// Nova função para obter apenas os dados do perfil do usuário
+const getUserProfileData = async (email) => {
+  try {
+    const user = await User.findOne({ email }, 'dados'); // Busca apenas a linha 'dados'
+    return user ? user.dados : null;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 const updateUserDados = async (email, dados) => {
     try {
         await User.findOneAndUpdate({ email }, { dados });
@@ -61,4 +71,4 @@ const updateUserTokenAdmin = async (email, tokenAdmin) => {
     }
 };
 
-module.exports = { createUser, getUserByEmail, getUserById, updateUserDados, updateUserTokenAdmin };
+module.exports = { createUser, getUserByEmail, getUserById, getUserProfileData, updateUserDados, updateUserTokenAdmin };
