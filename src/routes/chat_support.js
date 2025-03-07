@@ -56,9 +56,6 @@ router.post('/chat-support', async (req, res) => {
         if (message && email) {
             console.log(`Nova mensagem de ${email}: ${message}`);
             
-            // Simulação de resposta do assistente de IA
-            const botResponse = `Recebi sua mensagem: "${message}". Estamos analisando sua solicitação.`;
-
             // Obter o usuário pelo perfil_email
             const user = await User.findOne({ email: perfil_email });
 
@@ -100,7 +97,7 @@ router.post('/chat-support', async (req, res) => {
 
             // Envia a mensagem com contexto e instrução para a IA
             const result = await chat.sendMessage(`${userContext}\n\nInstrução: ${instruction}\n\n${empresaContext}\n\nUsuário: ${message}`);
-            const response = await result.response;
+            const response = await result.response();
             let botMessage = response.text();
 
             return res.json({ reply: botMessage });
