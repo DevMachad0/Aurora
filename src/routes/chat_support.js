@@ -125,7 +125,7 @@ router.post('/chat-support', async (req, res) => {
         const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
         const empresaData = await getEmpresaData(userInfo.empresa, "documento");
         const empresaContext = empresaData ? `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}` : "Dados da empresa não encontrados.";
-        const userProfileData = await getUserProfileData(userInfo.email);
+        const userProfileData = await getUserProfileData(userInfo.perfil_email);
         const profileContext = userProfileData ? `Dados do perfil: ${userProfileData.join(", ")}` : "Dados do perfil não encontrados.";
         await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${profileContext}\n\n${initialMessage}`);
 
