@@ -4,6 +4,7 @@ const Domain = require('../models/domainModel'); // Importar o modelo de domíni
 const SupportClient = require('../models/supportClientModel'); // Importar o modelo de suporte ao cliente
 const mongoose = require('mongoose');
 const aurora = require('./chat_support_bot'); // Importar o modelo Aurora
+const { getEmpresaData } = require('../services/chatService'); // Importar a função para obter dados da empresa
 
 // Variável para armazenar as informações do usuário
 let userInfo = {};
@@ -45,7 +46,9 @@ router.post('/chat-support', async (req, res) => {
             
             // Envia a mensagem com os dados do usuário para a IA Aurora
             const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
-            const botResponse = await aurora.getResponse(`${userContext}\n\n${message}`);
+            const empresaData = await getEmpresaData(userInfo.empresa, "documento");
+            const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
+            const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${message}`);
 
             return res.json({ reply: botResponse });
         }
@@ -114,10 +117,12 @@ router.post('/chat-support', async (req, res) => {
             userInfo
         });
 
-        // Envia a mensagem inicial para o modelo Aurora com os dados do usuário
+        // Envia a mensagem inicial para o modelo Aurora com os dados do usuário e da empresa
         const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${protocolNumber}. Como posso te ajudar?`;
         const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
-        await aurora.getResponse(`${userContext}\n\n${initialMessage}`);
+        const empresaData = await getEmpresaData(userInfo.empresa, "documento");
+        const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
+        await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${initialMessage}`);
 
     } catch (error) {
         console.error('Erro ao processar a requisição:', error);
