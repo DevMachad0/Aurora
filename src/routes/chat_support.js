@@ -85,8 +85,7 @@ router.post('/chat-support', async (req, res) => {
         const collectionName = `data_${userInfo.empresa}`;
 
         // Cria um novo documento na coleção da empresa conforme o modelo
-        const SupportClientModel = db.model('SupportClient', SupportClient.schema);
-        const newSupportClient = new SupportClientModel({
+        const newSupportClient = {
             firstName: userInfo.firstName,
             lastName: userInfo.lastName,
             cpf: userInfo.cpf,
@@ -97,10 +96,10 @@ router.post('/chat-support', async (req, res) => {
             status: "Em atendimento(Aurora)",
             observacao: "",
             messages: []
-        });
+        };
 
         try {
-            await newSupportClient.save();
+            await db.collection(collectionName).insertOne(newSupportClient);
             console.log('Protocolo salvo com sucesso:', protocolNumber);
         } catch (error) {
             console.error('Erro ao salvar o protocolo:', error);
