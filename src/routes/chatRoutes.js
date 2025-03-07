@@ -34,6 +34,47 @@ const planLimits = {
     MK3: 6000,
 };
 
+// Função para enviar mensagens para a IA com o contexto do usuário
+const sendMessageToAI = async (message, user) => {
+    try {
+        // Obtém o histórico de conversas do usuário
+        const chatHistory = await getChatHistory(user.email, user.empresa);
+
+        // Obtém as instruções e restrições do AuroraCore
+        const auroraCoreData = await getAuroraCoreData();
+
+        // Obtém os dados da empresa com base no tipo "documento"
+        const empresaData = await getEmpresaData(user.empresa, "documento");
+
+        // Cria um contexto para o modelo entender quem está falando
+        const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
+
+        // Adiciona o histórico de conversas ao contexto
+        const historyContext = chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n");
+
+        // Verifica o limite de caracteres baseado no plano do usuário
+        const charLimit = planLimits[user.plano] || 1000;
+
+        // Instrução para a IA respeitar o limite de caracteres e destacar títulos
+        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>.`;
+
+        // Adiciona as instruções e restrições do AuroraCore ao contexto
+        const coreInstructions = auroraCoreData.instructions.join("\n");
+        const coreRestrictions = auroraCoreData.restrictions.join("\n");
+
+        // Adiciona os dados da empresa ao contexto
+        const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
+
+        // Envia a mensagem com contexto e instrução para a IA
+        const result = await chat.sendMessage(`${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nUsuário: ${message}`);
+        const response = await result.response;
+        return response.text();
+    } catch (error) {
+        console.error("Erro ao conectar com Gemini:", error);
+        throw new Error("Erro ao processar sua solicitação");
+    }
+};
+
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
     try {
@@ -86,4 +127,4 @@ router.post("/chat", async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = { sendMessageToAI, router };

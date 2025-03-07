@@ -112,4 +112,17 @@ const getEmpresaData = async (empresa, tipo) => {
   }
 };
 
-module.exports = { getChatHistory, saveChatHistory, getChatHistoryByDatabase, getEmpresaData };
+// Função para obter dados do usuário com base no email
+const getUserDataByEmail = async (email) => {
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error("Usuário não encontrado.");
+    }
+    return user;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+module.exports = { getChatHistory, saveChatHistory, getChatHistoryByDatabase, getEmpresaData, getUserDataByEmail };
