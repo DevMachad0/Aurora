@@ -50,7 +50,7 @@ router.post('/chat-support', async (req, res) => {
             const empresaData = await getEmpresaData(userInfo.empresa, "documento");
             const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
             const userProfileData = await getUserProfileData(userInfo.email);
-            const profileContext = `Dados do perfil: ${userProfileData.join(", ")}`;
+            const profileContext = `Ultilizar dados do perfil: ${userProfileData.join(", ")}, que se referem ao atendimento ao cliente via (API)`;
             const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${profileContext}\n\n${message}`);
 
             return res.json({ reply: botResponse });
