@@ -3,8 +3,6 @@ const router = express.Router();
 const Domain = require('../models/domainModel'); // Importar o modelo de domínio
 const SupportClient = require('../models/supportClientModel'); // Importar o modelo de suporte ao cliente
 const mongoose = require('mongoose');
-const { getChatHistory, saveChatHistory, getUserDataByEmail } = require("../services/chatService");
-const { sendMessageToAI } = require("../routes/chatRoutes"); // Adicione esta linha
 
 // Variável para armazenar as informações do usuário
 let userInfo = {};
@@ -44,17 +42,10 @@ router.post('/chat-support', async (req, res) => {
         if (message && email) {
             console.log(`Nova mensagem de ${email}: ${message}`);
             
-            // Obtém os dados do usuário com base no email
-            const userData = await getUserDataByEmail(email);
+            // Simulação de resposta do assistente de IA
+            const botResponse = `Recebi sua mensagem: "${message}". Estamos analisando sua solicitação.`;
 
-            // Envia a mensagem para a IA com o contexto do usuário
-            const aiResponse = await sendMessageToAI(message, userData);
-
-            // Salva o histórico de conversas no banco de dados
-            await saveChatHistory(email, userData.empresa, { sender: "user", message });
-            await saveChatHistory(email, userData.empresa, { sender: "bot", message: aiResponse });
-
-            return res.json({ reply: aiResponse });
+            return res.json({ reply: botResponse });
         }
 
         // Se ainda não temos um domínio armazenado, buscamos a empresa associada
@@ -109,12 +100,9 @@ router.post('/chat-support', async (req, res) => {
         });
         await newSupportClient.save();
 
-        // Responde com o número de protocolo e envia a mensagem inicial para a IA
-        const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${protocolNumber}. Como posso te ajudar?`;
-        const aiResponse = await sendMessageToAI(initialMessage, userInfo);
-
+        // Responde com o número de protocolo
         return res.json({
-            reply: aiResponse,
+            reply: `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${protocolNumber}. Como posso te ajudar?`,
             userInfo
         });
 
