@@ -3,6 +3,7 @@ const router = express.Router();
 const Domain = require('../models/domainModel'); // Importar o modelo de domínio
 const SupportClient = require('../models/supportClientModel'); // Importar o modelo de suporte ao cliente
 const mongoose = require('mongoose');
+const aurora = require('./chat_support_bot'); // Importar o modelo Aurora
 
 // Variável para armazenar as informações do usuário
 let userInfo = {};
@@ -43,7 +44,7 @@ router.post('/chat-support', async (req, res) => {
             console.log(`Nova mensagem de ${email}: ${message}`);
             
             // Simulação de resposta do assistente de IA
-            const botResponse = `Recebi sua mensagem: "${message}". Estamos analisando sua solicitação.`;
+            const botResponse = await aurora.getResponse(message);
 
             return res.json({ reply: botResponse });
         }
@@ -107,10 +108,14 @@ router.post('/chat-support', async (req, res) => {
         }
 
         // Responde com o número de protocolo
-        return res.json({
+        res.json({
             reply: `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${protocolNumber}. Como posso te ajudar?`,
             userInfo
         });
+
+        // Envia a mensagem inicial para o modelo Aurora
+        const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${protocolNumber}. Como posso te ajudar?`;
+        await aurora.getResponse(initialMessage);
 
     } catch (error) {
         console.error('Erro ao processar a requisição:', error);
