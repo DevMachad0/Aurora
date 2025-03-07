@@ -43,8 +43,9 @@ router.post('/chat-support', async (req, res) => {
         if (message && email) {
             console.log(`Nova mensagem de ${email}: ${message}`);
             
-            // Simulação de resposta do assistente de IA
-            const botResponse = await aurora.getResponse(message);
+            // Envia a mensagem com os dados do usuário para a IA Aurora
+            const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
+            const botResponse = await aurora.getResponse(`${userContext}\n\n${message}`);
 
             return res.json({ reply: botResponse });
         }
@@ -113,9 +114,10 @@ router.post('/chat-support', async (req, res) => {
             userInfo
         });
 
-        // Envia a mensagem inicial para o modelo Aurora
+        // Envia a mensagem inicial para o modelo Aurora com os dados do usuário
         const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${protocolNumber}. Como posso te ajudar?`;
-        await aurora.getResponse(initialMessage);
+        const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
+        await aurora.getResponse(`${userContext}\n\n${initialMessage}`);
 
     } catch (error) {
         console.error('Erro ao processar a requisição:', error);
