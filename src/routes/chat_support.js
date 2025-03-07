@@ -90,7 +90,7 @@ router.post('/chat-support', async (req, res) => {
             firstName: userInfo.firstName,
             lastName: userInfo.lastName,
             cpf: userInfo.cpf,
-            tipo:"chamado",
+            tipo: "chamado",
             email: userInfo.email,
             domain: userInfo.domain,
             protocolNumber,
@@ -98,7 +98,14 @@ router.post('/chat-support', async (req, res) => {
             observacao: "",
             messages: []
         });
-        await newSupportClient.save();
+
+        try {
+            await newSupportClient.save();
+            console.log('Protocolo salvo com sucesso:', protocolNumber);
+        } catch (error) {
+            console.error('Erro ao salvar o protocolo:', error);
+            return res.status(500).json({ error: "Erro ao salvar o protocolo no banco de dados." });
+        }
 
         // Responde com o número de protocolo
         return res.json({
