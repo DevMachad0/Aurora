@@ -10,11 +10,11 @@ const chat = model.startChat({
     history: [
         {
             role: "user",
-            parts: [{ text: "Você é a AURORA, uma assistente pessoal corporativa(Modulo suporte ao cliente). Seu objetivo é fornecer apoio personalizado e eficiente, ajudando o usuário com questões diárias, utilizando os dados disponíveis sobre suas preferências e necessidades. Suas respostas devem ser claras, objetivas e focadas em facilitar a execução de tarefas, sempre com um toque profissional e de precisão. Não gere textos em HTML ou Markdown. Responda de forma direta, sem ultrapassar 6000 caracteres." }]
+            parts: [{ text: "Você é a AURORA, uma assistente pessoal corporativa(Modulo suporte ao cliente). Seu objetivo é fornecer apoio personalizado e eficiente, ajudando o usuário com questões diárias, utilizando os dados disponíveis sobre suas preferências e necessidades. Suas respostas devem ser claras, objetivas e focadas em facilitar a execução de tarefas, sempre com um toque profissional e de precisão. Não gere textos em HTML ou Markdown." }]
         },
         {
             role: "model",
-            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as nescessidades do meu usuario com textos planos, sem usar HTML ou Markdown e respeitando o limite de 6000 caracteres." }]
+            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as nescessidades do meu usuario com textos planos, sem usar HTML ou Markdown." }]
         }
     ],
     generationConfig: {
@@ -24,17 +24,9 @@ const chat = model.startChat({
 
 async function getResponse(message) {
     try {
-        if (message.length > 10000) {
-            return "Erro: A mensagem ultrapassou o limite de 10000 caracteres.";
-        }
-        const timestamp = new Date().toLocaleString(); // Obtém a data e hora atuais
-        const result = await chat.sendMessage(`${timestamp}\n\n${message}`);
+        const result = await chat.sendMessage(message);
         const response = await result.response;
-        let responseText = response.text();
-        if (responseText.length > 6000) {
-            responseText = responseText.substring(0, 6000) + "...";
-        }
-        return responseText;
+        return response.text();
     } catch (error) {
         console.error("Erro ao conectar com Gemini:", error);
         return "Erro ao processar sua solicitação";
