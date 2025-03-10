@@ -139,7 +139,7 @@ async function getEventDetailsFromUser(message) {
     const match = message.match(regex);
 
     if (!match) {
-        throw new Error("Detalhes do evento não encontrados na mensagem.");
+        throw new Error("Detalhes do evento não encontrados na mensagem. Certifique-se de usar o formato correto: 'agendar evento titulo: [titulo] data: [data e hora] apenas isso'.");
     }
 
     const [_, title, dateTime] = match;
