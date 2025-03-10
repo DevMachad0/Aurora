@@ -12,9 +12,12 @@ router.post("/login", login);
 router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
 // Rota de callback do Google
-router.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/" }), (req, res) => {
-    res.redirect("/chat-aurora.html");
-});
+router.get("/auth/google/callback", 
+  passport.authenticate("google", { failureRedirect: "/" }), 
+  (req, res) => {
+    res.redirect("/chat-aurora.html"); // Redireciona para a página correta após a autenticação
+  }
+);
 
 // Rota protegida para acessar a página do Chat-Aurora
 router.get("/chat-aurora", verifyToken, (req, res) => {

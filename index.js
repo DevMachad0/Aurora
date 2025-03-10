@@ -12,6 +12,7 @@ const storageRoutes = require("./src/routes/storageRoutes");
 const chatSupportRoutes = require('./src/routes/chat_support'); 
 const domainRoutes = require("./src/routes/domainRoutes");
 const fs = require('fs');
+const helmet = require('helmet');
 require("./src/config/passportConfig"); // Adiciona esta linha para configurar o Passport
 
 // Carregar domínios permitidos de um arquivo JSON
@@ -30,6 +31,18 @@ app.use(cors({
     },
     methods: ['GET', 'POST'], // Métodos permitidos
     allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
+}));
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"]
+    }
+  }
 }));
 
 // Configuração do Passport.js
