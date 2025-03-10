@@ -95,7 +95,7 @@ router.post("/chat", async (req, res) => {
         const charLimit = planLimits[user.plano] || 1000;
 
         // Instrução para a IA respeitar o limite de caracteres e destacar títulos
-        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>.`;
+        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>. informação de tempo e hora: ${timeContext}`;
 
         // Adiciona as instruções e restrições do AuroraCore ao contexto
         const coreInstructions = auroraCoreData.instructions.join("\n");
@@ -108,14 +108,8 @@ router.post("/chat", async (req, res) => {
         const timestamp = new Date().toLocaleString();
         const timeContext = `Data e Hora: ${timestamp}`;
 
-        // Verifica se a mensagem do usuário pergunta sobre a data ou hora
-        let additionalContext = "";
-        if (message.toLowerCase().includes("que horas são") || message.toLowerCase().includes("que dia é hoje")) {
-            additionalContext = `A data e hora atuais são: ${timestamp}.`;
-        }
-
         // Envia a mensagem com contexto e instrução para a IA
-        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\n${timeContext}\n\n${additionalContext}\n\nUsuário: ${message}`));
+        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\n${timeContext}\n\nUsuário: ${message}`));
         const response = await result.response;
         let botMessage = response.text();
 
