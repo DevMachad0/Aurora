@@ -77,9 +77,11 @@ async function updateGoogleEvent(email, eventDetails) {
 async function getTokensForUser(email) {
     // Implementar lógica para obter tokens de acesso do usuário
     // Exemplo: Buscar tokens armazenados no banco de dados
+    // Aqui, você deve implementar a lógica para buscar os tokens de acesso do usuário no banco de dados
+    // Para fins de exemplo, estou retornando tokens fictícios
     return {
-        access_token: "ACCESS_TOKEN",
-        refresh_token: "REFRESH_TOKEN",
+        access_token: "YOUR_ACCESS_TOKEN",
+        refresh_token: "YOUR_REFRESH_TOKEN",
         scope: SCOPES.join(" "),
         token_type: "Bearer",
         expiry_date: Date.now() + 3600 * 1000,

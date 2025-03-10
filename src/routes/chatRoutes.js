@@ -135,17 +135,25 @@ router.post("/chat", async (req, res) => {
 });
 
 async function getEventDetailsFromUser(message) {
-    // Implementar lógica para obter detalhes do evento do usuário
-    // Exemplo: Perguntar data, hora, título, descrição, etc.
+    const regex = /titulo:\s*(.*?)\s*data:\s*(.*?)\s*apenas isso/i;
+    const match = message.match(regex);
+
+    if (!match) {
+        throw new Error("Detalhes do evento não encontrados na mensagem.");
+    }
+
+    const [_, title, dateTime] = match;
+    const [date, time] = dateTime.split(" ");
+
     return {
-        summary: "Título do Evento",
-        description: "Descrição do Evento",
+        summary: title,
+        description: "Evento criado pela Aurora",
         start: {
-            dateTime: "2023-10-10T10:00:00-03:00",
+            dateTime: new Date(`${date}T${time}:00`).toISOString(),
             timeZone: "America/Sao_Paulo",
         },
         end: {
-            dateTime: "2023-10-10T11:00:00-03:00",
+            dateTime: new Date(`${date}T${time}:00`).toISOString(),
             timeZone: "America/Sao_Paulo",
         },
     };
