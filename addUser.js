@@ -13,7 +13,7 @@ async function run() {
   try {
     const userData = {
       nome: 'Deivid Kevin da Silva Machado',
-      email: 'deivid@empresa.com',
+      email: 'deivid2@empresa.com',
       empresa: 'Empresa X',
       usuario: 'deivid',
       senha: '1234',
