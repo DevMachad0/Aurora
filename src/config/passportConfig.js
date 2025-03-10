@@ -17,13 +17,9 @@ passport.use(new GoogleStrategy({
 ));
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, user);
 });
 
-passport.deserializeUser(async (id, done) => {
-  try {
-    // ...existing code...
-  } catch (error) {
-    done(error, null);
-  }
+passport.deserializeUser((user, done) => {
+  done(null, user);
 });
