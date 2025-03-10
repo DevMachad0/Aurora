@@ -15,6 +15,7 @@ router.get("/auth/google", passport.authenticate("google", { scope: ["profile", 
 router.get("/auth/google/callback", 
   passport.authenticate("google", { failureRedirect: "/" }), 
   (req, res) => {
+    console.log("Autenticação com o Google bem-sucedida!"); // Adiciona um console.log de confirmação
     res.redirect("/chat-aurora.html"); // Redireciona para a página correta após a autenticação
   }
 );
