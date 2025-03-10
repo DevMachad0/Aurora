@@ -47,16 +47,11 @@ async function retryWithDelay(fn, retries = 3, delay = 2000) {
     }
 }
 
-const cache = new Map();
-
-// Função para limpar o cache periodicamente
-function clearCache() {
-    cache.clear();
-    console.log("Cache limpo.");
+// Função para obter a data e hora atuais
+function getCurrentDateTime() {
+    const now = new Date();
+    return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
-
-// Limpa o cache a cada 10 minutos
-setInterval(clearCache, 10 * 60 * 1000);
 
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
@@ -66,15 +61,8 @@ router.post("/chat", async (req, res) => {
             return res.status(400).json({ error: "Mensagem não pode ser vazia" });
         }
 
-        if (message.length > 10000) {
-            return res.status(400).json({ error: "Erro: A mensagem ultrapassou o limite de 10000 caracteres." });
-        }
-
-        // Verifica se a resposta está no cache
-        const cacheKey = `${user.email}-${message}`;
-        if (cache.has(cacheKey)) {
-            return res.json({ message: cache.get(cacheKey) });
-        }
+        // Obtém a data e hora atuais
+        const currentDateTime = getCurrentDateTime();
 
         // Obtém o histórico de conversas do usuário
         const chatHistory = await getChatHistory(user.email, user.empresa);
@@ -88,12 +76,6 @@ router.post("/chat", async (req, res) => {
         // Cria um contexto para o modelo entender quem está falando
         const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
 
-        const timestamp = new Date().toLocaleString();
-        let additionalContext = "";
-        if (message.toLowerCase().includes("que horas são") || message.toLowerCase().includes("que dia é hoje")) {
-            additionalContext = `A data e hora atuais são: ${timestamp}.`;
-        }
-
         // Adiciona o histórico de conversas ao contexto
         const historyContext = chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n");
 
@@ -101,7 +83,7 @@ router.post("/chat", async (req, res) => {
         const charLimit = planLimits[user.plano] || 1000;
 
         // Instrução para a IA respeitar o limite de caracteres e destacar títulos
-        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>. Informação de tempo: ${timestamp}`;
+        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>.`;
 
         // Adiciona as instruções e restrições do AuroraCore ao contexto
         const coreInstructions = auroraCoreData.instructions.join("\n");
@@ -111,12 +93,9 @@ router.post("/chat", async (req, res) => {
         const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
 
         // Envia a mensagem com contexto e instrução para a IA
-        const result = await retryWithDelay(() => chat.sendMessage(`Data e Hora: ${timestamp}\n\n${additionalContext}\n\n${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nUsuário: ${message}`));
+        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nUsuário: ${message}`));
         const response = await result.response;
         let botMessage = response.text();
-
-        // Salva a resposta no cache
-        cache.set(cacheKey, botMessage);
 
         // Salva o histórico de conversas no banco de dados
         await saveChatHistory(user.email, user.empresa, { sender: "user", message });
