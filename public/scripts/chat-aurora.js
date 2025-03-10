@@ -93,8 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function appendMessage(sender, text) {
         const messageElement = document.createElement("div");
         messageElement.classList.add(sender);
-        const timestamp = new Date().toLocaleString(); // Obtém a data e hora atuais
-        messageElement.innerHTML = `<span class="timestamp">${timestamp}</span><br>${formatMarkdown(text)}`; // Adiciona o timestamp
+        messageElement.innerHTML = formatMarkdown(text); // Formata o texto em Markdown
         chatBox.appendChild(messageElement);
         chatBox.scrollTop = chatBox.scrollHeight;
     }

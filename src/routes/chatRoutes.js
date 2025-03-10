@@ -95,7 +95,7 @@ router.post("/chat", async (req, res) => {
         const charLimit = planLimits[user.plano] || 1000;
 
         // Instrução para a IA respeitar o limite de caracteres e destacar títulos
-        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>. informação de tempo e hora: ${timeContext}`;
+        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>. informação de tempo: ${timestamp}`;
 
         // Adiciona as instruções e restrições do AuroraCore ao contexto
         const coreInstructions = auroraCoreData.instructions.join("\n");
