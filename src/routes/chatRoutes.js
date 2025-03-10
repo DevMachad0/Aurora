@@ -55,6 +55,36 @@ function getCurrentDateTime() {
     return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
 
+// Variáveis globais para armazenar os detalhes do evento
+let eventDetails = {
+    summary: "",
+    start: {
+        dateTime: ""
+    },
+    end: {
+        dateTime: ""
+    },
+    location: "",
+    attendees: [],
+    description: ""
+};
+
+// Função para resetar os detalhes do evento
+function resetEventDetails() {
+    eventDetails = {
+        summary: "",
+        start: {
+            dateTime: ""
+        },
+        end: {
+            dateTime: ""
+        },
+        location: "",
+        attendees: [],
+        description: ""
+    };
+}
+
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
     try {
@@ -68,67 +98,66 @@ router.post("/chat", async (req, res) => {
             return res.status(401).json({ error: "Usuário não autenticado. Por favor, faça login." });
         }
 
-        // Obtém a data e hora atuais
-        const currentDateTime = getCurrentDateTime();
-
-        // Obtém o histórico de conversas do usuário
-        const chatHistory = await getChatHistory(user.email, user.empresa);
-
-        // Obtém as instruções e restrições do AuroraCore
-        const auroraCoreData = await getAuroraCoreData();
-
-        // Obtém os dados da empresa com base no tipo "documento"
-        const empresaData = await getEmpresaData(user.empresa, "documento");
-
-        // Cria um contexto para o modelo entender quem está falando
-        const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
-
-        // Adiciona o histórico de conversas ao contexto
-        const historyContext = chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n");
-
-        // Verifica o limite de caracteres baseado no plano do usuário
-        const charLimit = planLimits[user.plano] || 1000;
-
-        // Instrução para a IA respeitar o limite de caracteres e destacar títulos
-        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>.`;
-
-        // Adiciona as instruções e restrições do AuroraCore ao contexto
-        const coreInstructions = auroraCoreData.instructions.join("\n");
-        const coreRestrictions = auroraCoreData.restrictions.join("\n");
-
-        // Adiciona os dados da empresa ao contexto
-        const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
-
-        // Envia a mensagem com contexto e instrução para a IA
-        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));
-        const response = await result.response;
-        let botMessage = response.text();
-
-        // Verifica se a IA detectou uma solicitação de agendamento
-        if (botMessage.toLowerCase().includes("agendar evento")) {
-            // Solicita os detalhes do evento ao usuário
-            const eventDetails = await solicitEventDetails(user.email, message);
-            if (eventDetails) {
-                // Valida os detalhes do evento antes de criar o evento
-                if (validateEventDetails(eventDetails)) {
-                    const eventResponse = await createGoogleEvent(user.email, eventDetails);
-                    botMessage = eventResponse;
-                } else {
-                    botMessage = "Detalhes do evento inválidos. Por favor, forneça informações corretas.";
-                }
-            } else {
-                botMessage = "Agendamento de evento cancelado.";
-            }
+        // Verifica se a mensagem é uma solicitação de agendamento
+        if (message.toLowerCase().includes("criar evento")) {
+            resetEventDetails();
+            return res.json({ message: "Vamos criar um novo evento. Qual é o título do evento?" });
         }
 
-        // Salva o histórico de conversas no banco de dados
-        await saveChatHistory(user.email, user.empresa, { sender: "user", message });
-        await saveChatHistory(user.email, user.empresa, { sender: "bot", message: botMessage });
+        // Coleta os detalhes do evento passo a passo
+        if (!eventDetails.summary) {
+            eventDetails.summary = message;
+            return res.json({ message: "Qual é a data e hora de início do evento? (Formato: AAAA-MM-DDTHH:MM)" });
+        }
 
-        res.json({ message: botMessage });
+        if (!eventDetails.start.dateTime) {
+            eventDetails.start.dateTime = message;
+            return res.json({ message: "Qual é a data e hora de término do evento? (Formato: AAAA-MM-DDTHH:MM)" });
+        }
+
+        if (!eventDetails.end.dateTime) {
+            eventDetails.end.dateTime = message;
+            return res.json({ message: "Qual é a localização do evento?" });
+        }
+
+        if (!eventDetails.location) {
+            eventDetails.location = message;
+            return res.json({ message: "Quais são os e-mails dos participantes? (Separe por vírgula)" });
+        }
+
+        if (eventDetails.attendees.length === 0) {
+            eventDetails.attendees = message.split(",").map(email => ({ email: email.trim() }));
+            return res.json({ message: "Deseja adicionar uma descrição ao evento? (Se não, responda 'não')" });
+        }
+
+        if (!eventDetails.description && message.toLowerCase() !== "não") {
+            eventDetails.description = message;
+        }
+
+        // Confirmação final
+        return res.json({ message: `Confirme os detalhes do evento:\nTítulo: ${eventDetails.summary}\nInício: ${eventDetails.start.dateTime}\nTérmino: ${eventDetails.end.dateTime}\nLocalização: ${eventDetails.location}\nParticipantes: ${eventDetails.attendees.map(a => a.email).join(", ")}\nDescrição: ${eventDetails.description || "Nenhuma"}\n\nResponda 'sim' para confirmar e criar o evento.` });
+
     } catch (error) {
         console.error("Erro ao conectar com Gemini:", error);
         res.status(500).json({ error: "Erro ao processar sua solicitação" });
+    }
+});
+
+// Rota para confirmar e criar o evento
+router.post("/confirm-event", async (req, res) => {
+    try {
+        const { message, user } = req.body;
+        if (message.toLowerCase() === "sim") {
+            const eventResponse = await createGoogleEvent(user.email, eventDetails);
+            resetEventDetails();
+            return res.json({ message: eventResponse });
+        } else {
+            resetEventDetails();
+            return res.json({ message: "Criação de evento cancelada." });
+        }
+    } catch (error) {
+        console.error("Erro ao criar evento no Google Calendar:", error);
+        res.status(500).json({ error: "Erro ao criar evento no Google Calendar" });
     }
 });
 
