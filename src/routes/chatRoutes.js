@@ -34,6 +34,19 @@ const planLimits = {
     MK3: 6000,
 };
 
+// Função para repetir a solicitação com atraso
+async function retryWithDelay(fn, retries = 3, delay = 2000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            return await fn();
+        } catch (error) {
+            if (i === retries - 1 || error.status !== 503) throw error;
+            console.log(`Tentativa ${i + 1} falhou. Tentando novamente em ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+}
+
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
     try {
@@ -71,7 +84,7 @@ router.post("/chat", async (req, res) => {
         const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
 
         // Envia a mensagem com contexto e instrução para a IA
-        const result = await chat.sendMessage(`${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nUsuário: ${message}`);
+        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nUsuário: ${message}`));
         const response = await result.response;
         let botMessage = response.text();
 
