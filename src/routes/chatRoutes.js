@@ -67,26 +67,6 @@ router.post("/chat", async (req, res) => {
             return res.status(401).json({ error: "Usuário não autenticado. Por favor, faça login." });
         }
 
-        // Verifica se a mensagem é uma solicitação de agendamento
-        if (message.toLowerCase().includes("agendar evento")) {
-            const eventDetails = await getEventDetailsFromUser(message);
-            const eventResponse = await createGoogleEvent(user.email, eventDetails);
-            return res.json({ message: eventResponse });
-        }
-
-        // Verifica se a mensagem é uma solicitação para ver eventos
-        if (message.toLowerCase().includes("ver eventos")) {
-            const events = await getGoogleEvents(user.email);
-            return res.json({ message: `Eventos: ${events.join(", ")}` });
-        }
-
-        // Verifica se a mensagem é uma solicitação para modificar um evento
-        if (message.toLowerCase().includes("modificar evento")) {
-            const eventDetails = await getEventDetailsFromUser(message);
-            const eventResponse = await updateGoogleEvent(user.email, eventDetails);
-            return res.json({ message: eventResponse });
-        }
-
         // Obtém a data e hora atuais
         const currentDateTime = getCurrentDateTime();
 
@@ -123,6 +103,18 @@ router.post("/chat", async (req, res) => {
         const response = await result.response;
         let botMessage = response.text();
 
+        // Verifica se a IA detectou uma solicitação de agendamento
+        if (botMessage.toLowerCase().includes("agendar evento")) {
+            // Solicita os detalhes do evento ao usuário
+            const eventDetails = await solicitEventDetails(user.email, message);
+            if (eventDetails) {
+                const eventResponse = await createGoogleEvent(user.email, eventDetails);
+                botMessage = eventResponse;
+            } else {
+                botMessage = "Agendamento de evento cancelado.";
+            }
+        }
+
         // Salva o histórico de conversas no banco de dados
         await saveChatHistory(user.email, user.empresa, { sender: "user", message });
         await saveChatHistory(user.email, user.empresa, { sender: "bot", message: botMessage });
@@ -134,28 +126,19 @@ router.post("/chat", async (req, res) => {
     }
 });
 
-async function getEventDetailsFromUser(message) {
-    const regex = /titulo:\s*(.*?)\s*data:\s*(.*?)\s*hora:\s*(.*?)\s*apenas isso/i;
-    const match = message.match(regex);
+async function solicitEventDetails(email, message) {
+    // Solicita os detalhes do evento ao usuário usando a IA
+    const result = await chat.sendMessage(`Com base na mensagem do usuário: "${message}", solicite as informações necessárias para agendar um evento no Google Agenda. Pergunte sobre o título, data e hora do evento. Se o usuário fornecer todas as informações, retorne um objeto JSON com os detalhes do evento. Se o usuário cancelar, retorne null.`);
+    const response = await result.response;
+    const botMessage = response.text();
 
-    if (!match) {
-        throw new Error("Detalhes do evento não encontrados na mensagem. Certifique-se de usar o formato correto: 'agendar evento titulo: [titulo] data: [data] hora: [hora] apenas isso'.");
+    try {
+        // Tenta analisar a resposta da IA como JSON
+        return JSON.parse(botMessage);
+    } catch (error) {
+        // Se a resposta não for JSON, solicita as informações novamente
+        return solicitEventDetails(email, `${message} ${botMessage}`);
     }
-
-    const [_, title, date, time] = match;
-
-    return {
-        summary: title,
-        description: "Evento criado pela Aurora",
-        start: {
-            dateTime: new Date(`${date}T${time}:00`).toISOString(),
-            timeZone: "America/Sao_Paulo",
-        },
-        end: {
-            dateTime: new Date(`${date}T${time}:00`).toISOString(),
-            timeZone: "America/Sao_Paulo",
-        },
-    };
 }
 
 module.exports = router;

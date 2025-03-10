@@ -1,6 +1,6 @@
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
-const User = require("../models/userModel"); // Adicionar a importação do modelo User
+const User = require("../models/userModel");
 require("dotenv").config();
 
 const oAuth2Client = new OAuth2(
@@ -11,14 +11,20 @@ const oAuth2Client = new OAuth2(
 
 const SCOPES = ["https://www.googleapis.com/auth/calendar.events"];
 
-function isAuthenticated(email) {
-    // Implementar lógica para verificar se o usuário está autenticado
-    // Exemplo: Verificar se o token de acesso está armazenado
-    return true;
+async function isAuthenticated(email) {
+    const user = await User.findOne({ email });
+    if (!user) {
+        return false;
+    }
+    return !!user.access_token && user.expiry_date > Date.now();
 }
 
 async function createGoogleEvent(email, eventDetails) {
     try {
+        if (!eventDetails || !eventDetails.summary || !eventDetails.start || !eventDetails.end) {
+            throw new Error("Detalhes do evento incompletos.");
+        }
+
         const tokens = await getTokensForUser(email);
         oAuth2Client.setCredentials(tokens);
 
@@ -31,7 +37,10 @@ async function createGoogleEvent(email, eventDetails) {
         return `Evento criado com sucesso: ${event.data.htmlLink}`;
     } catch (error) {
         console.error("Erro ao criar evento no Google Calendar:", error);
-        throw new Error("Erro ao criar evento no Google Calendar");
+        if (error.errors && error.errors.length > 0) {
+            throw new Error(`Erro ao criar evento: ${error.errors[0].message}`);
+        }
+        throw new Error("Erro ao criar evento no Google Calendar.");
     }
 }
 
@@ -82,10 +91,15 @@ async function getTokensForUser(email) {
     }
 
     if (user.expiry_date < Date.now()) {
-        const newTokens = await oAuth2Client.refreshToken(user.refresh_token);
-        user.access_token = newTokens.credentials.access_token;
-        user.expiry_date = newTokens.credentials.expiry_date;
-        await user.save();
+        try {
+            const newTokens = await oAuth2Client.refreshToken(user.refresh_token);
+            user.access_token = newTokens.credentials.access_token;
+            user.expiry_date = newTokens.credentials.expiry_date;
+            await user.save();
+        } catch (refreshError) {
+            console.error("Erro ao atualizar token:", refreshError);
+            throw new Error("Erro ao atualizar token");
+        }
     }
 
     return {
