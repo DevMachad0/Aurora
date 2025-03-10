@@ -135,15 +135,14 @@ router.post("/chat", async (req, res) => {
 });
 
 async function getEventDetailsFromUser(message) {
-    const regex = /titulo:\s*(.*?)\s*data:\s*(.*?)\s*apenas isso/i;
+    const regex = /titulo:\s*(.*?)\s*data:\s*(.*?)\s*hora:\s*(.*?)\s*apenas isso/i;
     const match = message.match(regex);
 
     if (!match) {
-        throw new Error("Detalhes do evento não encontrados na mensagem. Certifique-se de usar o formato correto: 'agendar evento titulo: [titulo] data: [data e hora] apenas isso'.");
+        throw new Error("Detalhes do evento não encontrados na mensagem. Certifique-se de usar o formato correto: 'agendar evento titulo: [titulo] data: [data] hora: [hora] apenas isso'.");
     }
 
-    const [_, title, dateTime] = match;
-    const [date, time] = dateTime.split(" ");
+    const [_, title, date, time] = match;
 
     return {
         summary: title,

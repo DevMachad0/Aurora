@@ -1,5 +1,6 @@
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
+const User = require("../models/userModel"); // Adicionar a importação do modelo User
 require("dotenv").config();
 
 const oAuth2Client = new OAuth2(
@@ -75,13 +76,11 @@ async function updateGoogleEvent(email, eventDetails) {
 }
 
 async function getTokensForUser(email) {
-    // Implementar lógica para obter tokens de acesso do usuário do banco de dados
     const user = await User.findOne({ email });
     if (!user) {
         throw new Error("Usuário não encontrado.");
     }
 
-    // Verificar se o token de acesso está expirado e atualizar se necessário
     if (user.expiry_date < Date.now()) {
         const newTokens = await oAuth2Client.refreshToken(user.refresh_token);
         user.access_token = newTokens.credentials.access_token;
