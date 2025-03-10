@@ -2,7 +2,7 @@ const express = require("express");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { getChatHistory, saveChatHistory, getEmpresaData } = require("../services/chatService");
 const { getAuroraCoreData } = require("../services/auroraCoreService");
-const { createGoogleEvent, isAuthenticated } = require("../services/googleCalendarService");
+const { createGoogleEvent, getGoogleEvents, updateGoogleEvent, isAuthenticated } = require("../services/googleCalendarService");
 const AuroraCore = require("../models/auroraCoreModel");
 require("dotenv").config();
 
@@ -69,9 +69,21 @@ router.post("/chat", async (req, res) => {
 
         // Verifica se a mensagem é uma solicitação de agendamento
         if (message.toLowerCase().includes("agendar evento")) {
-            // Solicita informações sobre o evento
             const eventDetails = await getEventDetailsFromUser(message);
             const eventResponse = await createGoogleEvent(user.email, eventDetails);
+            return res.json({ message: eventResponse });
+        }
+
+        // Verifica se a mensagem é uma solicitação para ver eventos
+        if (message.toLowerCase().includes("ver eventos")) {
+            const events = await getGoogleEvents(user.email);
+            return res.json({ message: `Eventos: ${events.join(", ")}` });
+        }
+
+        // Verifica se a mensagem é uma solicitação para modificar um evento
+        if (message.toLowerCase().includes("modificar evento")) {
+            const eventDetails = await getEventDetailsFromUser(message);
+            const eventResponse = await updateGoogleEvent(user.email, eventDetails);
             return res.json({ message: eventResponse });
         }
 
