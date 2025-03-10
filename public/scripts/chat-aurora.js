@@ -93,7 +93,8 @@ document.addEventListener("DOMContentLoaded", function () {
     function appendMessage(sender, text) {
         const messageElement = document.createElement("div");
         messageElement.classList.add(sender);
-        messageElement.innerHTML = formatMarkdown(text); // Formata o texto em Markdown
+        const timestamp = new Date().toLocaleString(); // Obtém a data e hora atuais
+        messageElement.innerHTML = `<span class="timestamp">${timestamp}</span><br>${formatMarkdown(text)}`; // Adiciona o timestamp
         chatBox.appendChild(messageElement);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -171,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             messageElement.innerHTML = formatMarkdown(sanitizedText.slice(0, i + 1)); // Formata o texto em Markdown
             chatBox.scrollTop = chatBox.scrollHeight;
-            await new Promise(resolve => setTimeout(resolve, 50)); // Ajuste o tempo conforme necessário
+            await new Promise(resolve => setTimeout(resolve, 20)); // Ajuste o tempo conforme necessário
         }
     }
 
