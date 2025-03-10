@@ -2,6 +2,8 @@ require("dotenv").config(); // Importa variáveis do .env
 const cors = require('cors');
 const express = require("express");
 const mongoose = require("mongoose");
+const passport = require("passport");
+const session = require("express-session");
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require("./src/routes/userRoutes");
 const chatRoutes = require("./src/routes/chatRoutes");
@@ -10,6 +12,7 @@ const storageRoutes = require("./src/routes/storageRoutes");
 const chatSupportRoutes = require('./src/routes/chat_support'); 
 const domainRoutes = require("./src/routes/domainRoutes");
 const fs = require('fs');
+require("./src/config/passportConfig"); // Adiciona esta linha para configurar o Passport
 
 // Carregar domínios permitidos de um arquivo JSON
 const allowedDomains = JSON.parse(fs.readFileSync('./allowedDomains.json', 'utf8'));
@@ -28,6 +31,11 @@ app.use(cors({
     methods: ['GET', 'POST'], // Métodos permitidos
     allowedHeaders: ['Content-Type'] // Cabeçalhos permitidos
 }));
+
+// Configuração do Passport.js
+app.use(session({ secret: "secret", resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Servindo arquivos estáticos da pasta 'public'
 app.use(express.static("public"));
