@@ -194,6 +194,26 @@ h2 {
     background-color: #e60000;
 }
 
+/* Botão de autenticação com o Google */
+.google-auth {
+    margin-top: 15px;
+    text-align: center;
+}
+
+#google-auth-button {
+    padding: 10px 20px;
+    background-color: #4285F4;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#google-auth-button:hover {
+    background-color: #357ae8;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
     .config-container {
