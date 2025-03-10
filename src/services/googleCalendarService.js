@@ -80,8 +80,8 @@ async function getTokensForUser(email) {
     // Aqui, você deve implementar a lógica para buscar os tokens de acesso do usuário no banco de dados
     // Para fins de exemplo, estou retornando tokens fictícios
     return {
-        access_token: "YOUR_ACCESS_TOKEN",
-        refresh_token: "YOUR_REFRESH_TOKEN",
+        access_token: "VALID_ACCESS_TOKEN",
+        refresh_token: "VALID_REFRESH_TOKEN",
         scope: SCOPES.join(" "),
         token_type: "Bearer",
         expiry_date: Date.now() + 3600 * 1000,
