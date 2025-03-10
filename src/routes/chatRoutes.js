@@ -96,7 +96,10 @@ router.post("/chat", async (req, res) => {
 
         // Adiciona o contexto de tempo e hora
         const timestamp = new Date().toLocaleString();
-        const timeContext = `Data e Hora: ${timestamp}`;
+        let additionalContext = "";
+        if (message.toLowerCase().includes("que horas são") || message.toLowerCase().includes("que dia é hoje")) {
+            additionalContext = `A data e hora atuais são: ${timestamp}.`;
+        }
 
         // Instrução para a IA respeitar o limite de caracteres e destacar títulos
         const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>. Informação de tempo: ${timestamp}`;
@@ -108,14 +111,8 @@ router.post("/chat", async (req, res) => {
         // Adiciona os dados da empresa ao contexto
         const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
 
-        // Verifica se a mensagem do usuário pergunta sobre a data ou hora
-        let additionalContext = "";
-        if (message.toLowerCase().includes("que horas são") || message.toLowerCase().includes("que dia é hoje")) {
-            additionalContext = `A data e hora atuais são: ${timestamp}.`;
-        }
-
         // Envia a mensagem com contexto e instrução para a IA
-        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\n${timeContext}\n\n${additionalContext}\n\nUsuário: ${message}`));
+        const result = await retryWithDelay(() => chat.sendMessage(`Data e Hora: ${timestamp}\n\n${additionalContext}\n\n${userContext}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nUsuário: ${message}`));
         const response = await result.response;
         let botMessage = response.text();
 
