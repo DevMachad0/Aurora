@@ -75,16 +75,26 @@ async function updateGoogleEvent(email, eventDetails) {
 }
 
 async function getTokensForUser(email) {
-    // Implementar lógica para obter tokens de acesso do usuário
-    // Exemplo: Buscar tokens armazenados no banco de dados
-    // Aqui, você deve implementar a lógica para buscar os tokens de acesso do usuário no banco de dados
-    // Para fins de exemplo, estou retornando tokens fictícios
+    // Implementar lógica para obter tokens de acesso do usuário do banco de dados
+    const user = await User.findOne({ email });
+    if (!user) {
+        throw new Error("Usuário não encontrado.");
+    }
+
+    // Verificar se o token de acesso está expirado e atualizar se necessário
+    if (user.expiry_date < Date.now()) {
+        const newTokens = await oAuth2Client.refreshToken(user.refresh_token);
+        user.access_token = newTokens.credentials.access_token;
+        user.expiry_date = newTokens.credentials.expiry_date;
+        await user.save();
+    }
+
     return {
-        access_token: "VALID_ACCESS_TOKEN",
-        refresh_token: "VALID_REFRESH_TOKEN",
+        access_token: user.access_token,
+        refresh_token: user.refresh_token,
         scope: SCOPES.join(" "),
         token_type: "Bearer",
-        expiry_date: Date.now() + 3600 * 1000,
+        expiry_date: user.expiry_date,
     };
 }
 
