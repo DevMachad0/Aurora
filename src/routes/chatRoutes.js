@@ -1,3 +1,4 @@
+// chatRoutes.js
 const express = require("express");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { getChatHistory, saveChatHistory, getEmpresaData } = require("../services/chatService");
@@ -108,8 +109,13 @@ router.post("/chat", async (req, res) => {
             // Solicita os detalhes do evento ao usuário
             const eventDetails = await solicitEventDetails(user.email, message);
             if (eventDetails) {
-                const eventResponse = await createGoogleEvent(user.email, eventDetails);
-                botMessage = eventResponse;
+                // Valida os detalhes do evento antes de criar o evento
+                if (validateEventDetails(eventDetails)) {
+                    const eventResponse = await createGoogleEvent(user.email, eventDetails);
+                    botMessage = eventResponse;
+                } else {
+                    botMessage = "Detalhes do evento inválidos. Por favor, forneça informações corretas.";
+                }
             } else {
                 botMessage = "Agendamento de evento cancelado.";
             }
@@ -128,17 +134,42 @@ router.post("/chat", async (req, res) => {
 
 async function solicitEventDetails(email, message) {
     // Solicita os detalhes do evento ao usuário usando a IA
-    const result = await chat.sendMessage(`Com base na mensagem do usuário: "${message}", solicite as informações necessárias para agendar um evento no Google Agenda. Pergunte sobre o título, data e hora do evento. Se o usuário fornecer todas as informações, retorne um objeto JSON com os detalhes do evento. Se o usuário cancelar, retorne null.`);
+    const result = await chat.sendMessage(`Com base na mensagem do usuário: "${message}", solicite as informações necessárias para agendar um evento no Google Agenda. Pergunte sobre o título, data e hora de início, data e hora de término, localização (presencial ou online), participantes (emails) e descrição (opcional). Se o usuário fornecer todas as informações, retorne um objeto JSON no seguinte formato: { summary: "título", start: { dateTime: "data e hora de início" }, end: { dateTime: "data e hora de término" }, location: "localização", attendees: [{ email: "email1" }, { email: "email2" }], description: "descrição" }. Se o usuário cancelar, retorne null.`);
     const response = await result.response;
     const botMessage = response.text();
 
     try {
         // Tenta analisar a resposta da IA como JSON
-        return JSON.parse(botMessage);
+        const eventDetails = JSON.parse(botMessage);
+
+        // Verifica se os campos obrigatórios estão presentes
+        if (!eventDetails.summary || !eventDetails.start || !eventDetails.end) {
+            throw new Error("Detalhes do evento incompletos.");
+        }
+
+        return eventDetails;
     } catch (error) {
-        // Se a resposta não for JSON, solicita as informações novamente
+        // Se a resposta não for JSON ou estiver incompleta, solicita as informações novamente
         return solicitEventDetails(email, `${message} ${botMessage}`);
     }
+}
+
+function validateEventDetails(eventDetails) {
+    if (!eventDetails.summary || !eventDetails.start || !eventDetails.end) {
+        return false;
+    }
+
+    // Valida os formatos de data e hora
+    if (!isValidDate(eventDetails.start.dateTime) || !isValidDate(eventDetails.end.dateTime)) {
+        return false;
+    }
+
+    return true;
+}
+
+function isValidDate(dateString) {
+    const date = new Date(dateString);
+    return !isNaN(date.getTime());
 }
 
 module.exports = router;

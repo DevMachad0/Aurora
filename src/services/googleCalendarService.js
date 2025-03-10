@@ -1,3 +1,4 @@
+// googleCalendarService.js
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
 const User = require("../models/userModel");
@@ -58,7 +59,7 @@ async function getGoogleEvents(email) {
             orderBy: "startTime",
         });
 
-        return events.data.items.map(event => `${event.summary} (${event.start.dateTime || event.start.date})`);
+        return events.data.items.map(event => `<span class="math-inline">\{event\.summary\} \(</span>{event.start.dateTime || event.start.date})`);
     } catch (error) {
         console.error("Erro ao obter eventos do Google Calendar:", error);
         throw new Error("Erro ao obter eventos do Google Calendar");
