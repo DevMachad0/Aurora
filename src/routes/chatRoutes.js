@@ -88,18 +88,17 @@ router.post("/chat", async (req, res) => {
         // Cria um contexto para o modelo entender quem está falando
         const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
 
-        // Adiciona o histórico de conversas ao contexto
-        const historyContext = chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n");
-
-        // Verifica o limite de caracteres baseado no plano do usuário
-        const charLimit = planLimits[user.plano] || 1000;
-
-        // Adiciona o contexto de tempo e hora
         const timestamp = new Date().toLocaleString();
         let additionalContext = "";
         if (message.toLowerCase().includes("que horas são") || message.toLowerCase().includes("que dia é hoje")) {
             additionalContext = `A data e hora atuais são: ${timestamp}.`;
         }
+
+        // Adiciona o histórico de conversas ao contexto
+        const historyContext = chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n");
+
+        // Verifica o limite de caracteres baseado no plano do usuário
+        const charLimit = planLimits[user.plano] || 1000;
 
         // Instrução para a IA respeitar o limite de caracteres e destacar títulos
         const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>. Informação de tempo: ${timestamp}`;
