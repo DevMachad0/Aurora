@@ -142,7 +142,11 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             const data = await response.json();
-            await generateTextProcedurally("bot-message", `Aurora: ${data.message}`);
+            if (data.error) {
+                appendMessage("bot-message", `Erro: ${data.error}`);
+            } else {
+                await generateTextProcedurally("bot-message", `Aurora: ${data.message}`);
+            }
             saveChatHistory();
         } catch (error) {
             console.error("Erro ao enviar mensagem:", error);

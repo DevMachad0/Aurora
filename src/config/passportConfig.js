@@ -9,6 +9,8 @@ passport.use(new GoogleStrategy({
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
+      // Salvar tokens de acesso e perfil do usuário no banco de dados
+      // Exemplo: await saveTokens(profile.emails[0].value, accessToken, refreshToken);
       return done(null, profile);
     } catch (error) {
       return done(error, null);

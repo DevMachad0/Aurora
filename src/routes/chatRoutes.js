@@ -2,7 +2,8 @@ const express = require("express");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { getChatHistory, saveChatHistory, getEmpresaData } = require("../services/chatService");
 const { getAuroraCoreData } = require("../services/auroraCoreService");
-const AuroraCore = require("../models/auroraCoreModel"); // Adicione esta linha
+const { createGoogleEvent, isAuthenticated } = require("../services/googleCalendarService");
+const AuroraCore = require("../models/auroraCoreModel");
 require("dotenv").config();
 
 const router = express.Router();
@@ -61,6 +62,19 @@ router.post("/chat", async (req, res) => {
             return res.status(400).json({ error: "Mensagem não pode ser vazia" });
         }
 
+        // Verifica se o usuário está autenticado
+        if (!isAuthenticated(user.email)) {
+            return res.status(401).json({ error: "Usuário não autenticado. Por favor, faça login." });
+        }
+
+        // Verifica se a mensagem é uma solicitação de agendamento
+        if (message.toLowerCase().includes("agendar evento")) {
+            // Solicita informações sobre o evento
+            const eventDetails = await getEventDetailsFromUser(message);
+            const eventResponse = await createGoogleEvent(user.email, eventDetails);
+            return res.json({ message: eventResponse });
+        }
+
         // Obtém a data e hora atuais
         const currentDateTime = getCurrentDateTime();
 
@@ -107,5 +121,22 @@ router.post("/chat", async (req, res) => {
         res.status(500).json({ error: "Erro ao processar sua solicitação" });
     }
 });
+
+async function getEventDetailsFromUser(message) {
+    // Implementar lógica para obter detalhes do evento do usuário
+    // Exemplo: Perguntar data, hora, título, descrição, etc.
+    return {
+        summary: "Título do Evento",
+        description: "Descrição do Evento",
+        start: {
+            dateTime: "2023-10-10T10:00:00-03:00",
+            timeZone: "America/Sao_Paulo",
+        },
+        end: {
+            dateTime: "2023-10-10T11:00:00-03:00",
+            timeZone: "America/Sao_Paulo",
+        },
+    };
+}
 
 module.exports = router;

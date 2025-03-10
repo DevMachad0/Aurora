@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/login", login);
 
 // Rota para autenticação com o Google
-router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email", "https://www.googleapis.com/auth/calendar.events"] }));
 
 // Rota de callback do Google
 router.get("/auth/google/callback", 
