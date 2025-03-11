@@ -40,7 +40,8 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://gc.kis.v2.scr.kaspersky-labs.com"], // Adiciona a fonte específica
-      imgSrc: ["'self'", "data:"]
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'", "<URL>"] // Adiciona a URL específica
     }
   }
 }));
