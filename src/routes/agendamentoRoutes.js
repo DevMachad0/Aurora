@@ -16,9 +16,9 @@ router.get("/agendamentos", async (req, res) => {
 
         const chatHistory = await getChatHistory(email, empresa);
 
-        // Filtra mensagens que contêm "tipo: agendamento"
+        // Filtra mensagens enviadas por "Aurora" que contêm "Recebido! Aqui estão os detalhes do seu agendamento:"
         const agendamentos = chatHistory
-            .filter(chat => chat.message.includes("tipo: agendamento"))
+            .filter(chat => chat.sender === "Aurora" && chat.message.includes("Recebido! Aqui estão os detalhes do seu agendamento:"))
             .map(chat => {
                 const lines = chat.message.split('\n');
                 try {
