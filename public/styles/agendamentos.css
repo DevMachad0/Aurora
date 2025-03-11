@@ -105,6 +105,8 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    height: 100px; /* Tamanho fixo */
+    overflow: hidden; /* Esconde conteúdo extra */
 }
 
 .day h3 {
@@ -113,10 +115,35 @@ body {
 }
 
 .reminder {
-    background: #6e8efb;
-    color: white;
     padding: 5px;
     border-radius: 3px;
     margin-top: 5px;
     font-size: 14px;
+    cursor: pointer;
+}
+
+.reminder.baixa {
+    background: #6e8efb;
+    color: white;
+}
+
+.reminder.media {
+    background: #fba36e;
+    color: white;
+}
+
+.reminder.alta {
+    background: #fb6e6e;
+    color: white;
+}
+
+.popup {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 1000;
 }

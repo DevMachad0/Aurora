@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const prevMonthButton = document.getElementById("prev-month");
     const nextMonthButton = document.getElementById("next-month");
     const currentMonthYear = document.getElementById("current-month-year");
+    const popup = document.createElement("div");
+    popup.classList.add("popup");
+    document.body.appendChild(popup);
 
     let currentDate = new Date();
 
@@ -39,20 +42,37 @@ document.addEventListener("DOMContentLoaded", () => {
             dayElement.querySelectorAll(".reminder").forEach(reminderElement => reminderElement.remove());
     
             const reminderElement = document.createElement("div");
-            reminderElement.classList.add("reminder");
-            reminderElement.textContent = reminder;
+            reminderElement.classList.add("reminder", reminder.prioridade.toLowerCase());
+            reminderElement.textContent = reminder.titulo;
+            reminderElement.addEventListener("click", () => showPopup(reminder, reminderElement));
             dayElement.appendChild(reminderElement);
         } else {
             console.warn("Não foi possível encontrar um dia correspondente no calendário", date);
         }
     }
+
+    // Função para mostrar popup com detalhes do evento
+    function showPopup(reminder, element) {
+        popup.innerHTML = `
+            <p><strong>Título:</strong> ${reminder.titulo}</p>
+            <p><strong>Data:</strong> ${reminder.data}</p>
+            <p><strong>Hora:</strong> ${reminder.hora}</p>
+            <p><strong>Descrição:</strong> ${reminder.descricao}</p>
+            <p><strong>Prioridade:</strong> ${reminder.prioridade}</p>
+        `;
+        const rect = element.getBoundingClientRect();
+        popup.style.top = `${rect.bottom + window.scrollY}px`;
+        popup.style.left = `${rect.left + window.scrollX}px`;
+        popup.style.display = "block";
+    }
+
     // Função para carregar lembretes do localStorage
     function loadReminders() {
         const reminders = JSON.parse(localStorage.getItem("reminders")) || [];
         reminders.forEach(reminder => {
             const reminderDate = new Date(reminder.date);
             if (reminderDate.getFullYear() === currentDate.getFullYear() && reminderDate.getMonth() === currentDate.getMonth()) {
-                addReminder(reminderDate, reminder.text);
+                addReminder(reminderDate, reminder);
             }
         });
     }
@@ -81,13 +101,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.agendamentos) {
                 data.agendamentos.forEach(agendamento => {
-                    const reminderText = `${agendamento.titulo} - ${agendamento.hora} - ${agendamento.descricao} - ${agendamento.prioridade}`;
+                    const reminder = {
+                        titulo: agendamento.titulo,
+                        data: agendamento.data,
+                        hora: agendamento.hora,
+                        descricao: agendamento.descricao,
+                        prioridade: agendamento.prioridade
+                    };
                     const [day, month, year] = agendamento.data.split('/');
                     const reminderDate = new Date(year, month - 1, day);
 
                     // Verifica se a data é válida e se pertence ao mês atual
                     if (!isNaN(reminderDate.getTime()) && reminderDate.getFullYear() === currentDate.getFullYear() && reminderDate.getMonth() === currentDate.getMonth()) {
-                        addReminder(reminderDate, reminderText);
+                        addReminder(reminderDate, reminder);
                     } else {
                         console.error("Data inválida ou fora do mês atual para agendamento:", agendamento);
                     }
@@ -122,4 +148,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Exemplo de como adicionar um lembrete
     // saveReminder(new Date(2023, 10, 15), "Reunião às 10h");
+
+    // Esconde o popup ao clicar fora dele
+    document.addEventListener("click", (event) => {
+        if (!popup.contains(event.target)) {
+            popup.style.display = "none";
+        }
+    });
 });
