@@ -38,11 +38,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // Função para adicionar lembrete
     function addReminder(date, reminder) {
         const day = date.getDate();
-        const dayElement = calendar.querySelector(`.day:nth-child(${day + new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay()})`);
-        const reminderElement = document.createElement("div");
-        reminderElement.classList.add("reminder");
-        reminderElement.textContent = reminder;
-        dayElement.appendChild(reminderElement);
+        const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+        const dayElements = calendar.querySelectorAll(".day");
+
+        // Ajusta o índice do dia
+        const dayIndex = day + firstDayOfMonth - 1;
+        if (dayIndex >= 0 && dayIndex < dayElements.length) {
+            const dayElement = dayElements[dayIndex];
+            const reminderElement = document.createElement("div");
+            reminderElement.classList.add("reminder");
+            reminderElement.textContent = reminder;
+            dayElement.appendChild(reminderElement);
+        } else {
+            console.warn("Não foi possível encontrar um dia correspondente no calendário", date);
+        }
     }
 
     // Função para carregar lembretes do localStorage
@@ -76,11 +85,19 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const data = await response.json();
+            console.log("Agendamentos recebidos:", data.agendamentos); // Depuração
+
             if (data.agendamentos) {
                 data.agendamentos.forEach(agendamento => {
                     const reminderText = `${agendamento.titulo} - ${agendamento.hora} - ${agendamento.descricao} - ${agendamento.prioridade}`;
                     const reminderDate = new Date(agendamento.data);
-                    addReminder(reminderDate, reminderText);
+
+                    // Verifica se a data é válida
+                    if (!isNaN(reminderDate.getTime())) {
+                        addReminder(reminderDate, reminderText);
+                    } else {
+                        console.error("Data inválida para agendamento:", agendamento);
+                    }
                 });
             }
         } catch (error) {
@@ -90,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Inicializa o calendário e carrega os agendamentos
     createCalendar(currentDate);
-    loadAgendamentos();
+    setTimeout(loadAgendamentos, 1000);
 
     // Evento para voltar ao chat
     backToChatButton.addEventListener("click", () => {
@@ -101,13 +118,13 @@ document.addEventListener("DOMContentLoaded", () => {
     prevMonthButton.addEventListener("click", () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
         createCalendar(currentDate);
-        loadAgendamentos();
+        setTimeout(loadAgendamentos, 1000);
     });
 
     nextMonthButton.addEventListener("click", () => {
         currentDate.setMonth(currentDate.getMonth() + 1);
         createCalendar(currentDate);
-        loadAgendamentos();
+        setTimeout(loadAgendamentos, 1000);
     });
 
     // Exemplo de como adicionar um lembrete

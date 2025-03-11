@@ -16,18 +16,28 @@ router.get("/agendamentos", async (req, res) => {
 
         const chatHistory = await getChatHistory(email, empresa);
 
-        const agendamentos = chatHistory.filter(chat => chat.message.includes("tipo: agendamento"))
+        // Filtra mensagens que contêm "tipo: agendamento"
+        const agendamentos = chatHistory
+            .filter(chat => chat.message.includes("tipo: agendamento"))
             .map(chat => {
                 const lines = chat.message.split('\n');
-                return {
-                    titulo: lines[1].split(': ')[1],
-                    data: lines[2].split(': ')[1],
-                    hora: lines[3].split(': ')[1],
-                    descricao: lines[4].split(': ')[1],
-                    prioridade: lines[5].split(': ')[1],
-                    tipo: lines[6].split(': ')[1]
-                };
-            });
+                try {
+                    return {
+                        titulo: lines[1]?.split(': ')[1] || "Sem título",
+                        data: lines[2]?.split(': ')[1] || "Data não encontrada",
+                        hora: lines[3]?.split(': ')[1] || "Hora não encontrada",
+                        descricao: lines[4]?.split(': ')[1] || "Sem descrição",
+                        prioridade: lines[5]?.split(': ')[1] || "Normal",
+                        tipo: lines[6]?.split(': ')[1] || "Outro"
+                    };
+                } catch (error) {
+                    console.error("Erro ao processar um agendamento:", error);
+                    return null;
+                }
+            })
+            .filter(a => a !== null); // Remove agendamentos inválidos
+
+        console.log("Agendamentos encontrados:", agendamentos); // Log para depuração
 
         res.json({ agendamentos });
     } catch (error) {
