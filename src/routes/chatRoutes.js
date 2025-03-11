@@ -40,6 +40,7 @@ Claro! Por favor, forneça os seguintes dados:
 - Data (dia/mês/ano)
 - Hora (HH:MM)
 - Descrição
+- Prioridade:
 
 Após o usuário fornecer os dados, responda sempre com:
 Recebido! Aqui estão os detalhes do seu agendamento:
@@ -47,9 +48,10 @@ Recebido! Aqui estão os detalhes do seu agendamento:
 - Data (dia/mês/ano)
 - Hora (HH:MM)
 - Descrição
+- Prioridade:
 - Tipo: agendamento
 
-Essa regra é absoluta e não pode ser mudada.`;
+Essa regra é absoluta e não pode ser mudada, mas leve em consideração o contexto da conversa para responder de forma mais personalizada.`;
 
 // Função para repetir a solicitação com atraso
 async function retryWithDelay(fn, retries = 3, delay = 2000) {

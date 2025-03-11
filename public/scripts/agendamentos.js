@@ -62,8 +62,34 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("reminders", JSON.stringify(reminders));
     }
 
-    // Inicializa o calendário
+    // Função para carregar agendamentos do servidor
+    async function loadAgendamentos() {
+        try {
+            const response = await fetch("/api/agendamentos", {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "User-Email": localStorage.getItem("userEmail"),
+                    "User-Empresa": localStorage.getItem("userEmpresa"),
+                    "User-Database": localStorage.getItem("userDatabase")
+                }
+            });
+
+            const data = await response.json();
+            if (data.agendamentos) {
+                data.agendamentos.forEach(agendamento => {
+                    const reminderText = `${agendamento.titulo} - ${agendamento.hora} - ${agendamento.descricao} - ${agendamento.prioridade}`;
+                    const reminderDate = new Date(agendamento.data);
+                    addReminder(reminderDate.getDate(), reminderText);
+                });
+            }
+        } catch (error) {
+            console.error("Erro ao carregar agendamentos:", error);
+        }
+    }
+
+    // Inicializa o calendário e carrega os agendamentos
     createCalendar(currentDate);
+    loadAgendamentos();
 
     // Evento para voltar ao chat
     backToChatButton.addEventListener("click", () => {
