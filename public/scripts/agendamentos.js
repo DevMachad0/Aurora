@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.agendamentos) {
                 data.agendamentos.forEach(agendamento => {
                     const reminderText = `${agendamento.titulo} - ${agendamento.hora} - ${agendamento.descricao} - ${agendamento.prioridade}`;
-                    const reminderDate = new Date(agendamento.data);
+                    const reminderDate = new Date(agendamento.data.split('/').reverse().join('-'));
 
                     // Verifica se a data é válida
                     if (!isNaN(reminderDate.getTime())) {
