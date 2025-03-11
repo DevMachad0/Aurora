@@ -16,7 +16,7 @@ router.get("/agendamentos", async (req, res) => {
 
         const chatHistory = await getChatHistory(email, empresa);
 
-        const agendamentos = chatHistory.filter(chat => chat.message.includes("Recebido! Aqui estão os detalhes do seu agendamento:"))
+        const agendamentos = chatHistory.filter(chat => chat.message.includes("tipo: agendamento"))
             .map(chat => {
                 const lines = chat.message.split('\n');
                 return {
@@ -29,14 +29,7 @@ router.get("/agendamentos", async (req, res) => {
                 };
             });
 
-        // Conecta ao banco de dados principal
-        const db = mongoose.connection.useDb(database);
-        const collectionName = `agendamentos_${empresa}`;
-
-        // Insere os agendamentos na coleção de agendamentos
-        await db.collection(collectionName).insertMany(agendamentos);
-
-        res.json({ message: "Agendamentos registrados com sucesso", agendamentos });
+        res.json({ agendamentos });
     } catch (error) {
         console.error("Erro ao buscar agendamentos:", error);
         res.status(500).json({ error: "Erro ao buscar agendamentos" });

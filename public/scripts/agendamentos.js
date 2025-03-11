@@ -107,6 +107,4 @@ document.addEventListener("DOMContentLoaded", () => {
         createCalendar(currentDate);
     });
 
-    // Exemplo de como adicionar um lembrete
-    // saveReminder(new Date(2023, 10, 15), "Reunião às 10h");
 });
