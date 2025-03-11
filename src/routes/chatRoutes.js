@@ -3,7 +3,6 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { getChatHistory, saveChatHistory, getEmpresaData } = require("../services/chatService");
 const { getAuroraCoreData } = require("../services/auroraCoreService");
 const AuroraCore = require("../models/auroraCoreModel");
-const mongoose = require("mongoose");
 require("dotenv").config();
 
 const router = express.Router();
@@ -35,6 +34,23 @@ const planLimits = {
     MK3: 6000,
 };
 
+const instrucoesAgenda = `Sempre que for solicitado um agendamento, você deve responder exatamente neste padrão:
+Aurora: Claro! Por favor, forneça os seguintes dados:
+- Título do agendamento
+- Data (dia/mês/ano)
+- Hora (HH:MM)
+- Descrição
+
+Após o usuário fornecer os dados, responda sempre com:
+Aurora: Claro! Por favor, forneça os seguintes dados:
+- Título do agendamento
+- Data (dia/mês/ano)
+- Hora (HH:MM)
+- Descrição
+- Tipo: agendamento
+
+Essa regra é absoluta e não pode ser mudada.`;
+
 // Função para repetir a solicitação com atraso
 async function retryWithDelay(fn, retries = 3, delay = 2000) {
     for (let i = 0; i < retries; i++) {
@@ -54,48 +70,12 @@ function getCurrentDateTime() {
     return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
 
-// Função para detectar lembretes na mensagem do usuário
-function detectReminder(message) {
-    const reminderPattern = /Aurora: Claro! Por favor, forneça os seguintes dados:\nTítulo do agendamento\nData \(dia\/mes\/ano\)\nHora \(HH:MM\)\nDescrição\ntipo: agendamento/i;
-    const match = message.match(reminderPattern);
-    if (match) {
-        return {
-            title: match[1],
-            date: match[2],
-            time: match[3],
-            description: match[4]
-        };
-    }
-    return null;
-}
-
-// Função para salvar lembrete no banco de dados
-async function saveReminder(reminder) {
-    const ReminderModel = mongoose.model("Reminder", new mongoose.Schema({
-        title: String,
-        date: String,
-        time: String,
-        description: String
-    }));
-    const newReminder = new ReminderModel(reminder);
-    await newReminder.save();
-}
-
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
     try {
         const { message, user } = req.body;
         if (!message) {
             return res.status(400).json({ error: "Mensagem não pode ser vazia" });
-        }
-
-        // Detecta lembrete na mensagem do usuário
-        const reminder = detectReminder(message);
-        if (reminder) {
-            // Salva o lembrete no banco de dados
-            await saveReminder(reminder);
-
-            return res.json({ message: "Lembrete salvo com sucesso!" });
         }
 
         // Obtém a data e hora atuais
@@ -130,18 +110,13 @@ router.post("/chat", async (req, res) => {
         const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
 
         // Envia a mensagem com contexto e instrução para a IA
-        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));
+        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\n${instrucoesAgenda}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));
         const response = await result.response;
         let botMessage = response.text();
 
         // Salva o histórico de conversas no banco de dados
         await saveChatHistory(user.email, user.empresa, { sender: "user", message });
         await saveChatHistory(user.email, user.empresa, { sender: "bot", message: botMessage });
-
-        // Verifica se a mensagem do usuário é uma solicitação de agendamento
-        if (/criar um novo agendamento/i.test(message)) {
-            botMessage = "Aurora: Claro! Por favor, forneça os seguintes dados:\nTítulo do agendamento\nData (dia/mes/ano)\nHora (HH:MM)\nDescrição\ntipo: agendamento";
-        }
 
         res.json({ message: botMessage });
     } catch (error) {
