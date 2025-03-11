@@ -89,7 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     element.textContent = reminder.titulo;
                     popup.style.display = "none";
                 } else {
-                    console.error("Erro ao excluir agendamento:", await response.json());
+                    const errorData = await response.json();
+                    console.error("Erro ao excluir agendamento:", errorData);
                 }
             } catch (error) {
                 console.error("Erro ao excluir agendamento:", error);
