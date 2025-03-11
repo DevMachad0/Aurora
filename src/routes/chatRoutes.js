@@ -35,14 +35,14 @@ const planLimits = {
 };
 
 const instrucoesAgenda = `Sempre que for solicitado um agendamento, você deve responder exatamente neste padrão:
-Aurora: Claro! Por favor, forneça os seguintes dados:
+Claro! Por favor, forneça os seguintes dados:
 - Título do agendamento
 - Data (dia/mês/ano)
 - Hora (HH:MM)
 - Descrição
 
 Após o usuário fornecer os dados, responda sempre com:
-Aurora: Claro! Por favor, forneça os seguintes dados:
+Recebido! Aqui estão os detalhes do seu agendamento:
 - Título do agendamento
 - Data (dia/mês/ano)
 - Hora (HH:MM)
@@ -116,7 +116,7 @@ router.post("/chat", async (req, res) => {
 
         // Salva o histórico de conversas no banco de dados
         await saveChatHistory(user.email, user.empresa, { sender: "user", message });
-        await saveChatHistory(user.email, user.empresa, { sender: "bot", message: botMessage });
+        await saveChatHistory(user.email, user.empresa, { sender: "Aurora", message: botMessage });
 
         res.json({ message: botMessage });
     } catch (error) {
