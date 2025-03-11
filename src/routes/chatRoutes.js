@@ -1,10 +1,9 @@
-// chatRoutes.js
 const express = require("express");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { getChatHistory, saveChatHistory, getEmpresaData } = require("../services/chatService");
 const { getAuroraCoreData } = require("../services/auroraCoreService");
-const { createGoogleEvent, getGoogleEvents, updateGoogleEvent, isAuthenticated } = require("../services/googleCalendarService");
-const AuroraCore = require("../models/auroraCoreModel");
+const AuroraCore = require("../models/auroraCoreModel"); // Adicione esta linha
+const { createGoogleEvent } = require("../services/googleCalendarService");
 require("dotenv").config();
 
 const router = express.Router();
@@ -18,11 +17,11 @@ const chat = model.startChat({
     history: [
         {
             role: "user",
-            parts: [{ text: "Você é a AURORA, uma assistente pessoal corporativa. Seu objetivo é fornecer apoio personalizado e eficiente, ajudando o usuário com questões diárias, utilizando os dados disponíveis sobre suas preferências e necessidades. Suas respostas devem ser claras, objetivas e focadas em facilitar a execução de tarefas, sempre com um toque profissional e de precisão. Você tem a capacidade de criar, visualizar e modificar eventos no Google Agenda do usuário." }]
+            parts: [{ text: "Você é a AURORA, uma assistente pessoal corporativa. Seu objetivo é fornecer apoio personalizado e eficiente, ajudando o usuário com questões diárias, utilizando os dados disponíveis sobre suas preferências e necessidades. Suas respostas devem ser claras, objetivas e focadas em facilitar a execução de tarefas, sempre com um toque profissional e de precisão." }]
         },
         {
             role: "model",
-            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as nescessidades do meu usuario com textos planos. Eu posso criar eventos no Google Agenda para você." }]
+            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as nescessidades do meu usuario com textos planos." }]
         }
     ],
     generationConfig: {
@@ -55,40 +54,39 @@ function getCurrentDateTime() {
     return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
 
-// Variáveis globais para armazenar os detalhes do evento
-let eventDetails = {
-    summary: "",
-    start: {
-        dateTime: ""
-    },
-    end: {
-        dateTime: ""
-    },
-    location: "",
-    attendees: [],
-    description: ""
-};
+// Função para processar a criação de um novo evento
+async function processNewEventCreation(user, message) {
+    const eventDetails = {};
 
-// Função para formatar a data no formato brasileiro
-function formatDateToBR(dateString) {
-    const [year, month, day] = dateString.split("-");
-    return `${day}/${month}/${year}`;
-}
+    if (message.toLowerCase().includes("criar novo evento")) {
+        return "Por favor, forneça o título do evento.";
+    }
 
-// Função para resetar os detalhes do evento
-function resetEventDetails() {
-    eventDetails = {
-        summary: "",
-        start: {
-            dateTime: ""
-        },
-        end: {
-            dateTime: ""
-        },
-        location: "",
-        attendees: [],
-        description: ""
-    };
+    if (!eventDetails.summary) {
+        eventDetails.summary = message;
+        return "Qual é a data de início do evento? (Formato: YYYY-MM-DDTHH:MM:SS)";
+    }
+
+    if (!eventDetails.start) {
+        eventDetails.start = { dateTime: message, timeZone: "America/Sao_Paulo" };
+        return "Qual é a data de término do evento? (Formato: YYYY-MM-DDTHH:MM:SS)";
+    }
+
+    if (!eventDetails.end) {
+        eventDetails.end = { dateTime: message, timeZone: "America/Sao_Paulo" };
+        return "Deseja confirmar a criação do evento? (sim/não)";
+    }
+
+    if (message.toLowerCase() === "sim") {
+        try {
+            const response = await createGoogleEvent(user.email, eventDetails);
+            return response;
+        } catch (error) {
+            return `Erro ao criar evento: ${error.message}`;
+        }
+    }
+
+    return "Criação de evento cancelada.";
 }
 
 // Rota para processar mensagens do usuário
@@ -99,119 +97,57 @@ router.post("/chat", async (req, res) => {
             return res.status(400).json({ error: "Mensagem não pode ser vazia" });
         }
 
-        // Verifica se o usuário está autenticado
-        if (!isAuthenticated(user.email)) {
-            return res.status(401).json({ error: "Usuário não autenticado. Por favor, faça login." });
+        // Obtém a data e hora atuais
+        const currentDateTime = getCurrentDateTime();
+
+        // Obtém o histórico de conversas do usuário
+        const chatHistory = await getChatHistory(user.email, user.empresa);
+
+        // Obtém as instruções e restrições do AuroraCore
+        const auroraCoreData = await getAuroraCoreData();
+
+        // Obtém os dados da empresa com base no tipo "documento"
+        const empresaData = await getEmpresaData(user.empresa, "documento");
+
+        // Cria um contexto para o modelo entender quem está falando
+        const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
+
+        // Adiciona o histórico de conversas ao contexto
+        const historyContext = chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n");
+
+        // Verifica o limite de caracteres baseado no plano do usuário
+        const charLimit = planLimits[user.plano] || 1000;
+
+        // Instrução para a IA respeitar o limite de caracteres e destacar títulos
+        const instruction = `Responda de forma direta e curta, sem ultrapassar ${charLimit} caracteres. Sempre que for gerar um título, destaque o começo e o final do título com "#" a depender do tamanho que você escolher para o <h>.`;
+
+        // Adiciona as instruções e restrições do AuroraCore ao contexto
+        const coreInstructions = auroraCoreData.instructions.join("\n");
+        const coreRestrictions = auroraCoreData.restrictions.join("\n");
+
+        // Adiciona os dados da empresa ao contexto
+        const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
+
+        // Verifica se a mensagem é para criar um novo evento
+        const eventResponse = await processNewEventCreation(user, message);
+        if (eventResponse) {
+            return res.json({ message: eventResponse });
         }
 
-        // Verifica se a mensagem é uma solicitação de agendamento
-        if (message.toLowerCase().includes("criar evento")) {
-            resetEventDetails();
-            return res.json({ message: "Vamos criar um novo evento. Qual é o título do evento?" });
-        }
+        // Envia a mensagem com contexto e instrução para a IA
+        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));
+        const response = await result.response;
+        let botMessage = response.text();
 
-        // Coleta os detalhes do evento passo a passo
-        if (!eventDetails.summary) {
-            eventDetails.summary = message;
-            return res.json({ message: "Qual é a data de início do evento? (Formato: DD/MM/AAAA)" });
-        }
+        // Salva o histórico de conversas no banco de dados
+        await saveChatHistory(user.email, user.empresa, { sender: "user", message });
+        await saveChatHistory(user.email, user.empresa, { sender: "bot", message: botMessage });
 
-        if (!eventDetails.start.dateTime) {
-            const [day, month, year] = message.split("/");
-            eventDetails.start.dateTime = `${year}-${month}-${day}`;
-            return res.json({ message: "Qual é a hora de início do evento? (Formato: HH:MM)" });
-        }
-
-        if (!eventDetails.end.dateTime) {
-            eventDetails.end.dateTime = `${eventDetails.start.dateTime}T${message}:00`;
-            return res.json({ message: "Qual é a data de término do evento? (Formato: DD/MM/AAAA)" });
-        }
-
-        if (!eventDetails.end.dateTime.includes("T")) {
-            const [day, month, year] = message.split("/");
-            eventDetails.end.dateTime = `${year}-${month}-${day}T${eventDetails.end.dateTime.split("T")[1]}`;
-            return res.json({ message: "Qual é a localização do evento?" });
-        }
-
-        if (!eventDetails.location) {
-            eventDetails.location = message;
-            return res.json({ message: "Quais são os e-mails dos participantes? (Separe por vírgula)" });
-        }
-
-        if (eventDetails.attendees.length === 0) {
-            eventDetails.attendees = message.split(",").map(email => ({ email: email.trim() }));
-            return res.json({ message: "Deseja adicionar uma descrição ao evento? (Se não, responda 'não')" });
-        }
-
-        if (!eventDetails.description && message.toLowerCase() !== "não") {
-            eventDetails.description = message;
-        }
-
-        // Confirmação final
-        return res.json({ message: `Confirme os detalhes do evento:\nTítulo: ${eventDetails.summary}\nInício: ${formatDateToBR(eventDetails.start.dateTime.split("T")[0])} ${eventDetails.start.dateTime.split("T")[1]}\nTérmino: ${formatDateToBR(eventDetails.end.dateTime.split("T")[0])} ${eventDetails.end.dateTime.split("T")[1]}\nLocalização: ${eventDetails.location}\nParticipantes: ${eventDetails.attendees.map(a => a.email).join(", ")}\nDescrição: ${eventDetails.description || "Nenhuma"}\n\nResponda 'sim' para confirmar e criar o evento.` });
-
+        res.json({ message: botMessage });
     } catch (error) {
         console.error("Erro ao conectar com Gemini:", error);
         res.status(500).json({ error: "Erro ao processar sua solicitação" });
     }
 });
-
-// Rota para confirmar e criar o evento
-router.post("/confirm-event", async (req, res) => {
-    try {
-        const { message, user } = req.body;
-        if (message.toLowerCase() === "sim") {
-            const eventResponse = await createGoogleEvent(user.email, eventDetails);
-            resetEventDetails();
-            return res.json({ message: eventResponse });
-        } else {
-            resetEventDetails();
-            return res.json({ message: "Criação de evento cancelada." });
-        }
-    } catch (error) {
-        console.error("Erro ao criar evento no Google Calendar:", error);
-        res.status(500).json({ error: "Erro ao criar evento no Google Calendar" });
-    }
-});
-
-async function solicitEventDetails(email, message) {
-    // Solicita os detalhes do evento ao usuário usando a IA
-    const result = await chat.sendMessage(`Com base na mensagem do usuário: "${message}", solicite as informações necessárias para agendar um evento no Google Agenda. Pergunte sobre o título, data e hora de início, data e hora de término, localização (presencial ou online), participantes (emails) e descrição (opcional). Se o usuário fornecer todas as informações, retorne um objeto JSON no seguinte formato: { summary: "título", start: { dateTime: "data e hora de início" }, end: { dateTime: "data e hora de término" }, location: "localização", attendees: [{ email: "email1" }, { email: "email2" }], description: "descrição" }. Se o usuário cancelar, retorne null.`);
-    const response = await result.response;
-    const botMessage = response.text();
-
-    try {
-        // Tenta analisar a resposta da IA como JSON
-        const eventDetails = JSON.parse(botMessage);
-
-        // Verifica se os campos obrigatórios estão presentes
-        if (!eventDetails.summary || !eventDetails.start || !eventDetails.end) {
-            throw new Error("Detalhes do evento incompletos.");
-        }
-
-        return eventDetails;
-    } catch (error) {
-        // Se a resposta não for JSON ou estiver incompleta, solicita as informações novamente
-        return solicitEventDetails(email, `${message} ${botMessage}`);
-    }
-}
-
-function validateEventDetails(eventDetails) {
-    if (!eventDetails.summary || !eventDetails.start || !eventDetails.end) {
-        return false;
-    }
-
-    // Valida os formatos de data e hora
-    if (!isValidDate(eventDetails.start.dateTime) || !isValidDate(eventDetails.end.dateTime)) {
-        return false;
-    }
-
-    return true;
-}
-
-function isValidDate(dateString) {
-    const date = new Date(dateString);
-    return !isNaN(date.getTime());
-}
 
 module.exports = router;
