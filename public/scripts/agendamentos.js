@@ -12,22 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
         calendar.innerHTML = "";
         const year = date.getFullYear();
         const month = date.getMonth();
-        const firstDayOfMonth = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         currentMonthYear.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
-
-        // Preenche os dias anteriores ao primeiro dia do mês
-        for (let i = 0; i < firstDayOfMonth; i++) {
-            const emptyDayElement = document.createElement("div");
-            emptyDayElement.classList.add("day");
-            calendar.appendChild(emptyDayElement);
-        }
 
         // Preenche os dias do mês
         for (let i = 1; i <= daysInMonth; i++) {
             const dayElement = document.createElement("div");
             dayElement.classList.add("day");
+            const fullDate = new Date(year, month, i).toLocaleDateString('pt-BR');
+            dayElement.setAttribute("data-date", fullDate);
             dayElement.innerHTML = `<h3>${i}</h3>`;
             calendar.appendChild(dayElement);
         }
@@ -37,14 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Função para adicionar lembrete
     function addReminder(date, reminder) {
-        const day = date.getDate();
-        const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
-        const dayElements = calendar.querySelectorAll(".day");
+        const fullDate = date.toLocaleDateString('pt-BR');
+        const dayElement = calendar.querySelector(`.day[data-date='${fullDate}']`);
 
-        // Ajusta o índice do dia
-        const dayIndex = day + firstDayOfMonth - 1;
-        if (dayIndex >= 0 && dayIndex < dayElements.length) {
-            const dayElement = dayElements[dayIndex];
+        if (dayElement) {
             const reminderElement = document.createElement("div");
             reminderElement.classList.add("reminder");
             reminderElement.textContent = reminder;
