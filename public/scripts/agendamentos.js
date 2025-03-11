@@ -63,11 +63,18 @@ document.addEventListener("DOMContentLoaded", () => {
             <p><strong>Hora:</strong> ${reminder.hora}</p>
             <p><strong>Descrição:</strong> ${reminder.descricao}</p>
             <p><strong>Prioridade:</strong> ${reminder.prioridade}</p>
+            <button id="delete-button">Excluir</button>
         `;
         const rect = element.getBoundingClientRect();
         popup.style.top = `${rect.bottom + window.scrollY}px`;
         popup.style.left = `${rect.left + window.scrollX}px`;
         popup.style.display = "block";
+
+        document.getElementById("delete-button").addEventListener("click", () => {
+            reminder.titulo = "(Foi excluido da agenda) " + reminder.titulo;
+            element.textContent = reminder.titulo;
+            popup.style.display = "none";
+        });
     }
 
     // Função para carregar lembretes do localStorage
