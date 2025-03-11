@@ -56,7 +56,7 @@ function getCurrentDateTime() {
 
 // Função para detectar lembretes na mensagem do usuário
 function detectReminder(message) {
-    const reminderPattern = /usuario esses são os dados do agendamento:\ntitulo\n(.+)\ndata\n(.+)\nhora\n(.+)\ndescrição\n(.+)\n\(Tipo: lembrete\)/i;
+    const reminderPattern = /Aurora: Claro! Por favor, forneça os seguintes dados:\nTítulo do agendamento\nData \(dia\/mes\/ano\)\nHora \(HH:MM\)\nDescrição\ntipo: agendamento/i;
     const match = message.match(reminderPattern);
     if (match) {
         return {
@@ -140,7 +140,7 @@ router.post("/chat", async (req, res) => {
 
         // Verifica se a mensagem do usuário é uma solicitação de agendamento
         if (/criar um novo agendamento/i.test(message)) {
-            botMessage = "Claro! Por favor, forneça os seguintes dados:\n1. Título do agendamento\n2. Data (YYYY-MM-DD)\n3. Hora (HH:MM)\n4. Descrição";
+            botMessage = "Aurora: Claro! Por favor, forneça os seguintes dados:\nTítulo do agendamento\nData (dia/mes/ano)\nHora (HH:MM)\nDescrição\ntipo: agendamento";
         }
 
         res.json({ message: botMessage });
