@@ -7,22 +7,58 @@ Aurora é uma assistente pessoal corporativa projetada para fornecer apoio perso
 - **Chat com IA**: Interaja com a assistente Aurora para obter respostas rápidas e precisas.
 - **Histórico de Conversas**: Visualize e filtre o histórico de conversas com base em data, hora e texto.
 - **Autenticação**: Proteja o acesso ao chat e ao histórico de conversas com autenticação baseada em token.
+- **Configurações do Usuário**: Visualize e edite as informações do perfil do usuário.
+- **Suporte ao Cliente**: Sistema de suporte ao cliente com geração de número de protocolo.
 
 ## Estrutura do Projeto
 
 - **/src/routes**: Contém as rotas da API.
+  - `authRoutes.js`: Rota para autenticação de usuários.
   - `chatRoutes.js`: Rota para processar mensagens do usuário.
   - `chatHistoryRoutes.js`: Rota para obter o histórico de conversas.
+  - `empresaRoutes.js`: Rota para gerenciar dados da empresa.
+  - `supportClientRoutes.js`: Rota para gerenciar chamados de suporte ao cliente.
+  - `userRoutes.js`: Rota para gerenciar usuários.
+  - `storageRoutes.js`: Rota para obter o status de armazenamento.
+  - `domainRoutes.js`: Rota para gerenciar domínios.
+  - `chat_support.js`: Rota para suporte ao cliente via chat.
+  - `chat_support_bot.js`: Configuração do bot de suporte ao cliente.
+- **/src/models**: Contém os modelos de dados do Mongoose.
+  - `auroraCoreModel.js`: Modelo para dados centrais da Aurora.
+  - `chatHistoryModel.js`: Modelo para histórico de conversas.
+  - `domainModel.js`: Modelo para domínios.
+  - `empresaModel.js`: Modelo para dados da empresa.
+  - `supportClientModel.js`: Modelo para clientes de suporte.
+  - `userModel.js`: Modelo para usuários.
+- **/src/services**: Contém os serviços de lógica de negócios.
+  - `auroraCoreService.js`: Serviço para dados centrais da Aurora.
+  - `chatService.js`: Serviço para histórico de conversas.
+  - `userService.js`: Serviço para gerenciamento de usuários.
+- **/src/middleware**: Contém os middlewares.
+  - `verifyToken.js`: Middleware para verificar tokens de autenticação.
+- **/src/controllers**: Contém os controladores.
+  - `authController.js`: Controlador para autenticação de usuários.
+- **/src/config**: Contém as configurações.
+  - `storageConfig.js`: Configuração para status de armazenamento.
 - **/public**: Contém os arquivos estáticos (HTML, CSS, JS).
   - `chat-aurora.html`: Página principal do chat.
   - `chat-history.html`: Página para visualizar o histórico de conversas.
+  - `chat-config.html`: Página para configurações do usuário.
   - **/styles**: Contém os arquivos CSS.
     - `chat-aurora.css`: Estilos para a página do chat.
     - `chat-history-desktop.css`: Estilos para a página de histórico de conversas (desktop).
     - `chat-history-mobile.css`: Estilos para a página de histórico de conversas (mobile).
+    - `chat-config.css`: Estilos para a página de configurações do usuário.
+    - `desktop.css`: Estilos para a página de login (desktop).
+    - `mobile.css`: Estilos para a página de login (mobile).
   - **/scripts**: Contém os arquivos JavaScript.
     - `chat-aurora.js`: Lógica do chat.
     - `chat-history.js`: Lógica para filtrar e exibir o histórico de conversas.
+    - `config.js`: Lógica para a página de configurações do usuário.
+    - **/config**: Contém os scripts de configuração.
+      - `verifyToken.js`: Verificação de token no frontend.
+- **/aurora_api**: Contém a API da Aurora.
+  - `html.html`: Interface de chat para suporte ao cliente.
 
 ## Instalação
 
@@ -43,6 +79,9 @@ Aurora é uma assistente pessoal corporativa projetada para fornecer apoio perso
 
 1. Crie um arquivo `.env` na raiz do projeto e adicione as seguintes variáveis:
     ```env
+    MONGO_URI=your_mongo_uri
+    PORT=3000
+    JWT_SECRET=your_jwt_secret
     GEMINI_API_KEY=your_gemini_api_key
     ```
 

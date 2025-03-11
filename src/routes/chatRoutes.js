@@ -53,12 +53,41 @@ function getCurrentDateTime() {
     return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
 
+// Função para detectar lembretes na mensagem do usuário
+function detectReminder(message) {
+    const reminderPattern = /usuario esses são os dados do agendamento:\ntitulo\n(.+)\ndata\n(.+)\nhora\n(.+)\ndescrição\n(.+)\n\(Tipo: lembrete\)/i;
+    const match = message.match(reminderPattern);
+    if (match) {
+        return {
+            title: match[1],
+            date: match[2],
+            time: match[3],
+            description: match[4]
+        };
+    }
+    return null;
+}
+
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
     try {
         const { message, user } = req.body;
         if (!message) {
             return res.status(400).json({ error: "Mensagem não pode ser vazia" });
+        }
+
+        // Detecta lembrete na mensagem do usuário
+        const reminder = detectReminder(message);
+        if (reminder) {
+            // Salva o lembrete no localStorage
+            const reminders = JSON.parse(localStorage.getItem("reminders")) || [];
+            reminders.push({
+                date: reminder.date,
+                text: `${reminder.title} - ${reminder.time} - ${reminder.description}`
+            });
+            localStorage.setItem("reminders", JSON.stringify(reminders));
+
+            return res.json({ message: "Lembrete salvo com sucesso!" });
         }
 
         // Obtém a data e hora atuais
