@@ -3,7 +3,6 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { getChatHistory, saveChatHistory, getEmpresaData } = require("../services/chatService");
 const { getAuroraCoreData } = require("../services/auroraCoreService");
 const AuroraCore = require("../models/auroraCoreModel"); // Adicione esta linha
-const { createGoogleEvent } = require("../services/googleCalendarService");
 require("dotenv").config();
 
 const router = express.Router();
@@ -54,41 +53,6 @@ function getCurrentDateTime() {
     return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
 
-// Função para processar a criação de um novo evento
-async function processNewEventCreation(user, message) {
-    const eventDetails = {};
-
-    if (message.toLowerCase().includes("criar novo evento")) {
-        return "Por favor, forneça o título do evento.";
-    }
-
-    if (!eventDetails.summary) {
-        eventDetails.summary = message;
-        return "Qual é a data de início do evento? (Formato: YYYY-MM-DDTHH:MM:SS)";
-    }
-
-    if (!eventDetails.start) {
-        eventDetails.start = { dateTime: message, timeZone: "America/Sao_Paulo" };
-        return "Qual é a data de término do evento? (Formato: YYYY-MM-DDTHH:MM:SS)";
-    }
-
-    if (!eventDetails.end) {
-        eventDetails.end = { dateTime: message, timeZone: "America/Sao_Paulo" };
-        return "Deseja confirmar a criação do evento? (sim/não)";
-    }
-
-    if (message.toLowerCase() === "sim") {
-        try {
-            const response = await createGoogleEvent(user.email, eventDetails);
-            return response;
-        } catch (error) {
-            return `Erro ao criar evento: ${error.message}`;
-        }
-    }
-
-    return "Criação de evento cancelada.";
-}
-
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
     try {
@@ -127,12 +91,6 @@ router.post("/chat", async (req, res) => {
 
         // Adiciona os dados da empresa ao contexto
         const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
-
-        // Verifica se a mensagem é para criar um novo evento
-        const eventResponse = await processNewEventCreation(user, message);
-        if (eventResponse) {
-            return res.json({ message: eventResponse });
-        }
 
         // Envia a mensagem com contexto e instrução para a IA
         const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));

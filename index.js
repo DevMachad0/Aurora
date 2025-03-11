@@ -13,7 +13,6 @@ const chatSupportRoutes = require('./src/routes/chat_support');
 const domainRoutes = require("./src/routes/domainRoutes");
 const fs = require('fs');
 const helmet = require('helmet');
-require("./src/config/passportConfig"); // Adiciona esta linha para configurar o Passport
 
 // Carregar domínios permitidos de um arquivo JSON
 const allowedDomains = JSON.parse(fs.readFileSync('./allowedDomains.json', 'utf8'));
@@ -45,11 +44,6 @@ app.use(helmet({
     }
   }
 }));
-
-// Configuração do Passport.js
-app.use(session({ secret: "secret", resave: false, saveUninitialized: true }));
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Servindo arquivos estáticos da pasta 'public'
 app.use(express.static("public"));

@@ -55,10 +55,6 @@
             <button class="save-button">Salvar</button>
         </div>
 
-        <!-- Botão de autenticação com o Google -->
-        <div class="google-auth">
-            <button id="google-auth-button">Autenticar com o Google</button>
-        </div>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -74,10 +70,6 @@
             document.querySelector(".info-box p:nth-child(5)").innerHTML = `<strong>Plano:</strong> ${userPlano}`;
             document.querySelector(".info-box p:nth-child(6)").innerHTML = `<strong>Tipo:</strong> ${userTipo}`;
 
-            // Adicionar evento de clique para o botão de autenticação com o Google
-            document.getElementById("google-auth-button").addEventListener("click", () => {
-                window.location.href = "/api/auth/google";
-            });
         });
     </script>
     <script src="scripts/config.js"></script>
