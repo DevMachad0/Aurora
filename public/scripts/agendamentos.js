@@ -42,9 +42,13 @@ document.addEventListener("DOMContentLoaded", () => {
             dayElement.querySelectorAll(".reminder").forEach(reminderElement => reminderElement.remove());
     
             const reminderElement = document.createElement("div");
-            reminderElement.classList.add("reminder", reminder.prioridade.toLowerCase());
+            const prioridade = reminder.prioridade ? reminder.prioridade.toLowerCase() : "baixa";
+            reminderElement.classList.add("reminder", prioridade);
             reminderElement.textContent = reminder.titulo;
-            reminderElement.addEventListener("click", () => showPopup(reminder, reminderElement));
+            reminderElement.addEventListener("click", (event) => {
+                event.stopPropagation(); // Impede que o clique feche o popup
+                showPopup(reminder, reminderElement);
+            });
             dayElement.appendChild(reminderElement);
         } else {
             console.warn("Não foi possível encontrar um dia correspondente no calendário", date);
@@ -106,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         data: agendamento.data,
                         hora: agendamento.hora,
                         descricao: agendamento.descricao,
-                        prioridade: agendamento.prioridade
+                        prioridade: agendamento.prioridade || "baixa" // Define prioridade padrão como "baixa"
                     };
                     const [day, month, year] = agendamento.data.split('/');
                     const reminderDate = new Date(year, month - 1, day);
