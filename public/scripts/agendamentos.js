@@ -70,10 +70,30 @@ document.addEventListener("DOMContentLoaded", () => {
         popup.style.left = `${rect.left + window.scrollX}px`;
         popup.style.display = "block";
 
-        document.getElementById("delete-button").addEventListener("click", () => {
-            reminder.titulo = "(Foi excluido da agenda) " + reminder.titulo;
-            element.textContent = reminder.titulo;
-            popup.style.display = "none";
+        document.getElementById("delete-button").addEventListener("click", async () => {
+            try {
+                const response = await fetch("/api/agendamentos/excluir", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        "User-Email": localStorage.getItem("userEmail"),
+                        "User-Empresa": localStorage.getItem("userEmpresa"),
+                        "User-Database": localStorage.getItem("userDatabase")
+                    },
+                    body: JSON.stringify({ titulo: reminder.titulo, data: reminder.data, hora: reminder.hora })
+                });
+
+                if (response.ok) {
+                    reminder.titulo = "(Foi excluido da agenda) " + reminder.titulo;
+                    element.textContent = reminder.titulo;
+                    popup.style.display = "none";
+                } else {
+                    console.error("Erro ao excluir agendamento:", await response.json());
+                }
+            } catch (error) {
+                console.error("Erro ao excluir agendamento:", error);
+            }
         });
     }
 

@@ -46,4 +46,35 @@ router.get("/agendamentos", async (req, res) => {
     }
 });
 
+router.post("/agendamentos/excluir", async (req, res) => {
+    try {
+        const { titulo, data, hora } = req.body;
+        const email = req.headers["user-email"];
+        const empresa = req.headers["user-empresa"];
+        const database = req.headers["user-database"];
+
+        if (!email || !empresa || !database) {
+            return res.status(400).json({ error: "Email, empresa ou database do usuário não encontrado" });
+        }
+
+        const db = mongoose.connection.useDb(database);
+        const collectionName = `data_${empresa}`;
+        const collection = db.collection(collectionName);
+
+        const result = await collection.updateOne(
+            { email, "chat.message": { $regex: `Recebido! Aqui estão os detalhes do seu agendamento:` } },
+            { $set: { "chat.$.message": `(Foi excluido da agenda) Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ error: "Agendamento não encontrado" });
+        }
+
+        res.status(200).json({ message: "Agendamento excluído com sucesso" });
+    } catch (error) {
+        console.error("Erro ao excluir agendamento:", error);
+        res.status(500).json({ error: "Erro ao excluir agendamento" });
+    }
+});
+
 module.exports = router;
