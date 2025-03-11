@@ -80,7 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.agendamentos) {
                 data.agendamentos.forEach(agendamento => {
                     const reminderText = `${agendamento.titulo} - ${agendamento.hora} - ${agendamento.descricao} - ${agendamento.prioridade}`;
-                    const reminderDate = new Date(agendamento.data.split('/').reverse().join('-'));
+                    const [day, month, year] = agendamento.data.split('/');
+                    const reminderDate = new Date(`${year}-${month}-${day}`);
 
                     // Verifica se a data é válida e se pertence ao mês atual
                     if (!isNaN(reminderDate.getTime()) && reminderDate.getFullYear() === currentDate.getFullYear() && reminderDate.getMonth() === currentDate.getMonth()) {
