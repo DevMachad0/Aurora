@@ -92,11 +92,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     const reminderText = `${agendamento.titulo} - ${agendamento.hora} - ${agendamento.descricao} - ${agendamento.prioridade}`;
                     const reminderDate = new Date(agendamento.data.split('/').reverse().join('-'));
 
-                    // Verifica se a data é válida
-                    if (!isNaN(reminderDate.getTime())) {
+                    // Verifica se a data é válida e se pertence ao mês atual
+                    if (!isNaN(reminderDate.getTime()) && reminderDate.getFullYear() === currentDate.getFullYear() && reminderDate.getMonth() === currentDate.getMonth()) {
                         addReminder(reminderDate, reminderText);
                     } else {
-                        console.error("Data inválida para agendamento:", agendamento);
+                        console.error("Data inválida ou fora do mês atual para agendamento:", agendamento);
                     }
                 });
             }
