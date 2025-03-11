@@ -69,6 +69,12 @@ let eventDetails = {
     description: ""
 };
 
+// Função para formatar a data no formato brasileiro
+function formatDateToBR(dateString) {
+    const [year, month, day] = dateString.split("-");
+    return `${day}/${month}/${year}`;
+}
+
 // Função para resetar os detalhes do evento
 function resetEventDetails() {
     eventDetails = {
@@ -107,16 +113,23 @@ router.post("/chat", async (req, res) => {
         // Coleta os detalhes do evento passo a passo
         if (!eventDetails.summary) {
             eventDetails.summary = message;
-            return res.json({ message: "Qual é a data e hora de início do evento? (Formato: AAAA-MM-DDTHH:MM)" });
+            return res.json({ message: "Qual é a data de início do evento? (Formato: DD/MM/AAAA)" });
         }
 
         if (!eventDetails.start.dateTime) {
-            eventDetails.start.dateTime = message;
-            return res.json({ message: "Qual é a data e hora de término do evento? (Formato: AAAA-MM-DDTHH:MM)" });
+            const [day, month, year] = message.split("/");
+            eventDetails.start.dateTime = `${year}-${month}-${day}`;
+            return res.json({ message: "Qual é a hora de início do evento? (Formato: HH:MM)" });
         }
 
         if (!eventDetails.end.dateTime) {
-            eventDetails.end.dateTime = message;
+            eventDetails.end.dateTime = `${eventDetails.start.dateTime}T${message}:00`;
+            return res.json({ message: "Qual é a data de término do evento? (Formato: DD/MM/AAAA)" });
+        }
+
+        if (!eventDetails.end.dateTime.includes("T")) {
+            const [day, month, year] = message.split("/");
+            eventDetails.end.dateTime = `${year}-${month}-${day}T${eventDetails.end.dateTime.split("T")[1]}`;
             return res.json({ message: "Qual é a localização do evento?" });
         }
 
@@ -135,7 +148,7 @@ router.post("/chat", async (req, res) => {
         }
 
         // Confirmação final
-        return res.json({ message: `Confirme os detalhes do evento:\nTítulo: ${eventDetails.summary}\nInício: ${eventDetails.start.dateTime}\nTérmino: ${eventDetails.end.dateTime}\nLocalização: ${eventDetails.location}\nParticipantes: ${eventDetails.attendees.map(a => a.email).join(", ")}\nDescrição: ${eventDetails.description || "Nenhuma"}\n\nResponda 'sim' para confirmar e criar o evento.` });
+        return res.json({ message: `Confirme os detalhes do evento:\nTítulo: ${eventDetails.summary}\nInício: ${formatDateToBR(eventDetails.start.dateTime.split("T")[0])} ${eventDetails.start.dateTime.split("T")[1]}\nTérmino: ${formatDateToBR(eventDetails.end.dateTime.split("T")[0])} ${eventDetails.end.dateTime.split("T")[1]}\nLocalização: ${eventDetails.location}\nParticipantes: ${eventDetails.attendees.map(a => a.email).join(", ")}\nDescrição: ${eventDetails.description || "Nenhuma"}\n\nResponda 'sim' para confirmar e criar o evento.` });
 
     } catch (error) {
         console.error("Erro ao conectar com Gemini:", error);
