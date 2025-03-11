@@ -33,8 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function addReminder(date, reminder) {
         const fullDate = date.toLocaleDateString('pt-BR');
         const dayElement = calendar.querySelector(`.day[data-date='${fullDate}']`);
-
+    
         if (dayElement) {
+            // Removendo lembretes duplicados antes de adicionar novos
+            dayElement.querySelectorAll(".reminder").forEach(reminderElement => reminderElement.remove());
+    
             const reminderElement = document.createElement("div");
             reminderElement.classList.add("reminder");
             reminderElement.textContent = reminder;
@@ -43,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
             console.warn("Não foi possível encontrar um dia correspondente no calendário", date);
         }
     }
-
     // Função para carregar lembretes do localStorage
     function loadReminders() {
         const reminders = JSON.parse(localStorage.getItem("reminders")) || [];
