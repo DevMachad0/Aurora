@@ -36,7 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Função para adicionar lembrete
-    function addReminder(day, reminder) {
+    function addReminder(date, reminder) {
+        const day = date.getDate();
         const dayElement = calendar.querySelector(`.day:nth-child(${day + new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay()})`);
         const reminderElement = document.createElement("div");
         reminderElement.classList.add("reminder");
@@ -50,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
         reminders.forEach(reminder => {
             const reminderDate = new Date(reminder.date);
             if (reminderDate.getFullYear() === currentDate.getFullYear() && reminderDate.getMonth() === currentDate.getMonth()) {
-                addReminder(reminderDate.getDate(), reminder.text);
+                addReminder(reminderDate, reminder.text);
             }
         });
     }
@@ -79,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.agendamentos.forEach(agendamento => {
                     const reminderText = `${agendamento.titulo} - ${agendamento.hora} - ${agendamento.descricao} - ${agendamento.prioridade}`;
                     const reminderDate = new Date(agendamento.data);
-                    addReminder(reminderDate.getDate(), reminderText);
+                    addReminder(reminderDate, reminderText);
                 });
             }
         } catch (error) {
@@ -100,11 +101,15 @@ document.addEventListener("DOMContentLoaded", () => {
     prevMonthButton.addEventListener("click", () => {
         currentDate.setMonth(currentDate.getMonth() - 1);
         createCalendar(currentDate);
+        loadAgendamentos();
     });
 
     nextMonthButton.addEventListener("click", () => {
         currentDate.setMonth(currentDate.getMonth() + 1);
         createCalendar(currentDate);
+        loadAgendamentos();
     });
 
+    // Exemplo de como adicionar um lembrete
+    // saveReminder(new Date(2023, 10, 15), "Reunião às 10h");
 });
