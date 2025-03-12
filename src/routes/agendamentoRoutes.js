@@ -57,11 +57,10 @@ router.post("/agendamentos/excluir", async (req, res) => {
             return res.status(400).json({ error: "Email, empresa ou database do usuário não encontrado" });
         }
 
-        const db = mongoose.connection.useDb(database);
-        const collectionName = `data_${empresa}`; // Usar o nome da empresa com espaços
-        console.log(`Nome da coleção formatado: ${collectionName}`); // Log para depuração
+        const db = mongoose.connection.useDb(database.trim()); // Removendo espaços extras
+        const collectionName = database.startsWith("data_") ? database : `data_${empresa}`;
+        console.log(`Nome da coleção formatado: ${collectionName}`);
         const collection = db.collection(collectionName);
-
         const result = await collection.updateOne(
             { email, "chat.message": { $regex: `Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } },
             { $set: { "chat.$.message": `(Foi excluido da agenda) Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } }
