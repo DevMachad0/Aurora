@@ -69,39 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
         popup.style.top = `${rect.bottom + window.scrollY}px`;
         popup.style.left = `${rect.left + window.scrollX}px`;
         popup.style.display = "block";
-
-        document.getElementById("delete-button").addEventListener("click", async () => {
-            try {
-                const response = await fetch("/api/agendamentos/delete", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                        "User-Email": localStorage.getItem("userEmail"),
-                        "User-Empresa": localStorage.getItem("userEmpresa"),
-                        "User-Database": localStorage.getItem("userDatabase")
-                    },
-                    body: JSON.stringify({ 
-                        titulo: reminder.titulo.trim(), 
-                        data: reminder.data.trim(), 
-                        hora: reminder.hora.trim(), 
-                        descricao: reminder.descricao.trim(), 
-                        prioridade: reminder.prioridade.trim() 
-                    })
-                });
-
-                if (response.ok) {
-                    reminder.titulo = "(Excluído) " + reminder.titulo;
-                    element.textContent = reminder.titulo;
-                    popup.style.display = "none";
-                } else {
-                    const errorData = await response.json();
-                    console.error("Erro ao excluir agendamento:", errorData);
-                }
-            } catch (error) {
-                console.error("Erro ao excluir agendamento:", error);
-            }
-        });
     }
 
     // Função para carregar lembretes do localStorage

@@ -46,48 +46,4 @@ router.get("/agendamentos", async (req, res) => {
     }
 });
 
-router.post("/agendamentos/delete", async (req, res) => {
-    try {
-        const email = req.headers["user-email"];
-        const empresa = req.headers["user-empresa"]?.trim();
-        const database = req.headers["user-database"]?.trim();
-        const { titulo, data, hora, descricao, prioridade } = req.body;
-
-        if (!email || !empresa || !database) {
-            return res.status(400).json({ error: "Email, empresa ou database do usuário não encontrado" });
-        }
-
-        const chatHistory = await getChatHistory(email, empresa);
-
-        // Filtra as mensagens que contêm as informações do agendamento
-        const agendamento = chatHistory.find(chat => 
-            chat.sender === "Aurora" &&
-            chat.message.includes("Recebido! Aqui estão os detalhes do seu agendamento:") &&
-            chat.message.includes(`Título do agendamento: ${titulo.trim()}`) &&
-            chat.message.includes(`Data (dia/mês/ano): ${data.trim()}`) &&
-            chat.message.includes(`Hora (HH:MM): ${hora.trim()}`) &&
-            chat.message.includes(`Descrição: ${descricao.trim()}`) &&
-            chat.message.includes(`Prioridade: ${prioridade.trim()}`)
-        );
-
-        if (agendamento) {
-            // Modifica a mensagem para incluir "(excluido)"
-            const updatedMessage = agendamento.message.replace(
-                "Recebido! Aqui estão os detalhes do seu agendamento:", 
-                "(excluido) Recebido! Aqui estão os detalhes do seu agendamento:"
-            );
-
-            // Atualiza a mensagem no banco
-            await updateChatMessage(agendamento._id, updatedMessage);
-
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ error: "Agendamento não encontrado" });
-        }
-    } catch (error) {
-        console.error("Erro ao excluir agendamento:", error);
-        res.status(500).json({ error: "Erro ao excluir agendamento" });
-    }
-});
-
 module.exports = router;
