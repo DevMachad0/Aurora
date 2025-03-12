@@ -62,7 +62,7 @@ router.post("/agendamentos/excluir", async (req, res) => {
         const collection = db.collection(`data_${empresa}`);
 
         const result = await collection.updateOne(
-            { email, "chat.message": { $regex: `Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } },
+            { email, "chat.message": { $regex: `^Aurora: Recebido! Aqui estão os detalhes do seu agendamento:\nTítulo do agendamento: ${titulo}\nData \\(dia/mês/ano\\): ${data}\nHora \\(HH:MM\\): ${hora}\nDescrição:.*\nPrioridade:.*\nTipo:.*$` } },
             { $set: { "chat.$.message": `(Excluído) Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } }
         );
 
