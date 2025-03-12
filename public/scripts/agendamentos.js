@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("delete-button").addEventListener("click", async () => {
             try {
-                const response = await fetch("/api/agendamentos/excluir", {
+                const response = await fetch("/api/agendamentos/delete", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -81,7 +81,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         "User-Empresa": localStorage.getItem("userEmpresa"),
                         "User-Database": localStorage.getItem("userDatabase")
                     },
-                    body: JSON.stringify({ titulo: reminder.titulo, data: reminder.data, hora: reminder.hora })
+                    body: JSON.stringify({ 
+                        titulo: reminder.titulo, 
+                        data: reminder.data, 
+                        hora: reminder.hora, 
+                        descricao: reminder.descricao, 
+                        prioridade: reminder.prioridade 
+                    })
                 });
 
                 if (response.ok) {
