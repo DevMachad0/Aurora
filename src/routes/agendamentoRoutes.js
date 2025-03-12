@@ -59,14 +59,15 @@ router.post("/agendamentos/delete", async (req, res) => {
 
         const chatHistory = await getChatHistory(email, empresa);
 
+        // Encontre o agendamento com base em palavras-chave na mensagem
         const agendamento = chatHistory.find(chat => 
             chat.sender === "Aurora" && 
             chat.message.includes("Recebido! Aqui estão os detalhes do seu agendamento:") &&
-            chat.message.includes(`titulo: ${titulo.trim()}`) &&
-            chat.message.includes(`data: ${data.trim()}`) &&
-            chat.message.includes(`hora: ${hora.trim()}`) &&
-            chat.message.includes(`descricao: ${descricao.trim()}`) &&
-            chat.message.includes(`prioridade: ${prioridade.trim()}`)
+            chat.message.includes(`Título do agendamento: ${titulo.trim()}`) && 
+            chat.message.includes(`Data (dia/mês/ano): ${data.trim()}`) &&
+            chat.message.includes(`Hora (HH:MM): ${hora.trim()}`) &&
+            chat.message.includes(`Descrição: ${descricao.trim()}`) &&
+            chat.message.includes(`Prioridade: ${prioridade.trim()}`)
         );
 
         if (agendamento) {
