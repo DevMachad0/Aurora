@@ -50,6 +50,22 @@ document.addEventListener("keypress", resetInactivityTimer);
 startLogoutTimer();
 resetInactivityTimer();
 
+// Função para atualizar o relógio na sidebar
+function updateClock() {
+    fetch('/api/current-datetime')
+        .then(response => response.json())
+        .then(data => {
+            const clockElement = document.getElementById("clock");
+            if (clockElement) {
+                clockElement.textContent = data.currentDateTime;
+            }
+        })
+        .catch(error => console.error('Erro ao obter data e hora:', error));
+}
+
+// Inicia a atualização constante do relógio
+setInterval(updateClock, 1000);
+
 document.addEventListener("DOMContentLoaded", async () => {
     const menuToggle = document.getElementById("menu-toggle");
     const sidebar = document.getElementById("sidebar");
