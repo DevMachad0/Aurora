@@ -50,7 +50,7 @@ router.post("/agendamentos/excluir", async (req, res) => {
     try {
         const { titulo, data, hora } = req.body;
         const email = req.headers["user-email"];
-        const empresa = req.headers["user-empresa"]?.trim();
+        const empresa = req.headers["user-empresa"];
         const database = "aurora_db";
 
         if (!email || !empresa || !database) {
