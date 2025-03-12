@@ -8,6 +8,83 @@ document.addEventListener("DOMContentLoaded", () => {
     const userDados = JSON.parse(localStorage.getItem("userDados"));
     const tokenAdmin = localStorage.getItem("tokenAdmin");
 
+    const infoBox = document.querySelector(".info-box");
+    const profileInfoContainer = document.querySelector(".profile-info");
+    const storageInfo = document.querySelector(".storage-info");
+    const saveButton = document.querySelector(".save-button");
+    const backButton = document.querySelector(".back-button");
+    const tokenInput = document.getElementById("token");
+
+    // Função para exibir popup
+    function showPopup(message, callback) {
+        const popup = document.createElement("div");
+        popup.classList.add("popup");
+
+        const popupContent = document.createElement("div");
+        popupContent.classList.add("popup-content");
+
+        const messageElement = document.createElement("p");
+        messageElement.textContent = message;
+
+        const inputElement = document.createElement("input");
+        inputElement.type = "password";
+
+        const confirmButton = document.createElement("button");
+        confirmButton.textContent = "Confirmar";
+        confirmButton.addEventListener("click", () => {
+            document.body.removeChild(popup);
+            callback(inputElement.value);
+        });
+
+        popupContent.appendChild(messageElement);
+        popupContent.appendChild(inputElement);
+        popupContent.appendChild(confirmButton);
+        popup.appendChild(popupContent);
+        document.body.appendChild(popup);
+    }
+
+    // Função para exibir mensagens de erro e sucesso
+    function showMessage(message) {
+        const messageBox = document.createElement("div");
+        messageBox.classList.add("message-box");
+
+        const messageContent = document.createElement("div");
+        messageContent.classList.add("message-content");
+
+        const messageElement = document.createElement("p");
+        messageElement.textContent = message;
+
+        const closeButton = document.createElement("button");
+        closeButton.textContent = "Fechar";
+        closeButton.addEventListener("click", () => {
+            document.body.removeChild(messageBox);
+        });
+
+        messageContent.appendChild(messageElement);
+        messageContent.appendChild(closeButton);
+        messageBox.appendChild(messageContent);
+        document.body.appendChild(messageBox);
+    }
+
+    // Exibir token como "..." e mostrar apenas após o usuário inserir a senha
+    tokenInput.value = tokenAdmin ? "..." : "";
+    tokenInput.addEventListener("focus", () => {
+        if (tokenInput.value === "...") {
+            tokenInput.value = "";
+        }
+    });
+
+    // Mostrar popup para inserir token
+    showPopup("Por favor, insira o token de administrador:", (token) => {
+        if (token === tokenAdmin) {
+            infoBox.style.display = "block";
+            profileInfoContainer.style.display = "block";
+            storageInfo.style.display = "block";
+        } else {
+            showMessage("Token inválido. Tente novamente.");
+        }
+    });
+
     document.querySelector(".info-box p:nth-child(2)").innerHTML = `<strong>Nome:</strong> ${userNome}`;
     document.querySelector(".info-box p:nth-child(3)").innerHTML = `<strong>E-mail:</strong> ${userEmail}`;
     document.querySelector(".info-box p:nth-child(4)").innerHTML = `<strong>Telefone:</strong> ${userTelefone}`;
@@ -15,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".info-box p:nth-child(6)").innerHTML = `<strong>Tipo:</strong> ${userTipo}`;
 
     // Carregar dados do array "dados" e exibir em profile-info
-    const profileInfoContainer = document.querySelector(".profile-info");
     userDados.forEach(dado => {
         const inputContainer = document.createElement("div");
         const input = document.createElement("input");
@@ -122,18 +198,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(error => console.error("Erro ao obter status de armazenamento:", error));
 
-    const saveButton = document.querySelector(".save-button");
-    const backButton = document.querySelector(".back-button");
-    const tokenInput = document.getElementById("token");
-
-    // Exibir token como "..." e mostrar apenas após o usuário inserir a senha
-    tokenInput.value = tokenAdmin ? "..." : "";
-    tokenInput.addEventListener("focus", () => {
-        if (tokenInput.value === "...") {
-            tokenInput.value = "";
-        }
-    });
-
     saveButton.addEventListener("click", async () => {
         const updatedDados = Array.from(document.querySelectorAll(".profile-info input")).map(input => input.value);
         const newTokenAdmin = tokenInput.value;
@@ -150,10 +214,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (response.ok) {
                 localStorage.setItem("userDados", JSON.stringify(updatedDados));
-                alert("Dados atualizados com sucesso!");
+                showMessage("Dados atualizados com sucesso!");
             } else {
                 const errorData = await response.json();
-                alert(`Erro ao atualizar dados: ${errorData.error}`);
+                showMessage(`Erro ao atualizar dados: ${errorData.error}`);
             }
 
             // Atualizar tokenAdmin somente se foi alterado
@@ -169,15 +233,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (tokenResponse.ok) {
                     localStorage.setItem("tokenAdmin", newTokenAdmin);
-                    alert("Token atualizado com sucesso!");
+                    showMessage("Token atualizado com sucesso!");
                 } else {
                     const errorData = await tokenResponse.json();
-                    alert(`Erro ao atualizar token: ${errorData.error}`);
+                    showMessage(`Erro ao atualizar token: ${errorData.error}`);
                 }
             }
         } catch (error) {
             console.error("Erro ao atualizar dados:", error);
-            alert("Erro ao atualizar dados.");
+            showMessage("Erro ao atualizar dados.");
         }
     });
 
