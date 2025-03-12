@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const userTipo = localStorage.getItem("userTipo");
     const userDatabase = localStorage.getItem("userDatabase");
     const userDados = JSON.parse(localStorage.getItem("userDados"));
+    const tokenAdmin = localStorage.getItem("tokenAdmin");
 
     document.querySelector(".info-box p:nth-child(2)").innerHTML = `<strong>Nome:</strong> ${userNome}`;
     document.querySelector(".info-box p:nth-child(3)").innerHTML = `<strong>E-mail:</strong> ${userEmail}`;
@@ -125,9 +126,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const backButton = document.querySelector(".back-button");
     const tokenInput = document.getElementById("token");
 
+    // Exibir token como "..." e mostrar apenas após o usuário inserir a senha
+    tokenInput.value = tokenAdmin ? "..." : "";
+    tokenInput.addEventListener("focus", () => {
+        if (tokenInput.value === "...") {
+            tokenInput.value = "";
+        }
+    });
+
     saveButton.addEventListener("click", async () => {
         const updatedDados = Array.from(document.querySelectorAll(".profile-info input")).map(input => input.value);
-        const tokenAdmin = tokenInput.value;
+        const newTokenAdmin = tokenInput.value;
 
         try {
             const response = await fetch("/users/update-dados", {
@@ -147,21 +156,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert(`Erro ao atualizar dados: ${errorData.error}`);
             }
 
-            // Atualizar tokenAdmin
-            const tokenResponse = await fetch("/users/update-token-admin", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
-                },
-                body: JSON.stringify({ email: userEmail, tokenAdmin })
-            });
+            // Atualizar tokenAdmin somente se foi alterado
+            if (newTokenAdmin && newTokenAdmin !== "...") {
+                const tokenResponse = await fetch("/users/update-token-admin", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    },
+                    body: JSON.stringify({ email: userEmail, tokenAdmin: newTokenAdmin })
+                });
 
-            if (tokenResponse.ok) {
-                alert("Token atualizado com sucesso!");
-            } else {
-                const errorData = await tokenResponse.json();
-                alert(`Erro ao atualizar token: ${errorData.error}`);
+                if (tokenResponse.ok) {
+                    localStorage.setItem("tokenAdmin", newTokenAdmin);
+                    alert("Token atualizado com sucesso!");
+                } else {
+                    const errorData = await tokenResponse.json();
+                    alert(`Erro ao atualizar token: ${errorData.error}`);
+                }
             }
         } catch (error) {
             console.error("Erro ao atualizar dados:", error);

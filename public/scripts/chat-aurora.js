@@ -233,6 +233,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     messageInput.addEventListener("input", function () {
         messageInput.style.height = "auto";
-        messageInput.style.height = `${messageInput.scrollHeight}px`;
+        messageInput.style.height = `${Math.min(messageInput.scrollHeight, 61)}px`;
     });
 });
