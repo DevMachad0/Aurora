@@ -24,9 +24,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             callback(inputElement.value);
         });
 
+        const cancelButton = document.createElement("button");
+        cancelButton.textContent = "Cancelar";
+        cancelButton.addEventListener("click", () => {
+            window.location.href = "chat-aurora.html";
+        });
+
         popupContent.appendChild(messageElement);
         popupContent.appendChild(inputElement);
         popupContent.appendChild(confirmButton);
+        popupContent.appendChild(cancelButton);
         popup.appendChild(popupContent);
         document.body.appendChild(popup);
     }

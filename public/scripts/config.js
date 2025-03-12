@@ -32,8 +32,15 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.removeChild(messageBox);
         });
 
+        const cancelButton = document.createElement("button");
+        cancelButton.textContent = "Cancelar";
+        cancelButton.addEventListener("click", () => {
+            document.body.removeChild(messageBox);
+        });
+
         messageContent.appendChild(messageElement);
         messageContent.appendChild(closeButton);
+        messageContent.appendChild(cancelButton);
         messageBox.appendChild(messageContent);
         document.body.appendChild(messageBox);
     }
