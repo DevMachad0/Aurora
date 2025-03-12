@@ -51,17 +51,15 @@ router.post("/agendamentos/excluir", async (req, res) => {
         const { titulo, data, hora } = req.body;
         const email = req.headers["user-email"];
         const empresa = req.headers["user-empresa"]?.trim();
-        const database = req.headers["user-database"];
+        const database = req.headers["user-database"]?.trim();
+
         if (!email || !empresa || !database) {
             return res.status(400).json({ error: "Email, empresa ou database do usuário não encontrado" });
         }
 
         const db = mongoose.connection.useDb(database);
-        
-        
-        console.log(`Nome da coleção formatado corretamente: ${database}`); // Log para depuração
-
-        const collection = db;
+        console.log(`Nome do banco de dados: ${database}`); // Log para depuração
+        const collection = db.collection(`data_${empresa}`);
 
         const result = await collection.updateOne(
             { email, "chat.message": { $regex: `Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } },
