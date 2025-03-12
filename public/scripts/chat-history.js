@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatHistoryContainer = document.getElementById("chat-history");
     const backButton = document.getElementById("back-button");
     const filterDate = document.getElementById("filter-date");
+    const filterKeyword = document.getElementById("filter-keyword"); // Campo para busca por palavra-chave
     const email = localStorage.getItem("userEmail");
     const empresa = localStorage.getItem("userEmpresa");
     const database = localStorage.getItem("userDatabase");
@@ -10,9 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const today = new Date().toISOString().split("T")[0];
     filterDate.value = today; // Preenche o campo filter-date com a data de hoje
 
-    async function fetchChatHistory(date) {
+    async function fetchChatHistory(date, keyword) {
         const query = new URLSearchParams();
         if (date) query.append("date", date);
+        if (keyword) query.append("keyword", keyword); // Adiciona a palavra-chave à query
 
         console.log("Query:", query.toString());
         // Log para depuração
@@ -36,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
             data.forEach(chat => {
                 const messageElement = document.createElement("div");
                 messageElement.classList.add("message", chat.sender);
-                messageElement.innerHTML = formatMarkdown(`${date} - ${chat.sender}: ${chat.message}`); // Inclui a data da conversa e formata o texto
+                messageElement.innerHTML = formatMarkdown(`${chat.date} - ${chat.sender}: ${chat.message}`); // Inclui a data da conversa e formata o texto
                 chatHistoryContainer.appendChild(messageElement);
             });
         } else {
@@ -46,7 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     filterButton.addEventListener("click", () => {
         const date = filterDate.value;
-        fetchChatHistory(date);
+        const keyword = filterKeyword.value; // Obtém a palavra-chave do campo de entrada
+        fetchChatHistory(date, keyword);
     });
     backButton.addEventListener("click", () => {
         window.location.href = "chat-aurora.html";
