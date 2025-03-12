@@ -53,23 +53,6 @@ function getCurrentDateTime() {
     return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
 
-// Função para enviar a data e hora atualizadas para a Aurora a cada segundo
-function startDateTimeUpdate() {
-    setInterval(() => {
-        const currentDateTime = getCurrentDateTime();
-        chat.sendMessage(`Data e Hora Atuais: ${currentDateTime}`);
-    }, 1000);
-}
-
-// Inicia a atualização constante da data e hora
-startDateTimeUpdate();
-
-// Rota para fornecer a data e hora atuais para o frontend
-router.get("/current-datetime", (req, res) => {
-    const currentDateTime = getCurrentDateTime();
-    res.json({ currentDateTime });
-});
-
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
     try {
