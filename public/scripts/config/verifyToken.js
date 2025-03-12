@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const inputElement = document.createElement("input");
         inputElement.type = "password";
+        inputElement.placeholder = "Digite o token";
 
         const confirmButton = document.createElement("button");
         confirmButton.textContent = "Confirmar";

@@ -6,42 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const userTipo = localStorage.getItem("userTipo");
     const userDatabase = localStorage.getItem("userDatabase");
     const userDados = JSON.parse(localStorage.getItem("userDados"));
-    const tokenAdmin = localStorage.getItem("tokenAdmin");
 
     const infoBox = document.querySelector(".info-box");
     const profileInfoContainer = document.querySelector(".profile-info");
     const storageInfo = document.querySelector(".storage-info");
     const saveButton = document.querySelector(".save-button");
     const backButton = document.querySelector(".back-button");
-    const tokenInput = document.getElementById("token");
-
-    // Função para exibir popup
-    function showPopup(message, callback) {
-        const popup = document.createElement("div");
-        popup.classList.add("popup");
-
-        const popupContent = document.createElement("div");
-        popupContent.classList.add("popup-content");
-
-        const messageElement = document.createElement("p");
-        messageElement.textContent = message;
-
-        const inputElement = document.createElement("input");
-        inputElement.type = "password";
-
-        const confirmButton = document.createElement("button");
-        confirmButton.textContent = "Confirmar";
-        confirmButton.addEventListener("click", () => {
-            document.body.removeChild(popup);
-            callback(inputElement.value);
-        });
-
-        popupContent.appendChild(messageElement);
-        popupContent.appendChild(inputElement);
-        popupContent.appendChild(confirmButton);
-        popup.appendChild(popupContent);
-        document.body.appendChild(popup);
-    }
 
     // Função para exibir mensagens de erro e sucesso
     function showMessage(message) {
@@ -65,25 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
         messageBox.appendChild(messageContent);
         document.body.appendChild(messageBox);
     }
-
-    // Exibir token como "..." e mostrar apenas após o usuário inserir a senha
-    tokenInput.value = tokenAdmin ? "..." : "";
-    tokenInput.addEventListener("focus", () => {
-        if (tokenInput.value === "...") {
-            tokenInput.value = "";
-        }
-    });
-
-    // Mostrar popup para inserir token
-    showPopup("Por favor, insira o token de administrador:", (token) => {
-        if (token === tokenAdmin) {
-            infoBox.style.display = "block";
-            profileInfoContainer.style.display = "block";
-            storageInfo.style.display = "block";
-        } else {
-            showMessage("Token inválido. Tente novamente.");
-        }
-    });
 
     document.querySelector(".info-box p:nth-child(2)").innerHTML = `<strong>Nome:</strong> ${userNome}`;
     document.querySelector(".info-box p:nth-child(3)").innerHTML = `<strong>E-mail:</strong> ${userEmail}`;
