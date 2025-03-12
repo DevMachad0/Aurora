@@ -110,9 +110,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Função para salvar lembrete no localStorage
-    function saveReminder(date, text) {
+    function saveReminder(date, reminder) {
         const reminders = JSON.parse(localStorage.getItem("reminders")) || [];
-        reminders.push({ date, text });
+        reminders.push({ date: date.toLocaleDateString('pt-BR'), ...reminder });
         localStorage.setItem("reminders", JSON.stringify(reminders));
     }
 
