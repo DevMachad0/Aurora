@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/chat-history", verifyToken, async (req, res) => {
     try {
-        const { date, text } = req.query;
+        const { date, keyword } = req.query; // Adiciona keyword à query
         const email = req.headers["user-email"];
         const empresa = req.headers["user-empresa"];
 
@@ -14,13 +14,9 @@ router.get("/chat-history", verifyToken, async (req, res) => {
             return res.status(400).json({ error: "Email ou empresa do usuário não encontrado" });
         }
 
-        console.log(`Parâmetros recebidos - Email: ${email}, Empresa: ${empresa}, Date: ${date}, Text: ${text}`); // Log para depuração
+        console.log(`Parâmetros recebidos - Email: ${email}, Empresa: ${empresa}, Date: ${date}, Keyword: ${keyword}`); // Log para depuração
 
-        let chatHistory = await getChatHistory(email, empresa, date);
-
-        if (text) {
-            chatHistory = chatHistory.filter(chat => chat.message.includes(text));
-        }
+        const chatHistory = await getChatHistory(email, empresa, date, keyword); // Passa keyword para o serviço
 
         res.json(chatHistory);
     } catch (error) {

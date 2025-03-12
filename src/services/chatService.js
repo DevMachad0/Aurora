@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 // Função para obter o histórico de conversas de um usuário
-const getChatHistory = async (email, empresa, date) => {
+const getChatHistory = async (email, empresa, date, keyword) => {
   try {
     const collectionName = `data_${empresa}`;
     const query = { email };
@@ -14,12 +14,18 @@ const getChatHistory = async (email, empresa, date) => {
       return [];
     }
 
-    return chatHistory.flatMap(history => history.chat.map(chat => ({
+    let history = chatHistory.flatMap(history => history.chat.map(chat => ({
       sender: chat.sender,
       message: chat.message,
       timestamp: chat.timestamp,
       date: history.date // Inclui a data da conversa
     })));
+
+    if (keyword) {
+      history = history.filter(chat => chat.message.includes(keyword)); // Filtra por palavra-chave
+    }
+
+    return history;
   } catch (error) {
     throw new Error(error.message);
   }
