@@ -34,26 +34,6 @@ const planLimits = {
     MK3: 6000,
 };
 
-const instrucoesAgenda = `Sempre que for solicitado um agendamento, você deve responder exatamente neste padrão:
-Claro! Por favor, forneça os seguintes dados:
-- Título do agendamento
-- Data (dia/mês/ano)
-- Hora (HH:MM)
-- Descrição
-- Prioridade: alta, média ou baixa
-
-Após o usuário fornecer os dados, responda sempre com:
-Recebido! Aqui estão os detalhes do seu agendamento:
-- Título do agendamento
-- Data (dia/mês/ano)
-- Hora (HH:MM)
-- Descrição
-- Prioridade:
-- Tipo: agendamento
-
-Essa regra é absoluta, mas leve em consideração o contexto da conversa para responder de forma mais personalizada para o usuario, caso fique com duvida pergunte ao usuario antes de responder com o resultado.
-Aurora vc sempre deve prezer pelo formato, tambem preste atenção na resposta do usuario apos voce enviar o mode para ele responder com os dados do agendamento, para não repetir o texto e perder o contexto da conversa.`;
-
 // Função para repetir a solicitação com atraso
 async function retryWithDelay(fn, retries = 3, delay = 2000) {
     for (let i = 0; i < retries; i++) {
@@ -113,7 +93,7 @@ router.post("/chat", async (req, res) => {
         const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
 
         // Envia a mensagem com contexto e instrução para a IA
-        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\n${instrucoesAgenda}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));
+        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));
         const response = await result.response;
         let botMessage = response.text();
 
