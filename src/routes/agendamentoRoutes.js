@@ -60,7 +60,8 @@ router.post("/agendamentos/excluir", async (req, res) => {
         const db = mongoose.connection.useDb(database);
         console.log(`Nome do banco de dados: ${database}`); // Log para depuração
         const collection = db.collection(`data_${empresa}`);
-
+        console.log(`Coleção do banco de dados: data_${empresa}`); 
+        console.log(collection);
         const result = await collection.updateOne(
             { email, "chat.message": { $regex: `^Aurora: Recebido! Aqui estão os detalhes do seu agendamento:\nTítulo do agendamento: ${titulo}\nData \\(dia/mês/ano\\): ${data}\nHora \\(HH:MM\\): ${hora}\nDescrição:.*\nPrioridade:.*\nTipo:.*$` } },
             { $set: { "chat.$.message": `(Excluído) Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } }
