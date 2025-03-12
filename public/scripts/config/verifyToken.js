@@ -1,126 +1,68 @@
-document.addEventListener("DOMContentLoaded", (async () => {
-    const o = localStorage.getItem("userEmail");
+document.addEventListener("DOMContentLoaded", async () => {
+    const email = localStorage.getItem("userEmail");
 
-    // Criando o estilo CSS dentro do JS
-    const style = document.createElement('style');
-    style.innerHTML = `
-        /* Bloquear o fundo */
-        #overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        
-        /* Estilo do popup */
-        #popup {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
+    // Função para exibir popup
+    function showPopup(message, callback) {
+        const popup = document.createElement("div");
+        popup.classList.add("popup");
 
-        /* Estilo dos inputs e botões */
-        #popup input {
-            padding: 10px;
-            width: 200px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
+        const popupContent = document.createElement("div");
+        popupContent.classList.add("popup-content");
 
-        #popup button {
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-        }
+        const messageElement = document.createElement("p");
+        messageElement.textContent = message;
 
-        #popup button.cancel {
-            background-color: #f44336;
-        }
+        const inputElement = document.createElement("input");
+        inputElement.type = "password";
+        inputElement.placeholder = "Digite o token";
 
-        #popup button:hover {
-            opacity: 0.8;
-        }
-    `;
-    document.head.appendChild(style);
+        const confirmButton = document.createElement("button");
+        confirmButton.textContent = "Confirmar";
+        confirmButton.addEventListener("click", () => {
+            document.body.removeChild(popup);
+            callback(inputElement.value);
+        });
+
+        popupContent.appendChild(messageElement);
+        popupContent.appendChild(inputElement);
+        popupContent.appendChild(confirmButton);
+        popup.appendChild(popupContent);
+        document.body.appendChild(popup);
+    }
 
     try {
-        const e = await fetch(`/users/${o}`, {
+        const response = await fetch(`/users/${email}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
             }
         });
-        const t = await e.json();
+        const data = await response.json();
 
-        if (t.tokenAdmin) {
-            // Criar o overlay (bloqueio do fundo) e o popup
-            const overlay = document.createElement('div');
-            overlay.id = 'overlay';
-
-            const popup = document.createElement('div');
-            popup.id = 'popup';
-
-            // Criar a label e o campo de entrada para o token
-            const label = document.createElement('label');
-            label.textContent = "Digite o token de administrador:";
-            const inputPassword = document.createElement('input');
-            inputPassword.type = "password";
-            inputPassword.placeholder = "Token de administrador";
-            inputPassword.autofocus = true;
-
-            // Botões de ação
-            const submitButton = document.createElement('button');
-            submitButton.textContent = "Submeter";
-            const cancelButton = document.createElement('button');
-            cancelButton.textContent = "Cancelar";
-            cancelButton.classList.add('cancel');
-
-            // Adiciona os elementos no popup
-            popup.appendChild(label);
-            popup.appendChild(inputPassword);
-            popup.appendChild(submitButton);
-            popup.appendChild(cancelButton);
-
-            // Adiciona o popup e o overlay ao body
-            overlay.appendChild(popup);
-            document.body.appendChild(overlay);
-
-            // Lógica do botão de submeter
-            submitButton.addEventListener('click', () => {
-                const userToken = inputPassword.value;
-                if (btoa(userToken) !== t.tokenAdmin) {
-                    alert("Token incorreto. Acesso negado.");
-                    window.location.href = "chat-aurora.html";
+        if (data.tokenAdmin) {
+            showPopup("Digite o token de administrador:", (token) => {
+                if (btoa(token) !== data.tokenAdmin) {
+                    showPopup("Token incorreto. Acesso negado.", () => {
+                        window.location.href = "chat-aurora.html";
+                    });
                 } else {
                     console.log("Token correto. Acesso permitido.");
-                    // Você pode continuar a lógica para liberar o acesso
+                    // Chamar a função exibirDados do config.js
+                    if (typeof exibirDados === "function") {
+                        exibirDados();
+                    }
                 }
-                document.body.removeChild(overlay); // Remove o overlay
-            });
-
-            // Lógica do botão de cancelar (voltar para a home)
-            cancelButton.addEventListener('click', () => {
-                window.location.href = "chat-aurora.html"; // Redireciona para a home
-                document.body.removeChild(overlay); // Remove o overlay
             });
         } else {
             console.log("Token de administrador não definido. Acesso permitido.");
+            // Chamar a função exibirDados do config.js
+            if (typeof exibirDados === "function") {
+                exibirDados();
+            }
         }
-    } catch (o) {
-        console.error("Erro ao verificar token de administrador:", o);
-        alert("Erro ao verificar token de administrador.");
-        window.location.href = "chat-aurora.html";
+    } catch (error) {
+        console.error("Erro ao verificar token de administrador:", error);
+        showPopup("Erro ao verificar token de administrador.", () => {
+            window.location.href = "chat-aurora.html";
+        });
     }
-}));
+});
