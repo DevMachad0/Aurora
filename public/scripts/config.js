@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tokenInput = document.getElementById("token");
 
     // Função para exibir mensagens de erro e sucesso
-    function showMessage(message) {
+    function showMessage(message, isSuccess = false) {
         const messageBox = document.createElement("div");
         messageBox.classList.add("message-box");
 
@@ -27,20 +27,22 @@ document.addEventListener("DOMContentLoaded", () => {
         messageElement.textContent = message;
 
         const closeButton = document.createElement("button");
-        closeButton.textContent = "Fechar";
+        closeButton.textContent = isSuccess ? "OK" : "Fechar";
         closeButton.addEventListener("click", () => {
             document.body.removeChild(messageBox);
         });
 
-        const cancelButton = document.createElement("button");
-        cancelButton.textContent = "Cancelar";
-        cancelButton.addEventListener("click", () => {
-            document.body.removeChild(messageBox);
-        });
+        if (!isSuccess) {
+            const cancelButton = document.createElement("button");
+            cancelButton.textContent = "Cancelar";
+            cancelButton.addEventListener("click", () => {
+                document.body.removeChild(messageBox);
+            });
+            messageContent.appendChild(cancelButton);
+        }
 
         messageContent.appendChild(messageElement);
         messageContent.appendChild(closeButton);
-        messageContent.appendChild(cancelButton);
         messageBox.appendChild(messageContent);
         document.body.appendChild(messageBox);
     }
@@ -170,50 +172,77 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     saveButton.addEventListener("click", async () => {
-        const updatedDados = Array.from(document.querySelectorAll(".profile-info input")).map(input => input.value);
-        const newTokenAdmin = tokenInput.value;
+        const confirmationBox = document.createElement("div");
+        confirmationBox.classList.add("message-box");
 
-        try {
-            const response = await fetch("/users/update-dados", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
-                },
-                body: JSON.stringify({ email: userEmail, dados: updatedDados })
-            });
+        const confirmationContent = document.createElement("div");
+        confirmationContent.classList.add("message-content");
 
-            if (response.ok) {
-                localStorage.setItem("userDados", JSON.stringify(updatedDados));
-                showMessage("Dados atualizados com sucesso!");
-            } else {
-                const errorData = await response.json();
-                showMessage(`Erro ao atualizar dados: ${errorData.error}`);
-            }
+        const confirmationMessage = document.createElement("p");
+        confirmationMessage.textContent = "Este processo é irreversível. Deseja continuar e salvar as alterações?";
 
-            // Atualizar tokenAdmin somente se foi alterado
-            if (newTokenAdmin && newTokenAdmin !== "...") {
-                const tokenResponse = await fetch("/users/update-token-admin", {
+        const confirmButton = document.createElement("button");
+        confirmButton.textContent = "Salvar";
+        confirmButton.addEventListener("click", async () => {
+            document.body.removeChild(confirmationBox);
+
+            const updatedDados = Array.from(document.querySelectorAll(".profile-info input")).map(input => input.value);
+            const newTokenAdmin = tokenInput.value;
+
+            try {
+                const response = await fetch("/users/update-dados", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${localStorage.getItem("token")}`
                     },
-                    body: JSON.stringify({ email: userEmail, tokenAdmin: newTokenAdmin })
+                    body: JSON.stringify({ email: userEmail, dados: updatedDados })
                 });
 
-                if (tokenResponse.ok) {
-                    localStorage.setItem("tokenAdmin", newTokenAdmin);
-                    showMessage("Token atualizado com sucesso!");
+                if (response.ok) {
+                    localStorage.setItem("userDados", JSON.stringify(updatedDados));
+                    showMessage("Dados atualizados com sucesso!", true);
                 } else {
-                    const errorData = await tokenResponse.json();
-                    showMessage(`Erro ao atualizar token: ${errorData.error}`);
+                    const errorData = await response.json();
+                    showMessage(`Erro ao atualizar dados: ${errorData.error}`);
                 }
+
+                // Atualizar tokenAdmin somente se foi alterado
+                if (newTokenAdmin && newTokenAdmin !== "...") {
+                    const tokenResponse = await fetch("/users/update-token-admin", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`
+                        },
+                        body: JSON.stringify({ email: userEmail, tokenAdmin: newTokenAdmin })
+                    });
+
+                    if (tokenResponse.ok) {
+                        localStorage.setItem("tokenAdmin", newTokenAdmin);
+                        showMessage("Token atualizado com sucesso!", true);
+                    } else {
+                        const errorData = await tokenResponse.json();
+                        showMessage(`Erro ao atualizar token: ${errorData.error}`);
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao atualizar dados:", error);
+                showMessage("Erro ao atualizar dados.");
             }
-        } catch (error) {
-            console.error("Erro ao atualizar dados:", error);
-            showMessage("Erro ao atualizar dados.");
-        }
+        });
+
+        const cancelButton = document.createElement("button");
+        cancelButton.textContent = "Cancelar";
+        cancelButton.addEventListener("click", () => {
+            document.body.removeChild(confirmationBox);
+        });
+
+        confirmationContent.appendChild(confirmationMessage);
+        confirmationContent.appendChild(confirmButton);
+        confirmationContent.appendChild(cancelButton);
+        confirmationBox.appendChild(confirmationContent);
+        document.body.appendChild(confirmationBox);
     });
 
     backButton.addEventListener("click", () => {
