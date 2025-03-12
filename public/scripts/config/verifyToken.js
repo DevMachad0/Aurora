@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const email = localStorage.getItem("userEmail");
+    let attempts = 0;
 
     // Função para exibir popup
     function showPopup(message, callback) {
@@ -39,19 +40,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         const data = await response.json();
 
         if (data.tokenAdmin) {
-            showPopup("Digite o token de administrador:", (token) => {
-                if (btoa(token) !== data.tokenAdmin) {
-                    showPopup("Token incorreto. Acesso negado.", () => {
-                        window.location.href = "chat-aurora.html";
-                    });
-                } else {
-                    console.log("Token correto. Acesso permitido.");
-                    // Chamar a função exibirDados do config.js
-                    if (typeof exibirDados === "function") {
-                        exibirDados();
+            function verifyToken() {
+                showPopup("Digite o token de administrador:", (token) => {
+                    if (btoa(token) !== data.tokenAdmin) {
+                        attempts++;
+                        if (attempts < 3) {
+                            showPopup("Token incorreto. Tente novamente.", verifyToken);
+                        } else {
+                            showPopup("Token incorreto. Acesso negado.", () => {
+                                window.location.href = "chat-aurora.html";
+                            });
+                        }
+                    } else {
+                        console.log("Token correto. Acesso permitido.");
+                        // Chamar a função exibirDados do config.js
+                        if (typeof exibirDados === "function") {
+                            exibirDados();
+                        }
                     }
-                }
-            });
+                });
+            }
+            verifyToken();
         } else {
             console.log("Token de administrador não definido. Acesso permitido.");
             // Chamar a função exibirDados do config.js
