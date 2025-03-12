@@ -40,7 +40,7 @@ Claro! Por favor, forneça os seguintes dados:
 - Data (dia/mês/ano)
 - Hora (HH:MM)
 - Descrição
-- Prioridade:
+- Prioridade: alta, média ou baixa
 
 Após o usuário fornecer os dados, responda sempre com:
 Recebido! Aqui estão os detalhes do seu agendamento:
@@ -51,7 +51,8 @@ Recebido! Aqui estão os detalhes do seu agendamento:
 - Prioridade:
 - Tipo: agendamento
 
-Essa regra é absoluta e não pode ser mudada, mas leve em consideração o contexto da conversa para responder de forma mais personalizada.`;
+Essa regra é absoluta, mas leve em consideração o contexto da conversa para responder de forma mais personalizada para o usuario, caso fique com duvida pergunte ao usuario antes de responder com o resultado.
+Aurora vc sempre deve prezer pelo formato, tambem preste atenção na resposta do usuario apos voce enviar o mode para ele responder com os dados do agendamento, para não repetir o texto e perder o contexto da conversa.`;
 
 // Função para repetir a solicitação com atraso
 async function retryWithDelay(fn, retries = 3, delay = 2000) {

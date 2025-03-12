@@ -38,9 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const dayElement = calendar.querySelector(`.day[data-date='${fullDate}']`);
     
         if (dayElement) {
-            // Removendo lembretes duplicados antes de adicionar novos
-            dayElement.querySelectorAll(".reminder").forEach(reminderElement => reminderElement.remove());
-    
             const reminderElement = document.createElement("div");
             const prioridade = reminder.prioridade ? reminder.prioridade.toLowerCase() : "baixa";
             reminderElement.classList.add("reminder", prioridade);
