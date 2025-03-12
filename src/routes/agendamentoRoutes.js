@@ -50,52 +50,32 @@ router.post("/agendamentos/excluir", async (req, res) => {
     try {
         const { titulo, data, hora } = req.body;
         const email = req.headers["user-email"];
-        const empresa = req.headers["user-empresa"];
+        const empresa = req.headers["user-empresa"]?.trim();
         const database = req.headers["user-database"];
-
         if (!email || !empresa || !database) {
             return res.status(400).json({ error: "Email, empresa ou database do usuário não encontrado" });
         }
 
         const db = mongoose.connection.useDb(database);
-        const collectionName = `data_${empresa}`; // Mantendo o nome com espaço
+        
+        
+        console.log(`Nome da coleção formatado corretamente: ${database}`); // Log para depuração
 
-        console.log(`Nome da coleção: ${collectionName}`);
+        const collection = db.collection(database);
 
-        const collection = db.collection(collectionName);
-
-        // Primeiro, verifique se o documento existe antes de tentar atualizar
-        const query = {
-            email,
-            "chat.message": { 
-                $regex: `Recebido! Aqui estão os detalhes do seu agendamento:\\n- Título: ${titulo}\\n- Data: ${data}\\n- Hora: ${hora}`, 
-                $options: "i" // Ignora maiúsculas/minúsculas se necessário
-            }
-        };
-
-        console.log("Consulta para exclusão:", JSON.stringify(query, null, 2));
-
-        const agendamentoExiste = await collection.findOne(query);
-
-        if (!agendamentoExiste) {
-            return res.status(404).json({ error: "Agendamento não encontrado" });
-        }
-
-        const update = await collection.updateOne(
-            query,
-            { 
-                $set: { "chat.$.message": `(Excluído) ${agendamentoExiste.chat.find(c => c.message.includes(titulo)).message}` } 
-            }
+        const result = await collection.updateOne(
+            { email, "chat.message": { $regex: `Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } },
+            { $set: { "chat.$.message": `(Excluído) Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } }
         );
 
-        if (update.modifiedCount === 0) {
-            return res.status(500).json({ error: "Falha ao atualizar o agendamento" });
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ error: "Agendamento não encontrado" });
         }
 
         res.status(200).json({ message: "Agendamento marcado como excluído com sucesso" });
     } catch (error) {
         console.error("Erro ao marcar agendamento como excluído:", error);
-        res.status(500).json({ error: "Erro interno do servidor" });
+        res.status(500).json({ error: "Erro ao marcar agendamento como excluído" });
     }
 });
 
