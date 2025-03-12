@@ -62,11 +62,11 @@ router.post("/agendamentos/delete", async (req, res) => {
         const agendamento = chatHistory.find(chat => 
             chat.sender === "Aurora" && 
             chat.message.includes("Recebido! Aqui estão os detalhes do seu agendamento:") &&
-            chat.message.includes(`Título: ${titulo.trim()}`) &&
-            chat.message.includes(`Data: ${data.trim()}`) &&
-            chat.message.includes(`Hora: ${hora.trim()}`) &&
-            chat.message.includes(`Descrição: ${descricao.trim()}`) &&
-            chat.message.includes(`Prioridade: ${prioridade.trim()}`)
+            chat.message.includes(`titulo: ${titulo.trim()}`) &&
+            chat.message.includes(`data: ${data.trim()}`) &&
+            chat.message.includes(`hora: ${hora.trim()}`) &&
+            chat.message.includes(`descricao: ${descricao.trim()}`) &&
+            chat.message.includes(`prioridade: ${prioridade.trim()}`)
         );
 
         if (agendamento) {

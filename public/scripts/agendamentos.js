@@ -82,11 +82,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         "User-Database": localStorage.getItem("userDatabase")
                     },
                     body: JSON.stringify({ 
-                        titulo: reminder.titulo, 
-                        data: reminder.data, 
-                        hora: reminder.hora, 
-                        descricao: reminder.descricao, 
-                        prioridade: reminder.prioridade 
+                        titulo: reminder.titulo.trim(), 
+                        data: reminder.data.trim(), 
+                        hora: reminder.hora.trim(), 
+                        descricao: reminder.descricao.trim(), 
+                        prioridade: reminder.prioridade.trim() 
                     })
                 });
 
