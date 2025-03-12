@@ -83,6 +83,22 @@ header {
     border-color: #6e8efb;
 }
 
+/* Estilo para o input de palavra-chave */
+#filter-keyword {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-right: 10px;
+    background-color: #f1f1f1;
+    color: #333;
+}
+
+#filter-keyword:focus {
+    outline: none;
+    border-color: #6e8efb;
+}
+
 /* Mensagens do bot */
 .message {
     margin-bottom: 10px;
