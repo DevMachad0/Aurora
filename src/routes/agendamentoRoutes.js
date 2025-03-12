@@ -59,19 +59,27 @@ router.post("/agendamentos/delete", async (req, res) => {
 
         const chatHistory = await getChatHistory(email, empresa);
 
+        // Filtra as mensagens que contêm as informações do agendamento
         const agendamento = chatHistory.find(chat => 
-            chat.sender === "Aurora" && 
+            chat.sender === "Aurora" &&
             chat.message.includes("Recebido! Aqui estão os detalhes do seu agendamento:") &&
-            chat.message.includes(`Título: ${titulo.trim()}`) &&
-            chat.message.includes(`Data: ${data.trim()}`) &&
-            chat.message.includes(`Hora: ${hora.trim()}`) &&
+            chat.message.includes(`Título do agendamento: ${titulo.trim()}`) &&
+            chat.message.includes(`Data (dia/mês/ano): ${data.trim()}`) &&
+            chat.message.includes(`Hora (HH:MM): ${hora.trim()}`) &&
             chat.message.includes(`Descrição: ${descricao.trim()}`) &&
             chat.message.includes(`Prioridade: ${prioridade.trim()}`)
         );
 
         if (agendamento) {
-            const updatedMessage = `(excluido) ${agendamento.message}`;
+            // Modifica a mensagem para incluir "(excluido)"
+            const updatedMessage = agendamento.message.replace(
+                "Recebido! Aqui estão os detalhes do seu agendamento:", 
+                "(excluido) Recebido! Aqui estão os detalhes do seu agendamento:"
+            );
+
+            // Atualiza a mensagem no banco
             await updateChatMessage(agendamento._id, updatedMessage);
+
             res.json({ success: true });
         } else {
             res.status(404).json({ error: "Agendamento não encontrado" });
