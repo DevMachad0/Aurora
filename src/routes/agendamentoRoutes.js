@@ -49,8 +49,8 @@ router.get("/agendamentos", async (req, res) => {
 router.post("/agendamentos/delete", async (req, res) => {
     try {
         const email = req.headers["user-email"];
-        const empresa = req.headers["user-empresa"];
-        const database = req.headers["user-database"];
+        const empresa = req.headers["user-empresa"]?.trim();
+        const database = req.headers["user-database"]?.trim();
         const { titulo, data, hora, descricao, prioridade } = req.body;
 
         if (!email || !empresa || !database) {
@@ -62,11 +62,11 @@ router.post("/agendamentos/delete", async (req, res) => {
         const agendamento = chatHistory.find(chat => 
             chat.sender === "Aurora" && 
             chat.message.includes("Recebido! Aqui estão os detalhes do seu agendamento:") &&
-            chat.message.includes(`Título: ${titulo}`) &&
-            chat.message.includes(`Data: ${data}`) &&
-            chat.message.includes(`Hora: ${hora}`) &&
-            chat.message.includes(`Descrição: ${descricao}`) &&
-            chat.message.includes(`Prioridade: ${prioridade}`)
+            chat.message.includes(`Título: ${titulo.trim()}`) &&
+            chat.message.includes(`Data: ${data.trim()}`) &&
+            chat.message.includes(`Hora: ${hora.trim()}`) &&
+            chat.message.includes(`Descrição: ${descricao.trim()}`) &&
+            chat.message.includes(`Prioridade: ${prioridade.trim()}`)
         );
 
         if (agendamento) {
