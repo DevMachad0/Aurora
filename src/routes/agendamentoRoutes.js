@@ -62,7 +62,7 @@ router.post("/agendamentos/excluir", async (req, res) => {
         const collection = db.collection(collectionName);
 
         const result = await collection.updateOne(
-            { email, "chat.message": { $regex: `Recebido! Aqui estão os detalhes do seu agendamento:` } },
+            { email, "chat.message": { $regex: `Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } },
             { $set: { "chat.$.message": `(Foi excluido da agenda) Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } }
         );
 
