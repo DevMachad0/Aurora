@@ -61,7 +61,7 @@ router.post("/agendamentos/excluir", async (req, res) => {
         
         console.log(`Nome da coleção formatado corretamente: ${database}`); // Log para depuração
 
-        const collection = db.collection(database);
+        const collection = db;
 
         const result = await collection.updateOne(
             { email, "chat.message": { $regex: `Recebido! Aqui estão os detalhes do seu agendamento:\n- Título: ${titulo}\n- Data: ${data}\n- Hora: ${hora}` } },
