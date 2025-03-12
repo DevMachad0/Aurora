@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 if (response.ok) {
-                    reminder.titulo = "(Foi excluido da agenda) " + reminder.titulo;
+                    reminder.titulo = "(Excluído) " + reminder.titulo;
                     element.textContent = reminder.titulo;
                     popup.style.display = "none";
                 } else {
