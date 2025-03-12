@@ -292,7 +292,7 @@ h2 {
 }
 
 .message-content {
-    background: white;
+    background: #44475a;
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -300,7 +300,7 @@ h2 {
 }
 
 .message-content button {
-    margin-top: 10px;
+    margin: 10px;
     padding: 5px 10px;
     background-color: #007bff;
     color: white;
