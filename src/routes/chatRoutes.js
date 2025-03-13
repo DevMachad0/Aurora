@@ -96,8 +96,8 @@ router.post("/chat", async (req, res) => {
         const coreInstructions = auroraCoreData.instructions.join("\n");
         const coreRestrictions = auroraCoreData.restrictions.join("\n");
 
-        // Adiciona os dados da empresa ao contexto
-        const empresaContext = `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}`;
+        // Adiciona os dados da empresa ao contexto, se disponíveis
+        const empresaContext = empresaData ? `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}` : "Dados da empresa não encontrados.";
 
         // Envia a mensagem com contexto e instrução para a IA
         const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));

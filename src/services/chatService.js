@@ -109,12 +109,14 @@ const getEmpresaData = async (empresa, tipo) => {
     const empresaData = await mongoose.connection.collection(collectionName).findOne({ tipo });
 
     if (!empresaData) {
-      throw new Error("Dados da empresa não encontrados.");
+      console.log("Dados da empresa não encontrados.");
+      return null;
     }
 
     return empresaData;
   } catch (error) {
-    throw new Error(error.message);
+    console.error("Erro ao obter dados da empresa:", error.message);
+    return null;
   }
 };
 
