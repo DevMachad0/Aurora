@@ -34,12 +34,16 @@ function logout() {
 // Função para resetar o timer de inatividade
 function resetInactivityTimer() {
     clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(logout, 10 * 60 * 1000); // 10 minutos
+    inactivityTimer = setTimeout(logout, 30 * 60 * 1000); // 30 minutos
 }
 
 // Função para iniciar o timer de logout
 function startLogoutTimer() {
-    logoutTimer = setTimeout(logout, 60 * 60 * 1000); // 1 hora
+    logoutTimer = setTimeout(() => {
+        localStorage.clear();
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
+    }, 5 * 60 * 60 * 1000); // 5 horas
 }
 
 // Eventos para resetar o timer de inatividade
