@@ -74,6 +74,11 @@ router.post("/chat", async (req, res) => {
         // Obtém o histórico de conversas do usuário
         const chatHistory = await getChatHistory(user.email, user.empresa);
 
+        // Verifica se o histórico de conversas está vazio
+        if (!chatHistory || chatHistory.length === 0) {
+            console.log("Nenhum histórico de conversas encontrado.");
+        }
+
         // Obtém as instruções e restrições do AuroraCore
         const auroraCoreData = await getAuroraCoreData();
 
