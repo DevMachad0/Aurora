@@ -109,9 +109,6 @@ router.post("/chat", async (req, res) => {
         const response = await result.response;
         let botMessage = response.text();
 
-        // Atualiza a data e hora atuais após a resposta da Aurora
-        currentDateTime = updateCurrentDateTime();
-
         // Salva o histórico de conversas no banco de dados
         await saveChatHistory(user.email, user.empresa, { sender: "user", message });
         await saveChatHistory(user.email, user.empresa, { sender: "Aurora", message: botMessage });
