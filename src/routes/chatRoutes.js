@@ -53,6 +53,11 @@ function getCurrentDateTime() {
     return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
 
+// Função para atualizar a data e hora atuais
+function updateCurrentDateTime() {
+    return getCurrentDateTime();
+}
+
 // Rota para processar mensagens do usuário
 router.post("/chat", async (req, res) => {
     try {
@@ -61,8 +66,8 @@ router.post("/chat", async (req, res) => {
             return res.status(400).json({ error: "Mensagem não pode ser vazia" });
         }
 
-        // Obtém a data e hora atuais
-        const currentDateTime = getCurrentDateTime();
+        // Atualiza a data e hora atuais
+        let currentDateTime = updateCurrentDateTime();
 
         // Obtém o histórico de conversas do usuário
         const chatHistory = await getChatHistory(user.email, user.empresa);
@@ -96,6 +101,9 @@ router.post("/chat", async (req, res) => {
         const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));
         const response = await result.response;
         let botMessage = response.text();
+
+        // Atualiza a data e hora atuais após a resposta da Aurora
+        currentDateTime = updateCurrentDateTime();
 
         // Salva o histórico de conversas no banco de dados
         await saveChatHistory(user.email, user.empresa, { sender: "user", message });
