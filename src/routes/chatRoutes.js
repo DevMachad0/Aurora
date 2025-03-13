@@ -9,7 +9,7 @@ const router = express.Router();
 
 // Inicializa a API Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
 // Configuração do chat com histórico de mensagem objetiva
 const chat = model.startChat({
@@ -35,7 +35,7 @@ const planLimits = {
 };
 
 // Função para repetir a solicitação com atraso
-async function retryWithDelay(fn, retries = 3, delay = 2000) {
+async function retryWithDelay(fn, retries = 5, delay = 5000) { // Aumenta o número de tentativas para 5 e o tempo de espera para 5 segundos
     for (let i = 0; i < retries; i++) {
         try {
             return await fn();
@@ -108,9 +108,6 @@ router.post("/chat", async (req, res) => {
         const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));
         const response = await result.response;
         let botMessage = response.text();
-
-        // Atualiza a data e hora atuais após a resposta da Aurora
-        currentDateTime = updateCurrentDateTime();
 
         // Salva o histórico de conversas no banco de dados
         await saveChatHistory(user.email, user.empresa, { sender: "user", message });
