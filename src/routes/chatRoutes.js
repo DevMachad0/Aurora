@@ -89,7 +89,7 @@ router.post("/chat", async (req, res) => {
         const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
 
         // Adiciona o histórico de conversas ao contexto
-        const historyContext = chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n");
+        const historyContext = chatHistory ? chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n") : "";
 
         // Verifica o limite de caracteres baseado no plano do usuário
         const charLimit = planLimits[user.plano] || 1000;
@@ -108,6 +108,9 @@ router.post("/chat", async (req, res) => {
         const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));
         const response = await result.response;
         let botMessage = response.text();
+
+        // Atualiza a data e hora atuais após a resposta da Aurora
+        currentDateTime = updateCurrentDateTime();
 
         // Salva o histórico de conversas no banco de dados
         await saveChatHistory(user.email, user.empresa, { sender: "user", message });

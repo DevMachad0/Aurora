@@ -14,12 +14,12 @@ const getChatHistory = async (email, empresa, date, keyword) => {
       return [];
     }
 
-    let history = chatHistory.flatMap(history => history.chat.map(chat => ({
+    let history = chatHistory.flatMap(history => history.chat ? history.chat.map(chat => ({
       sender: chat.sender,
       message: chat.message,
       timestamp: chat.timestamp,
       date: history.date // Inclui a data da conversa
-    })));
+    })) : []);
 
     if (keyword) {
       history = history.filter(chat => chat.message.includes(keyword)); // Filtra por palavra-chave
