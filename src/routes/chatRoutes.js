@@ -55,7 +55,9 @@ function getCurrentDateTime() {
 
 // Função para atualizar a data e hora atuais
 function updateCurrentDateTime() {
-    return getCurrentDateTime();
+    const currentDateTime = getCurrentDateTime();
+    console.log(`Data e Hora Atualizadas: ${currentDateTime}`);
+    return currentDateTime;
 }
 
 // Rota para processar mensagens do usuário
