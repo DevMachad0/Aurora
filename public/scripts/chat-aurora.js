@@ -82,6 +82,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     themeToggle.addEventListener("click", () => {
         document.body.classList.toggle("dark-mode");
     });
+
+    // Adiciona evento de logout ao botão "Sair"
+    const logoutButton = document.querySelector("a[href='index.html']");
+    if (logoutButton) {
+        logoutButton.addEventListener("click", (event) => {
+            event.preventDefault();
+            localStorage.clear();
+            localStorage.removeItem("token");
+            window.location.href = "index.html";
+        });
+    }
 });
 
 document.addEventListener("DOMContentLoaded", function () {

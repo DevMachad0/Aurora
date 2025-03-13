@@ -12,17 +12,17 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 async function run() {
   try {
     const userData = {
-      nome: 'Deivid Kevin da Silva Machado',
-      email: 'deivid2@empresa.com',
-      empresa: 'Empresa X',
-      usuario: 'deivid',
+      nome: 'Rebeca dara arcanjo de lima',
+      email: 'Rebeca2@empresa.com',
+      empresa: 'Empreda_rebeca',
+      usuario: 'Rebeca',
       senha: '1234',
       licenca: 'premium',
       plano: 'MK3',
       dados: ['dados do cliente', 'informações extras'],
       telefone: '123456789',
       status: 'online',
-      tipo: 'setor',
+      tipo: 'pessoal',
       statusLicenca: 'Ativo',
     };
 
