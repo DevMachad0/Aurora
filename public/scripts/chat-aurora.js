@@ -262,17 +262,21 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    document.getElementById('calendar').addEventListener('click', function() {
-        const iframe = document.getElementById('popup-iframe');
-        iframe.style.display = 'block';
-    });
+    const calendarButton = document.getElementById('calendar');
+    const iframe = document.getElementById('popup-iframe');
 
-    document.getElementById('popup-iframe').addEventListener('load', function() {
-        const iframe = this;
-        iframe.contentWindow.document.addEventListener('click', function(event) {
-            if (event.target.id === 'close-popup') {
-                iframe.style.display = 'none';
-            }
+    if (calendarButton && iframe) {
+        calendarButton.addEventListener('click', function() {
+            iframe.style.display = 'block';
         });
-    });
+
+        iframe.addEventListener('load', function() {
+            const iframeDocument = iframe.contentWindow.document;
+            iframeDocument.addEventListener('click', function(event) {
+                if (event.target.id === 'close-popup') {
+                    iframe.style.display = 'none';
+                }
+            });
+        });
+    }
 });
