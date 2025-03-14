@@ -36,6 +36,7 @@
         <button id="menu-toggle" class="menu-button">☰</button>
         <h1>Chat Aurora</h1>
         <button id="theme-toggle" class="theme-button">🌙</button>
+        <button id="calendar-button" class="calendar-button">📅</button> <!-- Novo botão de calendário -->
     </header>
 
     <main class="chat-box">
@@ -52,8 +53,21 @@
     </div>
 </div>
 
+<!-- Popup de agendamento -->
+<div id="calendar-popup" class="calendar-popup">
+    <div class="calendar-container">
+        <div id="calendar"></div>
+        <div class="event-buttons">
+            <button id="register-event">Registrar evento</button>
+            <button id="edit-event">Editar evento</button>
+            <button id="cancel-event">Cancelar evento</button>
+        </div>
+    </div>
+</div>
+
 <script src="scripts/chat-aurora.js"></script>
 <script src="scripts/loading.js"></script>
+<script src="scripts/calendar.js"></script> <!-- Novo script para o calendário -->
 
 </body>
 </html>

@@ -251,4 +251,14 @@ document.addEventListener("DOMContentLoaded", function () {
         messageInput.style.height = "auto";
         messageInput.style.height = `${messageInput.scrollHeight}px`;
     });
+
+    document.getElementById('calendar-button').addEventListener('click', function() {
+        document.getElementById('calendar-popup').style.display = 'block';
+    });
+
+    document.getElementById('calendar-popup').addEventListener('click', function(event) {
+        if (event.target === this) {
+            this.style.display = 'none';
+        }
+    });
 });
