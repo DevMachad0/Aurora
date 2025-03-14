@@ -14,7 +14,6 @@ router.get("/storage-status", verifyToken, async (req, res) => {
       return res.status(400).json({ error: "Database do usuário não encontrado" });
     }
 
-    
     const user = await getUserByEmail(email);
     if (!user) {
       return res.status(400).json({ error: "Usuário não encontrado" });

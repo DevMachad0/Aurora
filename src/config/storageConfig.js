@@ -12,7 +12,7 @@ const getStorageStatus = async (database, plano) => {
     const db = mongoose.connection.useDb(sanitizedDatabase);
 
     // Verifica se o plano é válido
-    if (!planStorageLimits[plano]) {
+    if (!planStorageLimits.hasOwnProperty(plano)) {
       throw new Error("Plano de armazenamento inválido");
     }
 
