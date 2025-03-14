@@ -20,7 +20,7 @@ const chat = model.startChat({
         },
         {
             role: "model",
-            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as nescessidades do meu usuario com textos planos." }]
+            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as necessidades do meu usuário com textos planos." }]
         }
     ],
     generationConfig: {
@@ -35,7 +35,7 @@ const planLimits = {
 };
 
 // Função para repetir a solicitação com atraso
-async function retryWithDelay(fn, retries = 5, delay = 5000) { // Aumenta o número de tentativas para 5 e o tempo de espera para 5 segundos
+async function retryWithDelay(fn, retries = 5, delay = 5000) {
     for (let i = 0; i < retries; i++) {
         try {
             return await fn();
@@ -49,15 +49,7 @@ async function retryWithDelay(fn, retries = 5, delay = 5000) { // Aumenta o núm
 
 // Função para obter a data e hora atuais
 function getCurrentDateTime() {
-    const now = new Date();
-    return now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-}
-
-// Função para atualizar a data e hora atuais
-function updateCurrentDateTime() {
-    const currentDateTime = getCurrentDateTime();
-    console.log(`Data e Hora Atualizadas: ${currentDateTime}`);
-    return currentDateTime;
+    return new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
 
 // Rota para processar mensagens do usuário
@@ -68,16 +60,11 @@ router.post("/chat", async (req, res) => {
             return res.status(400).json({ error: "Mensagem não pode ser vazia" });
         }
 
-        // Atualiza a data e hora atuais
-        let currentDateTime = updateCurrentDateTime();
+        // Atualiza a data e hora atuais apenas para essa interação
+        let currentDateTime = getCurrentDateTime();
 
         // Obtém o histórico de conversas do usuário
         const chatHistory = await getChatHistory(user.email, user.empresa);
-
-        // Verifica se o histórico de conversas está vazio
-        if (!chatHistory || chatHistory.length === 0) {
-            console.log("Nenhum histórico de conversas encontrado.");
-        }
 
         // Obtém as instruções e restrições do AuroraCore
         const auroraCoreData = await getAuroraCoreData();
@@ -86,7 +73,7 @@ router.post("/chat", async (req, res) => {
         const empresaData = await getEmpresaData(user.empresa, "documento");
 
         // Cria um contexto para o modelo entender quem está falando
-        const userContext = `Dados do usuario do sistema, Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
+        const userContext = `Dados do usuário do sistema: Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
 
         // Adiciona o histórico de conversas ao contexto
         const historyContext = chatHistory ? chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n") : "";
@@ -105,7 +92,7 @@ router.post("/chat", async (req, res) => {
         const empresaContext = empresaData ? `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}` : "Dados da empresa não encontrados.";
 
         // Envia a mensagem com contexto e instrução para a IA
-        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nInformações em tempo real são: ${currentDateTime}\n\nUsuário: ${message}`));
+        const result = await retryWithDelay(() => chat.sendMessage(`${userContext}\n\nData e Hora Atuais: ${currentDateTime}\n\nHistórico de Conversas:\n${historyContext}\n\nInstrução: ${instruction}\n\nInstruções do AuroraCore:\n${coreInstructions}\n\nRestrições do AuroraCore:\n${coreRestrictions}\n\n${empresaContext}\n\nUsuário: ${message}`));
         const response = await result.response;
         let botMessage = response.text();
 
