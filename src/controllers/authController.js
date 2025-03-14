@@ -18,11 +18,17 @@ const login = async (req, res) => {
     }
 
     // Verifica se o banco de dados da empresa existe, se não, cria
-    const dbName = `data_${user.empresa}`;
+    const dbName = `data_${user.empresa.replace(/\s+/g, '_')}`;
     const db = mongoose.connection.useDb(dbName);
-    const collections = await db.listCollections().toArray();
-    if (collections.length === 0) {
-      await db.createCollection("exampleCollection");
+
+    try {
+      await db.command({ ping: 1 });
+    } catch (error) {
+      if (error.codeName === 'NamespaceNotFound') {
+        await db.createCollection("exampleCollection");
+      } else {
+        throw error;
+      }
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });

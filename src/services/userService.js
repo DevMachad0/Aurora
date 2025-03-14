@@ -12,11 +12,11 @@ const planStorageLimits = {
 const createUser = async (userData) => {
     try {
         const user = new User(userData);
-        user.database = `data_${user.empresa}`;
+        user.database = `data_${user.empresa.replace(/\s+/g, '_')}`;
         await user.save();
 
         // Cria um novo banco de dados baseado na empresa do usuário
-        const dbName = `data_${user.empresa}`;
+        const dbName = `data_${user.empresa.replace(/\s+/g, '_')}`;
         const db = mongoose.connection.useDb(dbName);
 
         // Cria uma coleção de exemplo no novo banco de dados
