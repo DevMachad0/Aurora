@@ -6,6 +6,11 @@ const getStorageStatus = async (database, plano) => {
     const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
     const db = mongoose.connection.useDb(sanitizedDatabase);
 
+    // Verifica se o plano é válido
+    if (!planStorageLimits[plano]) {
+      throw new Error("Plano de armazenamento inválido");
+    }
+
     // Obtém o status de armazenamento do banco de dados
     const stats = await db.db.command({ dbStats: 1 });
 
