@@ -15,10 +15,12 @@ const createUser = async (userData) => {
         user.database = `data_${user.empresa}`;
         await user.save();
 
-        // Cria uma nova coleção baseada na empresa do usuário com limite de armazenamento
-        const collectionName = `data_${user.empresa}`;
-        const storageLimit = planStorageLimits[user.plano] || 2147483648; // 2 GB por padrão
-        await mongoose.connection.createCollection(collectionName, { capped: true, size: storageLimit });
+        // Cria um novo banco de dados baseado na empresa do usuário
+        const dbName = `data_${user.empresa}`;
+        const db = mongoose.connection.useDb(dbName);
+
+        // Cria uma coleção de exemplo no novo banco de dados
+        await db.createCollection("exampleCollection");
 
         return user;
     } catch (error) {
