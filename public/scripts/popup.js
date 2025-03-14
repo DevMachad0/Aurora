@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const prevMonthButton = document.getElementById("prev-month");
     const nextMonthButton = document.getElementById("next-month");
 
+    if (!calendarBody || !currentMonthLabel || !prevMonthButton || !nextMonthButton) {
+        console.error("Elementos do calendário não encontrados.");
+        return;
+    }
+
     let currentDate = new Date();
 
     function updateCalendar() {

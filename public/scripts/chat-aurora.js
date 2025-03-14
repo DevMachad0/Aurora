@@ -252,18 +252,9 @@ document.addEventListener("DOMContentLoaded", function () {
         messageInput.style.height = `${messageInput.scrollHeight}px`;
     });
 
-    document.getElementById('calendar').addEventListener('click', function() {
-        document.getElementById('popup-overlay').style.display = 'flex';
-    });
-
-    document.getElementById('popup-overlay').addEventListener('click', function(event) {
-        if (event.target === this) {
-            this.style.display = 'none';
-        }
-    });
-
     const calendarButton = document.getElementById('calendar');
     const iframe = document.getElementById('popup-iframe');
+    const popupOverlay = document.getElementById('popup-overlay');
 
     if (calendarButton) {
         calendarButton.addEventListener('click', function() {
@@ -281,6 +272,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     iframe.style.display = 'none';
                 }
             });
+        });
+    }
+
+    if (popupOverlay) {
+        popupOverlay.addEventListener('click', function(event) {
+            if (event.target === this) {
+                this.style.display = 'none';
+            }
         });
     }
 });
