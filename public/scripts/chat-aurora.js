@@ -252,24 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
         messageInput.style.height = `${messageInput.scrollHeight}px`;
     });
 
-    document.getElementById('calendar-button').addEventListener('click', function() {
-        document.getElementById('calendar-popup').style.display = 'block';
+    document.getElementById('calendar').addEventListener('click', function() {
+        window.open('popup.html', 'popup', 'width=600,height=400');
     });
-
-    document.getElementById('calendar-popup').addEventListener('click', function(event) {
-        if (event.target === this) {
-            this.style.display = 'none';
-        }
-    });
-});
-document.addEventListener('DOMContentLoaded', function() {
-
-
-    const eventButton = document.getElementById('theme-toggle'); // Assumindo que o botão "Evento" tem o id "theme-toggle"
-
-    eventButton.addEventListener('click', function() {
-        showCalendarPopup(); // Chama a função para mostrar o pop-up
-    });
-
-
 });

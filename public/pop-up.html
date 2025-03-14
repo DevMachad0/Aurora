@@ -8,28 +8,36 @@
 </head>
 <body>
     <div id="overlay" class="overlay">
-        <div id="calendar-popup" class="calendar-popup">
-            <div class="calendar">
+        <div class="container">
+            <div class="calendar-container">
                 <div class="calendar-header">
-                    <div class="day-names">
-                        <div>Su</div>
-                        <div>Mo</div>
-                        <div>Tu</div>
-                        <div>We</div>
-                        <div>Th</div>
-                        <div>Fr</div>
-                        <div>Sa</div>
-                    </div>
+                    <button id="prev-month" class="nav-button">&#9665;</button>
+                    <span id="current-month"></span>
+                    <button id="next-month" class="nav-button">&#9655;</button>
                 </div>
-                <div class="calendar-body">
-                    <div class="days">
-                        </div>
-                </div>
+                <table class="calendar-table">
+                    <thead>
+                        <tr>
+                            <th>Dom</th>
+                            <th>Seg</th>
+                            <th>Ter</th>
+                            <th>Qua</th>
+                            <th>Qui</th>
+                            <th>Sex</th>
+                            <th>Sáb</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendar-body">
+                        <!-- Preenchido pelo JS -->
+                    </tbody>
+                </table>
             </div>
-            <div class="event-actions">
-                <button id="register-event">Registrar evento</button>
-                <button id="edit-event">Editar evento</button>
-                <button id="cancel-event">Cancelar evento</button>
+            <div class="menu-container">
+                <div class="event-actions">
+                    <button id="register-event">Registrar evento</button>
+                    <button id="edit-event">Editar evento</button>
+                    <button id="cancel-event">Cancelar evento</button>
+                </div>
             </div>
         </div>
     </div>

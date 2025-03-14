@@ -291,3 +291,15 @@ code {
         margin-bottom: 10px; /* Espaço entre o input e o botão */
     }
 }
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+.calendar {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+}

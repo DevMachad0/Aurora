@@ -1,60 +1,91 @@
+/* Overlay para fundo escuro */
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fundo escurecido */
-    display: none; /* Inicialmente oculto */
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Garante que fique acima do conteúdo */
+    z-index: 1000;
 }
 
-.calendar-popup {
-    background-color: #fff;
-    border-radius: 8px;
+/* Contêiner principal com tamanho fixo */
+.container {
+    display: flex;
+    width: 700px; /* Tamanho fixo */
+    height: 350px; /* Altura fixa */
+    background-color: #6c7192;
+    border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 300px;
 }
 
-.calendar {
-    margin-bottom: 20px;
+/* Área do calendário */
+.calendar-container {
+    width: 60%;
+    align-items: center;
+    padding: 20px;
 }
 
+/* Cabeçalho do calendário */
 .calendar-header {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin-bottom: 10px;
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
 }
 
-.day-names {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    margin-bottom: 5px;
-}
-
-.days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-}
-
-.days div {
-    text-align: center;
-    padding: 8px;
-    border-radius: 4px;
+/* Botões de navegação */
+.nav-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
     cursor: pointer;
+    padding: 5px 10px;
 }
 
-.days div:hover {
-    background-color: #f0f0f0;
+/* Tabela do calendário */
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
 }
 
+.calendar-table th,
+.calendar-table td {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 10px;
+}
+
+.calendar-table th {
+    background-color: #6e8efb;
+    color: white;
+}
+
+/* Área do menu */
+.menu-container {
+    width: 40%;
+    display: flex;
+
+    justify-content: flex-end; /* Move os botões para a borda inferior */
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+/* Botões */
 .event-actions {
     display: flex;
-    justify-content: space-around;
+    flex-direction: column; /* Mantém os botões empilhados */
+    gap: 10px;
+    width: 80%;
 }
 
 .event-actions button {
@@ -62,19 +93,15 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 16px;
+    color: white;
+    width: 100%;
 }
 
-#register-event {
-    background-color: #4CAF50;
-    color: white;
-}
-
-#edit-event {
-    background-color: #008CBA;
-    color: white;
+#register-event, #edit-event {
+    background-color: #6e8efb;
 }
 
 #cancel-event {
-    background-color: #f44336;
-    color: white;
+    background-color: #ff5757;
 }

@@ -1,59 +1,55 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const overlay = document.getElementById('overlay');
-    const calendarPopup = document.getElementById('calendar-popup');
-    const daysContainer = document.querySelector('.days');
+document.addEventListener("DOMContentLoaded", function () {
+    const calendarBody = document.getElementById("calendar-body");
+    const currentMonthLabel = document.getElementById("current-month");
+    const prevMonthButton = document.getElementById("prev-month");
+    const nextMonthButton = document.getElementById("next-month");
 
-    function generateCalendar() {
-        const today = new Date();
-        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-        const startingDay = firstDayOfMonth.getDay();
+    let currentDate = new Date();
 
-        daysContainer.innerHTML = ''; // Limpa os dias anteriores
+    function updateCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+        const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
-        // Adiciona espaços vazios para os dias antes do primeiro dia do mês
-        for (let i = 0; i < startingDay; i++) {
-            daysContainer.innerHTML += '<div></div>';
-        }
+        currentMonthLabel.textContent = `${months[month]} ${year}`;
 
-        // Adiciona os dias do mês
-        for (let i = 1; i <= daysInMonth; i++) {
-            daysContainer.innerHTML += `<div>${i}</div>`;
+        calendarBody.innerHTML = ""; // Limpa a tabela
+
+        let date = 1;
+        for (let i = 0; i < 6; i++) {
+            let row = document.createElement("tr");
+
+            for (let j = 0; j < 7; j++) {
+                let cell = document.createElement("td");
+
+                if (i === 0 && j < firstDay) {
+                    cell.textContent = "";
+                } else if (date > lastDate) {
+                    break;
+                } else {
+                    cell.textContent = date;
+                    cell.classList.add("calendar-day");
+                    date++;
+                }
+
+                row.appendChild(cell);
+            }
+
+            calendarBody.appendChild(row);
         }
     }
 
-    generateCalendar();
-
-    // Função para mostrar o pop-up
-    window.showCalendarPopup = function() {
-        overlay.style.display = 'flex';
-    };
-
-    // Função para fechar o pop-up
-    function closeCalendarPopup() {
-        overlay.style.display = 'none';
-    }
-
-    // Fecha o pop-up ao clicar fora dele
-    overlay.addEventListener('click', function(event) {
-        if (event.target === overlay) {
-            closeCalendarPopup();
-        }
+    prevMonthButton.addEventListener("click", function () {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        updateCalendar();
     });
 
-    // Adicione aqui a lógica para os botões de ação (registrar, editar, cancelar)
-    document.getElementById('register-event').addEventListener('click', function() {
-        alert('Registrar evento');
-        closeCalendarPopup();
+    nextMonthButton.addEventListener("click", function () {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        updateCalendar();
     });
 
-    document.getElementById('edit-event').addEventListener('click', function() {
-        alert('Editar evento');
-        closeCalendarPopup();
-    });
-
-    document.getElementById('cancel-event').addEventListener('click', function() {
-        alert('Cancelar evento');
-        closeCalendarPopup();
-    });
+    updateCalendar();
 });
