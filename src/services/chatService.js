@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 // Função para obter o histórico de conversas de um usuário
 const getChatHistory = async (email, database, date, keyword) => {
   try {
-    const db = mongoose.connection.useDb(database);
+    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    const db = mongoose.connection.useDb(sanitizedDatabase);
     const collectionName = "historico";
     const query = { email };
     if (date) {
@@ -35,7 +36,8 @@ const getChatHistory = async (email, database, date, keyword) => {
 // Função para salvar o histórico de conversas de um usuário
 const saveChatHistory = async (email, database, chatData) => {
   try {
-    const db = mongoose.connection.useDb(database);
+    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    const db = mongoose.connection.useDb(sanitizedDatabase);
     const collectionName = "historico";
     const today = new Date().toISOString().split("T")[0];
     const chatHistory = await db.collection(collectionName).findOne({ email, date: today });
@@ -60,14 +62,11 @@ const saveChatHistory = async (email, database, chatData) => {
 // Nova função para obter o histórico de conversas de um usuário através do database
 const getChatHistoryByDatabase = async (email, database) => {
   try {
-    // Sanitização do nome do banco de dados (substituindo espaços por underscores)
-    const sanitizedDatabase = database.replace(/\s+/g, '_');
+    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
     console.log(`Conectando à database: ${sanitizedDatabase}`);
     
-    // Conecta ao banco de dados correto
     const db = mongoose.connection.useDb(sanitizedDatabase);
 
-    // Define o modelo para o histórico de chat
     const chatHistorySchema = new mongoose.Schema({
       email: String,
       date: String, // Data formatada (YYYY-MM-DD)
@@ -78,15 +77,13 @@ const getChatHistoryByDatabase = async (email, database) => {
           timestamp: Date
         }
       ]
-    }, { collection: "chat_history" }); // Defina a coleção correta aqui
+    }, { collection: "historico" });
 
-    // Cria o modelo para o histórico de chat
     const ChatHistory = db.model("ChatHistory", chatHistorySchema);
 
     console.log(`Buscando histórico de chat para o email: ${email}`);
     
-    // Busca o histórico de chat do usuário
-    const chatHistory = await ChatHistory.findOne({ email }).sort({ date: -1 }); // Ordena por data (mais recente primeiro)
+    const chatHistory = await ChatHistory.findOne({ email }).sort({ date: -1 });
 
     if (!chatHistory) {
       console.log("Nenhum histórico de chat encontrado.");
@@ -94,7 +91,7 @@ const getChatHistoryByDatabase = async (email, database) => {
     }
 
     console.log("Histórico de chat encontrado:", chatHistory);
-    return chatHistory.chat; // Retorna apenas as mensagens do chat
+    return chatHistory.chat;
   } catch (error) {
     console.error("Erro ao obter histórico de chat:", error);
     throw new Error(error.message);
@@ -104,7 +101,7 @@ const getChatHistoryByDatabase = async (email, database) => {
 // Função para obter dados da empresa com base no tipo e nome da empresa
 const getEmpresaData = async (empresa, tipo) => {
   try {
-    const collectionName = `data_${empresa}`;
+    const collectionName = `data_${empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
     const empresaData = await mongoose.connection.collection(collectionName).findOne({ tipo });
 
     if (!empresaData) {

@@ -12,11 +12,11 @@ const planStorageLimits = {
 const createUser = async (userData) => {
     try {
         const user = new User(userData);
-        user.database = `data_${user.empresa.replace(/\s+/g, '_')}`;
+        user.database = `data_${user.empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
         await user.save();
 
         // Cria um novo banco de dados baseado na empresa do usuário
-        const dbName = `data_${user.empresa.replace(/\s+/g, '_')}`;
+        const dbName = `data_${user.empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
         const db = mongoose.connection.useDb(dbName);
 
         // Define o limite de armazenamento com base no plano do usuário
