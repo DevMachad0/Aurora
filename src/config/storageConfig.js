@@ -13,7 +13,7 @@ const getStorageStatus = async (database) => {
     const atualBytes = stats.storageSize - stats.dataSize;
 
     const storageStatus = {
-      total: totalGB,
+      total: parseFloat(totalGB),
       emUso: emUsoBytes,
       atual: atualBytes,
     };
