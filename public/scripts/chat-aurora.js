@@ -262,3 +262,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+document.addEventListener('DOMContentLoaded', function() {
+
+
+    const eventButton = document.getElementById('theme-toggle'); // Assumindo que o botão "Evento" tem o id "theme-toggle"
+
+    eventButton.addEventListener('click', function() {
+        showCalendarPopup(); // Chama a função para mostrar o pop-up
+    });
+
+
+});
