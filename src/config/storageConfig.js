@@ -2,15 +2,15 @@ const mongoose = require("mongoose");
 
 const getStorageStatus = async (database) => {
   try {
-    // Conecta ao banco de dados principal
-    const db = mongoose.connection.useDb("aurora_db");
+    const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
+    const db = mongoose.connection.useDb(sanitizedDatabase);
 
-    // Obtém o status de armazenamento da coleção específica
-    const stats = await db.db.command({ collStats: database });
+    // Obtém o status de armazenamento do banco de dados
+    const stats = await db.db.command({ dbStats: 1 });
 
-    const totalGB = (stats.maxSize / (1024 * 1024 * 1024)).toFixed(2);
-    const emUsoBytes = stats.totalIndexSize;
-    const atualBytes = stats.maxSize - stats.storageSize;
+    const totalGB = (stats.storageSize / (1024 * 1024 * 1024)).toFixed(2);
+    const emUsoBytes = stats.dataSize;
+    const atualBytes = stats.storageSize - stats.dataSize;
 
     const storageStatus = {
       total: totalGB,
