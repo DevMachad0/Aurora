@@ -3,9 +3,16 @@ const mongoose = require("mongoose");
 // Função para obter o histórico de conversas de um usuário
 const getChatHistory = async (email, database, date, keyword) => {
   try {
-    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
     const db = mongoose.connection.useDb(sanitizedDatabase);
     const collectionName = "historico";
+
+    // Verifica se a coleção existe, se não, cria
+    const collections = await db.listCollections({ name: collectionName }).toArray();
+    if (collections.length === 0) {
+      await db.createCollection(collectionName);
+    }
+
     const query = { email };
     if (date) {
       query.date = date;
@@ -36,9 +43,16 @@ const getChatHistory = async (email, database, date, keyword) => {
 // Função para salvar o histórico de conversas de um usuário
 const saveChatHistory = async (email, database, chatData) => {
   try {
-    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
     const db = mongoose.connection.useDb(sanitizedDatabase);
     const collectionName = "historico";
+
+    // Verifica se a coleção existe, se não, cria
+    const collections = await db.listCollections({ name: collectionName }).toArray();
+    if (collections.length === 0) {
+      await db.createCollection(collectionName);
+    }
+
     const today = new Date().toISOString().split("T")[0];
     const chatHistory = await db.collection(collectionName).findOne({ email, date: today });
 
@@ -62,10 +76,17 @@ const saveChatHistory = async (email, database, chatData) => {
 // Nova função para obter o histórico de conversas de um usuário através do database
 const getChatHistoryByDatabase = async (email, database) => {
   try {
-    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
     console.log(`Conectando à database: ${sanitizedDatabase}`);
     
     const db = mongoose.connection.useDb(sanitizedDatabase);
+    const collectionName = "historico";
+
+    // Verifica se a coleção existe, se não, cria
+    const collections = await db.listCollections({ name: collectionName }).toArray();
+    if (collections.length === 0) {
+      await db.createCollection(collectionName);
+    }
 
     const chatHistorySchema = new mongoose.Schema({
       email: String,
@@ -77,7 +98,7 @@ const getChatHistoryByDatabase = async (email, database) => {
           timestamp: Date
         }
       ]
-    }, { collection: "historico" });
+    }, { collection: collectionName });
 
     const ChatHistory = db.model("ChatHistory", chatHistorySchema);
 
