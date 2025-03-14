@@ -110,8 +110,8 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
             let emUsoFormatted;
             let emUsoUnit;
-            let atualFormatted;
-            let atualUnit;
+            let restanteFormatted;
+            let restanteUnit;
 
             if (data.emUso < 1024) {
                 emUsoFormatted = data.emUso.toFixed(2);
@@ -127,23 +127,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 emUsoUnit = 'GB';
             }
 
-            if (data.atual < 1024) {
-                atualFormatted = data.atual.toFixed(2);
-                atualUnit = 'Bytes';
-            } else if (data.atual < 1024 * 1024) {
-                atualFormatted = (data.atual / 1024).toFixed(2);
-                atualUnit = 'KB';
-            } else if (data.atual < 1024 * 1024 * 1024) {
-                atualFormatted = (data.atual / (1024 * 1024)).toFixed(2);
-                atualUnit = 'MB';
+            if (data.restante < 1024) {
+                restanteFormatted = data.restante.toFixed(2);
+                restanteUnit = 'Bytes';
+            } else if (data.restante < 1024 * 1024) {
+                restanteFormatted = (data.restante / 1024).toFixed(2);
+                restanteUnit = 'KB';
+            } else if (data.restante < 1024 * 1024 * 1024) {
+                restanteFormatted = (data.restante / (1024 * 1024)).toFixed(2);
+                restanteUnit = 'MB';
             } else {
-                atualFormatted = (data.atual / (1024 * 1024 * 1024)).toFixed(2);
-                atualUnit = 'GB';
+                restanteFormatted = (data.restante / (1024 * 1024 * 1024)).toFixed(2);
+                restanteUnit = 'GB';
             }
 
             document.querySelector(".storage-info").innerHTML = `
                 <p><span class="dot blue"></span> Em Uso: ${emUsoFormatted} ${emUsoUnit}</p>
-                <p><span class="dot cyan"></span> Atual: ${atualFormatted} ${atualUnit}</p>
+                <p><span class="dot cyan"></span> Restante: ${restanteFormatted} ${restanteUnit}</p>
                 <p><strong>Total:</strong> ${data.total} GB</p>
             `;
 

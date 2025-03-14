@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const { planStorageLimits } = require("../services/userService");
 
-const getStorageStatus = async (database) => {
+const getStorageStatus = async (database, plano) => {
   try {
     const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
     const db = mongoose.connection.useDb(sanitizedDatabase);
@@ -8,14 +9,14 @@ const getStorageStatus = async (database) => {
     // Obtém o status de armazenamento do banco de dados
     const stats = await db.db.command({ dbStats: 1 });
 
-    const totalGB = (stats.storageSize / (1024 * 1024 * 1024)).toFixed(2);
+    const totalGB = planStorageLimits[plano] / (1024 * 1024 * 1024);
     const emUsoBytes = stats.dataSize;
-    const atualBytes = stats.storageSize - stats.dataSize;
+    const restanteBytes = planStorageLimits[plano] - emUsoBytes;
 
     const storageStatus = {
-      total: parseFloat(totalGB),
+      total: totalGB.toFixed(2),
       emUso: emUsoBytes,
-      atual: atualBytes,
+      restante: restanteBytes,
     };
 
     return storageStatus;

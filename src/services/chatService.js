@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { getStorageStatus } = require("../config/storageConfig");
 
 // Função para obter o histórico de conversas de um usuário
 const getChatHistory = async (email, database, date, keyword) => {
@@ -41,7 +42,7 @@ const getChatHistory = async (email, database, date, keyword) => {
 };
 
 // Função para salvar o histórico de conversas de um usuário
-const saveChatHistory = async (email, database, chatData) => {
+const saveChatHistory = async (email, database, chatData, plano) => {
   try {
     const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
     const db = mongoose.connection.useDb(sanitizedDatabase);
@@ -51,6 +52,12 @@ const saveChatHistory = async (email, database, chatData) => {
     const collections = await db.db.listCollections({ name: collectionName }).toArray();
     if (collections.length === 0) {
       await db.createCollection(collectionName);
+    }
+
+    // Verifica o status de armazenamento
+    const storageStatus = await getStorageStatus(database, plano);
+    if (storageStatus.restante <= 0) {
+      throw new Error("Armazenamento cheio. Não é possível salvar mais mensagens.");
     }
 
     const today = new Date().toISOString().split("T")[0];
