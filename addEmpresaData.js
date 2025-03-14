@@ -25,16 +25,14 @@ async function run() {
           "7. Lei Aplicável: Este acordo será regido pelas leis do país em que a Empresa X está registrada."
         ]
       };
-      
 
-    // Conecta ao banco de dados principal
-    const db = mongoose.connection.useDb('aurora_db');
-    const collectionName = `data_${empresaData.empresa}`;
+    // Conecta ao banco de dados da empresa
+    const dbName = `data_${empresaData.empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
+    const db = mongoose.connection.useDb(dbName);
+    const collectionName = "documentos";
 
-    // Cria um novo documento na coleção da empresa conforme o modelo
-    const EmpresaModel = db.model('Empresa', Empresa.schema, collectionName);
-    const newEmpresa = new EmpresaModel(empresaData);
-    await newEmpresa.save();
+    // Cria um novo documento na coleção de documentos da empresa
+    await db.collection(collectionName).insertOne(empresaData);
 
     console.log('Dados da empresa adicionados com sucesso');
   } catch (err) {

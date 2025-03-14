@@ -22,6 +22,7 @@ const createUser = async (userData) => {
         // Define o limite de armazenamento com base no plano do usuário
         const storageLimit = planStorageLimits[user.plano] || 2147483648; // 2 GB por padrão
         await db.createCollection("historico", { capped: true, size: storageLimit });
+        await db.createCollection("documentos");
 
         return user;
     } catch (error) {

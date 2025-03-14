@@ -101,8 +101,10 @@ const getChatHistoryByDatabase = async (email, database) => {
 // Função para obter dados da empresa com base no tipo e nome da empresa
 const getEmpresaData = async (empresa, tipo) => {
   try {
-    const collectionName = `data_${empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
-    const empresaData = await mongoose.connection.collection(collectionName).findOne({ tipo });
+    const sanitizedDatabase = `data_${empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
+    const db = mongoose.connection.useDb(sanitizedDatabase);
+    const collectionName = "documentos";
+    const empresaData = await db.collection(collectionName).findOne({ tipo });
 
     if (!empresaData) {
       throw new Error("Dados da empresa não encontrados.");
