@@ -135,19 +135,6 @@ document.addEventListener("DOMContentLoaded", function () {
         sendButton.textContent = "Gerando..."; 
 
         try {
-            // Verifica o status de armazenamento antes de enviar a mensagem
-            const storageResponse = await fetch("/api/storage-status", {
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "User-Database": database
-                }
-            });
-            const storageData = await storageResponse.json();
-            if (storageData.restante <= 0) {
-                appendMessage("bot-message", "Armazenamento cheio. Não é possível enviar mais mensagens.");
-                return;
-            }
-
             const response = await fetch("/api/chat", {
                 method: "POST",
                 headers: {

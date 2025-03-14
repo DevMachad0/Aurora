@@ -54,12 +54,6 @@ const saveChatHistory = async (email, database, chatData, plano) => {
       await db.createCollection(collectionName);
     }
 
-    // Verifica o status de armazenamento
-    const storageStatus = await getStorageStatus(database, plano);
-    if (storageStatus.restante <= 0) {
-      throw new Error("Armazenamento cheio. Não é possível salvar mais mensagens.");
-    }
-
     const today = new Date().toISOString().split("T")[0];
     const chatHistory = await db.collection(collectionName).findOne({ email, date: today });
 
