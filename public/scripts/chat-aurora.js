@@ -258,8 +258,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (calendarButton) {
         calendarButton.addEventListener('click', function() {
-            if (iframe) {
+            if (iframe && popupOverlay) {
                 iframe.style.display = 'block';
+                popupOverlay.style.display = 'flex';
             }
         });
     }
@@ -270,6 +271,9 @@ document.addEventListener("DOMContentLoaded", function () {
             iframeDocument.addEventListener('click', function(event) {
                 if (event.target.id === 'close-popup') {
                     iframe.style.display = 'none';
+                    if (popupOverlay) {
+                        popupOverlay.style.display = 'none';
+                    }
                 }
             });
         });
@@ -279,6 +283,9 @@ document.addEventListener("DOMContentLoaded", function () {
         popupOverlay.addEventListener('click', function(event) {
             if (event.target === this) {
                 this.style.display = 'none';
+                if (iframe) {
+                    iframe.style.display = 'none';
+                }
             }
         });
     }
