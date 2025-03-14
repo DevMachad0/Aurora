@@ -253,6 +253,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     document.getElementById('calendar').addEventListener('click', function() {
-        window.open('popup.html', 'popup', 'width=600,height=400');
+        document.getElementById('popup-overlay').style.display = 'flex';
+    });
+
+    document.getElementById('popup-overlay').addEventListener('click', function(event) {
+        if (event.target === this) {
+            this.style.display = 'none';
+        }
     });
 });
