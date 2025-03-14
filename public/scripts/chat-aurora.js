@@ -147,6 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         nome: userName,
                         email: userEmail,
                         empresa: userEmpresa,
+                        database: database,
                         licenca: userLicenca,
                         plano: userPlano,
                         dados: userDados,

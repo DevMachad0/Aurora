@@ -19,8 +19,9 @@ const createUser = async (userData) => {
         const dbName = `data_${user.empresa.replace(/\s+/g, '_')}`;
         const db = mongoose.connection.useDb(dbName);
 
-        // Cria uma coleção de exemplo no novo banco de dados
-        await db.createCollection("exampleCollection");
+        // Define o limite de armazenamento com base no plano do usuário
+        const storageLimit = planStorageLimits[user.plano] || 2147483648; // 2 GB por padrão
+        await db.createCollection("historico", { capped: true, size: storageLimit });
 
         return user;
     } catch (error) {

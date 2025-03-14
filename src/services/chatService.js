@@ -1,14 +1,15 @@
 const mongoose = require("mongoose");
 
 // Função para obter o histórico de conversas de um usuário
-const getChatHistory = async (email, empresa, date, keyword) => {
+const getChatHistory = async (email, database, date, keyword) => {
   try {
-    const collectionName = `data_${empresa}`;
+    const db = mongoose.connection.useDb(database);
+    const collectionName = "historico";
     const query = { email };
     if (date) {
       query.date = date;
     }
-    const chatHistory = await mongoose.connection.collection(collectionName).find(query).toArray();
+    const chatHistory = await db.collection(collectionName).find(query).toArray();
 
     if (!chatHistory.length) {
       return [];
@@ -32,28 +33,26 @@ const getChatHistory = async (email, empresa, date, keyword) => {
 };
 
 // Função para salvar o histórico de conversas de um usuário
-const saveChatHistory = async (email, empresa, chatData) => {
+const saveChatHistory = async (email, database, chatData) => {
   try {
-    const collectionName = `data_${empresa}`;
+    const db = mongoose.connection.useDb(database);
+    const collectionName = "historico";
     const today = new Date().toISOString().split("T")[0];
-    const chatHistory = await mongoose.connection.collection(collectionName).findOne({ email, date: today });
+    const chatHistory = await db.collection(collectionName).findOne({ email, date: today });
 
     if (!chatHistory) {
-      console.log(`Inserindo novo histórico de chat para ${email} na coleção ${collectionName}`);
-      await mongoose.connection.collection(collectionName).insertOne({
+      await db.collection(collectionName).insertOne({
         email,
         date: today,
         chat: [chatData],
       });
     } else {
-      console.log(`Atualizando histórico de chat para ${email} na coleção ${collectionName}`);
-      await mongoose.connection.collection(collectionName).updateOne(
+      await db.collection(collectionName).updateOne(
         { email, date: today },
         { $push: { chat: chatData } }
       );
     }
   } catch (error) {
-    console.error("Erro ao salvar histórico de chat:", error);
     throw new Error(error.message);
   }
 };
