@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let restanteUnit;
 
             if (data.emUso < 1024) {
-                emUsoFormatted = data.emUso.toFixed(2);
+                emUsoFormatted = (data.emUso / 1024).toFixed(2);
                 emUsoUnit = 'Bytes';
             } else if (data.emUso < 1024 * 1024) {
                 emUsoFormatted = (data.emUso / 1024).toFixed(2);
@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (data.restante < 1024) {
-                restanteFormatted = data.restante.toFixed(2);
+                restanteFormatted = (data.restante / 1024).toFixed(2);
                 restanteUnit = 'Bytes';
             } else if (data.restante < 1024 * 1024) {
                 restanteFormatted = (data.restante / 1024).toFixed(2);

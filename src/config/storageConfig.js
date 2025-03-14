@@ -19,12 +19,12 @@ const getStorageStatus = async (database, plano) => {
     // Obtém o status de armazenamento do banco de dados
     const stats = await db.db.command({ dbStats: 1 });
 
-    const totalGB = planStorageLimits[plano] / (1024 * 1024 * 1024);
+    const totalGB = (planStorageLimits[plano] / (1024 * 1024 * 1024)).toFixed(2);
     const emUsoBytes = stats.dataSize;
     const restanteBytes = planStorageLimits[plano] - emUsoBytes;
 
     const storageStatus = {
-      total: totalGB.toFixed(2),
+      total: parseFloat(totalGB),
       emUso: emUsoBytes,
       restante: restanteBytes,
     };
