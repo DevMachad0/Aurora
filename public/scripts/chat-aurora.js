@@ -265,11 +265,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const calendarButton = document.getElementById('calendar');
     const iframe = document.getElementById('popup-iframe');
 
-    if (calendarButton && iframe) {
+    if (calendarButton) {
         calendarButton.addEventListener('click', function() {
-            iframe.style.display = 'block';
+            if (iframe) {
+                iframe.style.display = 'block';
+            }
         });
+    }
 
+    if (iframe) {
         iframe.addEventListener('load', function() {
             const iframeDocument = iframe.contentWindow.document;
             iframeDocument.addEventListener('click', function(event) {
