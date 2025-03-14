@@ -261,4 +261,18 @@ document.addEventListener("DOMContentLoaded", function () {
             this.style.display = 'none';
         }
     });
+
+    document.getElementById('calendar').addEventListener('click', function() {
+        const iframe = document.getElementById('popup-iframe');
+        iframe.style.display = 'block';
+    });
+
+    document.getElementById('popup-iframe').addEventListener('load', function() {
+        const iframe = this;
+        iframe.contentWindow.document.addEventListener('click', function(event) {
+            if (event.target.id === 'close-popup') {
+                iframe.style.display = 'none';
+            }
+        });
+    });
 });
