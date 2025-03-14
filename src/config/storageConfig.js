@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
-const { planStorageLimits } = require("../services/userService");
+
+const planStorageLimits = {
+    MK1: 2147483648, // 2 GB
+    MK2: 5368709120, // 5 GB
+    MK3: 10737418240, // 10 GB
+};
 
 const getStorageStatus = async (database, plano) => {
   try {
