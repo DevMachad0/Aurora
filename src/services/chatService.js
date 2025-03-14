@@ -8,7 +8,7 @@ const getChatHistory = async (email, database, date, keyword) => {
     const collectionName = "historico";
 
     // Verifica se a coleção existe, se não, cria
-    const collections = await db.listCollections({ name: collectionName }).toArray();
+    const collections = await db.db.listCollections({ name: collectionName }).toArray();
     if (collections.length === 0) {
       await db.createCollection(collectionName);
     }
@@ -48,7 +48,7 @@ const saveChatHistory = async (email, database, chatData) => {
     const collectionName = "historico";
 
     // Verifica se a coleção existe, se não, cria
-    const collections = await db.listCollections({ name: collectionName }).toArray();
+    const collections = await db.db.listCollections({ name: collectionName }).toArray();
     if (collections.length === 0) {
       await db.createCollection(collectionName);
     }
@@ -83,7 +83,7 @@ const getChatHistoryByDatabase = async (email, database) => {
     const collectionName = "historico";
 
     // Verifica se a coleção existe, se não, cria
-    const collections = await db.listCollections({ name: collectionName }).toArray();
+    const collections = await db.db.listCollections({ name: collectionName }).toArray();
     if (collections.length === 0) {
       await db.createCollection(collectionName);
     }
