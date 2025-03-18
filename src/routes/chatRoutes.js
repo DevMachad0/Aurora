@@ -30,8 +30,8 @@ const chat = model.startChat({
 
 const planLimits = {
     MK1: 1000,
-    MK2: 2000,
-    MK3: 6000,
+    MK2: 4000,
+    MK3: 10000,
 };
 
 // Função para repetir a solicitação com atraso

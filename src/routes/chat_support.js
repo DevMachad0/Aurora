@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const aurora = require('./chat_support_bot'); // Importar o modelo Aurora
 const { getEmpresaData } = require('../services/chatService'); // Importar a função para obter dados da empresa
 const { getUserProfileData } = require('../services/userService'); // Importar a função para obter dados do perfil do usuário
+const { getAuroraCoreData } = require('../services/auroraCoreService'); // Importar o serviço Aurora Core
 
 // Variável para armazenar as informações do usuário
 let userInfo = {};
@@ -157,14 +158,20 @@ router.post('/chat-support', async (req, res) => {
             userInfo
         });
 
-        // Envia a mensagem inicial para o modelo Aurora com os dados do usuário, da empresa e do perfil
-        const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${protocolNumber}. Como posso te ajudar?`;
+        // Obter as instruções e restrições do Aurora Core
+        const auroraCoreData = await getAuroraCoreData();
+        const coreInstructions = auroraCoreData.instructions.join("\n");
+        const coreRestrictions = auroraCoreData.restrictions.join("\n");
+
+        // Envia a mensagem inicial para o modelo Aurora com os dados do usuário, da empresa, do perfil e do Aurora Core
+        const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${userInfo.protocolNumber}. Como posso te ajudar?`;
         const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
         const empresaData = await getEmpresaData(userInfo.empresa, "documento");
         const empresaContext = empresaData ? `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}` : "Dados da empresa não encontrados.";
         const userProfileData = await getUserProfileData(userInfo.perfil_email);
         const profileContext = userProfileData ? `Dados do perfil: ${userProfileData.join(", ")}` : "Dados do perfil não encontrados.";
-        await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${profileContext}\n\n${initialMessage}`);
+
+        await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${profileContext}\n\nInstruções do Aurora Core:\n${coreInstructions}\n\nRestrições do Aurora Core:\n${coreRestrictions}\n\n${initialMessage}`);
 
     } catch (error) {
         console.error('Erro ao processar a requisição:', error);
