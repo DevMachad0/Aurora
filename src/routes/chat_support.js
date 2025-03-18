@@ -91,27 +91,32 @@ router.post('/chat-support', async (req, res) => {
         // Conecta ao banco de dados principal
         const db = mongoose.connection.useDb('aurora_db');
         const collectionName = `data_${userInfo.empresa}`;
+        const atendimentoCollection = "atendimento";
 
-        // Cria um novo documento na coleção da empresa conforme o modelo
-        const newSupportClient = {
+        // Cria um novo documento na coleção "atendimento" da empresa
+        const atendimentoData = {
+            protocolNumber,
             firstName: userInfo.firstName,
             lastName: userInfo.lastName,
             cpf: userInfo.cpf,
-            tipo: "chamado",
             email: userInfo.email,
             domain: userInfo.domain,
-            protocolNumber,
             status: "Em atendimento(Aurora)",
-            observacao: "",
-            messages: []
+            messages: [],
+            createdAt: new Date(),
         };
 
         try {
-            await db.collection(collectionName).insertOne(newSupportClient);
-            console.log('Protocolo salvo com sucesso:', protocolNumber);
+            const empresaDb = mongoose.connection.useDb(collectionName);
+            const collections = await empresaDb.db.listCollections({ name: atendimentoCollection }).toArray();
+            if (collections.length === 0) {
+                await empresaDb.createCollection(atendimentoCollection);
+            }
+            await empresaDb.collection(atendimentoCollection).insertOne(atendimentoData);
+            console.log('Atendimento salvo com sucesso na coleção "atendimento".');
         } catch (error) {
-            console.error('Erro ao salvar o protocolo:', error);
-            return res.status(500).json({ error: "Erro ao salvar o protocolo no banco de dados." });
+            console.error('Erro ao salvar o atendimento na coleção "atendimento":', error);
+            return res.status(500).json({ error: "Erro ao salvar o atendimento no banco de dados da empresa." });
         }
 
         // Responde com o número de protocolo
