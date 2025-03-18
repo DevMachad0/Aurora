@@ -53,6 +53,38 @@ router.post('/chat-support', async (req, res) => {
             const profileContext = userProfileData ? `Ultilizar dados do perfil: ${userProfileData.join(", ")}, que se referem ao atendimento ao cliente via (API)` : "Dados do perfil não encontrados.";
             const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${profileContext}\n\n${message}`);
 
+            // Sanitizar o nome do banco de dados
+            const sanitizedDatabaseName = `data_${userInfo.empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
+            const atendimentoCollection = "atendimento";
+
+            // Salvar a mensagem trocada entre o cliente e a AURORA
+            if (message) {
+                try {
+                    const empresaDb = mongoose.connection.useDb(sanitizedDatabaseName);
+                    const atendimento = await empresaDb.collection(atendimentoCollection).findOne({ protocolNumber: userInfo.protocolNumber });
+
+                    if (!atendimento) {
+                        return res.status(404).json({ error: "Atendimento não encontrado." });
+                    }
+
+                    const newMessage = {
+                        sender: email ? "cliente" : "AURORA",
+                        message,
+                        timestamp: new Date(),
+                    };
+
+                    await empresaDb.collection(atendimentoCollection).updateOne(
+                        { protocolNumber: userInfo.protocolNumber },
+                        { $push: { messages: newMessage } }
+                    );
+
+                    console.log('Mensagem salva com sucesso no atendimento.');
+                } catch (error) {
+                    console.error('Erro ao salvar a mensagem no atendimento:', error);
+                    return res.status(500).json({ error: "Erro ao salvar a mensagem no banco de dados." });
+                }
+            }
+
             return res.json({ reply: botResponse });
         }
 
@@ -87,6 +119,7 @@ router.post('/chat-support', async (req, res) => {
 
         // Gera um número de protocolo único
         const protocolNumber = await generateProtocolNumber();
+        userInfo.protocolNumber = protocolNumber;
 
         // Sanitizar o nome do banco de dados
         const sanitizedDatabaseName = `data_${userInfo.empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
