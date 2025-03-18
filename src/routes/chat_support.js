@@ -88,9 +88,8 @@ router.post('/chat-support', async (req, res) => {
         // Gera um número de protocolo único
         const protocolNumber = await generateProtocolNumber();
 
-        // Conecta ao banco de dados principal
-        const db = mongoose.connection.useDb('aurora_db');
-        const collectionName = `data_${userInfo.empresa}`;
+        // Sanitizar o nome do banco de dados
+        const sanitizedDatabaseName = `data_${userInfo.empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
         const atendimentoCollection = "atendimento";
 
         // Cria um novo documento na coleção "atendimento" da empresa
@@ -107,7 +106,7 @@ router.post('/chat-support', async (req, res) => {
         };
 
         try {
-            const empresaDb = mongoose.connection.useDb(collectionName);
+            const empresaDb = mongoose.connection.useDb(sanitizedDatabaseName);
             const collections = await empresaDb.db.listCollections({ name: atendimentoCollection }).toArray();
             if (collections.length === 0) {
                 await empresaDb.createCollection(atendimentoCollection);
