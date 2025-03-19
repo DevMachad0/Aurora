@@ -93,6 +93,8 @@ async function verificarLembretes() {
                 } catch (error) {
                     console.error(`[${agora.format("YYYY-MM-DD HH:mm:ss")}] Erro ao enviar e-mail para ${evento.email}:`, error);
                 }
+            } else {
+                console.log(`[${agora.format("YYYY-MM-DD HH:mm:ss")}] Nenhum e-mail enviado para o evento: ${evento.title}`);
             }
         }
     } catch (error) {
