@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { getStorageStatus } = require("../config/storageConfig");
+const LembreteEvento = require("../models/lembreteEventoModel"); // Importa o modelo LembreteEvento
 
 // Função para obter o histórico de conversas de um usuário
 const getChatHistory = async (email, database, date, keyword) => {
