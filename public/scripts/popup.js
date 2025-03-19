@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
             description: document.getElementById("description").value,
             email: document.getElementById("email").value,
             notifyEmail: document.getElementById("notify-email").checked,
+            database: localStorage.getItem("userDatabase"), // Obtém o banco de dados da empresa
         };
 
         try {

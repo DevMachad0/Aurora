@@ -5,11 +5,15 @@ const LembreteEvento = require("../models/lembreteEventoModel");
 const mongoose = require("mongoose");
 
 router.post("/events", async (req, res) => {
-    const { title, date, startTime, endTime, description, email, notifyEmail } = req.body;
+    const { title, date, startTime, endTime, description, email, notifyEmail, database } = req.body;
+
+    if (!database) {
+        return res.status(400).json({ error: "Banco de dados da empresa não especificado." });
+    }
 
     try {
         // Salvar no banco da empresa
-        const empresaDb = mongoose.connection.useDb(`data_${email.split("@")[1].replace(/\./g, "_")}`);
+        const empresaDb = mongoose.connection.useDb(database);
         const EventoModel = empresaDb.model("Evento", Evento.schema);
         await EventoModel.create({ title, date, startTime, endTime, description, email, notifyEmail });
 
