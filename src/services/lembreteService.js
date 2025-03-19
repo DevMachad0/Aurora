@@ -11,16 +11,24 @@ const transporter = nodemailer.createTransport({
 
 async function verificarLembretes() {
     try {
+        console.log("Iniciando verificação de lembretes...");
         const agora = new Date();
+        console.log("Data e hora atual:", agora);
+
         const eventos = await LembreteEvento.find({
             notifyEmail: true,
             status: { $in: ["evento criado", "lembrete enviado"] },
             date: { $gte: agora.toISOString().split("T")[0] },
         });
 
+        console.log(`Eventos encontrados para verificação: ${eventos.length}`);
+
         for (const evento of eventos) {
             const eventoDataHora = new Date(`${evento.date}T${evento.startTime}`);
             const diffMinutos = Math.floor((eventoDataHora - agora) / (1000 * 60));
+
+            console.log(`Verificando evento: ${evento.title}`);
+            console.log(`Diferença em minutos para o evento: ${diffMinutos}`);
 
             let mailOptions;
 
@@ -74,8 +82,9 @@ async function verificarLembretes() {
 
             if (mailOptions) {
                 try {
+                    console.log(`Enviando e-mail para ${evento.email} sobre o evento ${evento.title}`);
                     await transporter.sendMail(mailOptions);
-                    console.log(`E-mail enviado para ${evento.email} sobre o evento ${evento.title}`);
+                    console.log(`E-mail enviado com sucesso para ${evento.email}`);
                     await evento.save();
                 } catch (error) {
                     console.error(`Erro ao enviar e-mail para ${evento.email}:`, error);

@@ -77,7 +77,12 @@ app.use("/api", domainRoutes);
 app.use("/api", eventRoutes);
 
 // Executar o serviço de lembretes a cada 1 minuto
-setInterval(verificarLembretes, 1 * 60 * 1000);
+setInterval(() => {
+    console.log("Executando o serviço de lembretes...");
+    verificarLembretes()
+        .then(() => console.log("Serviço de lembretes executado com sucesso."))
+        .catch((error) => console.error("Erro ao executar o serviço de lembretes:", error));
+}, 1 * 60 * 1000);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
