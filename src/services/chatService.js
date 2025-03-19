@@ -172,4 +172,27 @@ const getTodayEvents = async (email, database) => {
   }
 };
 
-module.exports = { getChatHistory, saveChatHistory, getChatHistoryByDatabase, getEmpresaData, getUserEvents, getTodayEvents };
+const getCompanyEvents = async (database, query) => {
+  try {
+    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    const empresaDb = mongoose.connection.useDb(sanitizedDatabase);
+    const EventoModel = empresaDb.model("Evento", require("../models/eventoModel").schema);
+
+    // Busca eventos na coleção "Evento" com base no query fornecido
+    const events = await EventoModel.find(query);
+    return events;
+  } catch (error) {
+    console.error("Erro ao buscar eventos no banco da empresa:", error);
+    throw new Error("Erro ao buscar eventos no banco da empresa.");
+  }
+};
+
+module.exports = { 
+  getChatHistory, 
+  saveChatHistory, 
+  getChatHistoryByDatabase, 
+  getEmpresaData, 
+  getUserEvents, 
+  getTodayEvents, 
+  getCompanyEvents 
+};
