@@ -13,7 +13,7 @@ router.post("/events", async (req, res) => {
 
     try {
         // Sanitizar o nome do banco de dados
-        const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
+        const sanitizedDatabase = `${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
 
         // Salvar no banco da empresa
         const empresaDb = mongoose.connection.useDb(sanitizedDatabase);
