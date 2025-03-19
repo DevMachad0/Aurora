@@ -12,8 +12,11 @@ router.post("/events", async (req, res) => {
     }
 
     try {
+        // Sanitizar o nome do banco de dados
+        const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
+
         // Salvar no banco da empresa
-        const empresaDb = mongoose.connection.useDb(database);
+        const empresaDb = mongoose.connection.useDb(sanitizedDatabase);
         const EventoModel = empresaDb.model("Evento", Evento.schema);
         await EventoModel.create({ title, date, startTime, endTime, description, email, notifyEmail });
 
