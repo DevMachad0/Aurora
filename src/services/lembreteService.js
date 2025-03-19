@@ -9,11 +9,16 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+function getHoraBrasil() {
+    return new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+}
+
 async function verificarLembretes() {
     try {
-        console.log("Iniciando verificação de lembretes...");
         const agora = new Date();
-        console.log("Data e hora atual:", agora);
+        const horaBrasil = getHoraBrasil();
+        console.log(`[${horaBrasil}] Iniciando verificação de lembretes...`);
+        console.log(`[${horaBrasil}] Data e hora atual no Brasil: ${horaBrasil}`);
 
         const eventos = await LembreteEvento.find({
             notifyEmail: true,
@@ -21,14 +26,14 @@ async function verificarLembretes() {
             date: { $gte: agora.toISOString().split("T")[0] },
         });
 
-        console.log(`Eventos encontrados para verificação: ${eventos.length}`);
+        console.log(`[${horaBrasil}] Eventos encontrados para verificação: ${eventos.length}`);
 
         for (const evento of eventos) {
             const eventoDataHora = new Date(`${evento.date}T${evento.startTime}`);
             const diffMinutos = Math.floor((eventoDataHora - agora) / (1000 * 60));
 
-            console.log(`Verificando evento: ${evento.title}`);
-            console.log(`Diferença em minutos para o evento: ${diffMinutos}`);
+            console.log(`[${horaBrasil}] Verificando evento: ${evento.title}`);
+            console.log(`[${horaBrasil}] Diferença em minutos para o evento: ${diffMinutos}`);
 
             let mailOptions;
 
@@ -82,17 +87,17 @@ async function verificarLembretes() {
 
             if (mailOptions) {
                 try {
-                    console.log(`Enviando e-mail para ${evento.email} sobre o evento ${evento.title}`);
+                    console.log(`[${horaBrasil}] Enviando e-mail para ${evento.email} sobre o evento ${evento.title}`);
                     await transporter.sendMail(mailOptions);
-                    console.log(`E-mail enviado com sucesso para ${evento.email}`);
+                    console.log(`[${horaBrasil}] E-mail enviado com sucesso para ${evento.email}`);
                     await evento.save();
                 } catch (error) {
-                    console.error(`Erro ao enviar e-mail para ${evento.email}:`, error);
+                    console.error(`[${horaBrasil}] Erro ao enviar e-mail para ${evento.email}:`, error);
                 }
             }
         }
     } catch (error) {
-        console.error("Erro ao verificar lembretes:", error);
+        console.error(`[${getHoraBrasil()}] Erro ao verificar lembretes:`, error);
     }
 }
 
