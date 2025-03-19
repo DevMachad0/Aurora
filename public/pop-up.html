@@ -36,43 +36,61 @@
                 <div class="event-actions">
                     <button id="register-event">Registrar evento</button>
                     <button id="edit-event">Editar evento</button>
-                    <button id="cancel-event">Cancelar evento</button>
+                    <button id="cancela-event">Cancelar evento</button>
                 </div>
             </div>
         </div>
     </div>
     <div id="event-form-popup" class="overlay" style="display: none;">
-        <div class="container">
+        <div class="container2">
             <form id="event-form">
                 <h2>Registrar Evento</h2>
-                <label for="event-title">Título:</label>
-                <input type="text" id="event-title" required>
-                
-                <label for="event-date">Data:</label>
-                <input type="date" id="event-date" required>
-                
-                <label for="start-time">Hora de Início:</label>
-                <input type="time" id="start-time" required>
-                
-                <label for="end-time">Hora de Fim:</label>
-                <input type="time" id="end-time" required>
-                
+        
+                <!-- Primeira linha com 3 campos -->
+                <div class="field-row">
+                    <div>
+                        <label for="event-title">Título:</label>
+                        <input type="text" id="event-title" required>
+                    </div>
+                    <div>
+                        <label for="email">E-mail:</label>
+                        <input type="email" id="email" required>
+                    </div>
+
+                    <div>
+                        <label for="start-time">Hora de Início:</label>
+                        <input type="time" id="start-time" required>
+                    </div>
+                </div>
+        
+                <!-- Segunda linha com 3 campos -->
+                <div class="field-row">
+                    <div>
+                        <label for="end-time">Hora de Fim:</label>
+                        <input type="time" id="end-time" required>
+                    </div>
+                    <div>
+                        <label for="event-date">Data:</label>
+                        <input type="date" id="event-date" required>
+                    </div>
+                    <div>
+                        <label>
+                            <input type="checkbox" id="notify-email"> Notificar por e-mail?
+                        </label>
+                    </div>
+                </div>
+        
+                <!-- Campo de descrição ocupa toda a largura -->
                 <label for="description">Descrição:</label>
                 <textarea id="description" required></textarea>
-                
-                <label for="email">E-mail:</label>
-                <input type="email" id="email" required>
-                
-                <label>
-                    <input type="checkbox" id="notify-email"> Notificar por e-mail?
-                </label>
-                
+        
+                <!-- Botões alinhados no canto -->
                 <div class="event-actions">
                     <button type="submit" id="save-event">Salvar</button>
                     <button type="button" id="cancel-event">Cancelar</button>
                 </div>
             </form>
-        </div>
+        </div>        
     </div>
     <script src="scripts/popup.js"></script>
 </body>
