@@ -35,8 +35,21 @@ const sendDailyReminders = async () => {
             const mailOptions = {
                 from: '"Aurora TI" <lembrete@aurorati.tech>',
                 to: lembrete.email,
-                subject: `Lembrete do Evento: ${lembrete.title}`,
-                text: `Olá, este é um lembrete para o evento "${lembrete.title}" que ocorrerá em ${lembrete.date} das ${lembrete.startTime} às ${lembrete.endTime}. Descrição: ${lembrete.description}`,
+                subject: `📅 Lembrete do Evento: ${lembrete.title}`,
+                text: `Olá,
+
+Este é um lembrete para o evento "${lembrete.title}" que você tem agendado.
+
+📅 Data: ${lembrete.date}
+⏰ Horário: Das ${lembrete.startTime} às ${lembrete.endTime}
+
+📄 Descrição:
+${lembrete.description}
+
+Estamos à disposição para qualquer dúvida.
+
+Atenciosamente,
+Equipe Aurora TI`,
             };
 
             await transporter.sendMail(mailOptions);
