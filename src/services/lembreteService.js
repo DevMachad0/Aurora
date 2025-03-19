@@ -30,6 +30,23 @@ const sendDailyReminders = async () => {
             },
         });
 
+        const updateEventStatusInCompanyDatabase = async (lembrete) => {
+            try {
+                const sanitizedDatabase = lembrete.database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+                const empresaDb = mongoose.connection.useDb(sanitizedDatabase);
+                const EventoModel = empresaDb.model("Evento", LembreteEvento.schema);
+
+                // Atualiza o status do evento correspondente
+                await EventoModel.updateOne(
+                    { title: lembrete.title, date: lembrete.date, email: lembrete.email },
+                    { $set: { status: "email enviado" } }
+                );
+                console.log(`Status do evento atualizado no banco da empresa: ${lembrete.database}`);
+            } catch (error) {
+                console.error("Erro ao atualizar status do evento no banco da empresa:", error);
+            }
+        };
+
         // Envia e-mails para cada lembrete
         for (const lembrete of lembretes) {
             const mailOptions = {
@@ -49,7 +66,7 @@ ${lembrete.description}
 Estamos à disposição para qualquer dúvida.
 
 Atenciosamente,
-Equipe Aurora TI`,
+Equipe Aurora`,
             };
 
             await transporter.sendMail(mailOptions);
@@ -58,6 +75,9 @@ Equipe Aurora TI`,
             // Atualiza o status do lembrete para "email enviado"
             lembrete.status = "email enviado";
             await lembrete.save();
+
+            // Atualiza o status do evento no banco da empresa
+            await updateEventStatusInCompanyDatabase(lembrete);
         }
     } catch (error) {
         console.error("Erro ao enviar lembretes:", error);

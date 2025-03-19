@@ -4,7 +4,7 @@ const { getStorageStatus } = require("../config/storageConfig");
 // Função para obter o histórico de conversas de um usuário
 const getChatHistory = async (email, database, date, keyword) => {
   try {
-    const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
+    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
     const db = mongoose.connection.useDb(sanitizedDatabase);
     const collectionName = "historico";
 
@@ -44,7 +44,7 @@ const getChatHistory = async (email, database, date, keyword) => {
 // Função para salvar o histórico de conversas de um usuário
 const saveChatHistory = async (email, database, chatData, plano) => {
   try {
-    const sanitizedDatabase = `data_${database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
+    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
     const db = mongoose.connection.useDb(sanitizedDatabase);
     const collectionName = "historico";
 
@@ -138,4 +138,19 @@ const getEmpresaData = async (empresa, tipo) => {
   }
 };
 
-module.exports = { getChatHistory, saveChatHistory, getChatHistoryByDatabase, getEmpresaData };
+const getUserEvents = async (email, database) => {
+  try {
+    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    const empresaDb = mongoose.connection.useDb(sanitizedDatabase);
+    const EventoModel = empresaDb.model("Evento", LembreteEvento.schema);
+
+    // Busca eventos associados ao e-mail do usuário
+    const events = await EventoModel.find({ email });
+    return events;
+  } catch (error) {
+    console.error("Erro ao buscar eventos do usuário:", error);
+    throw new Error("Erro ao buscar eventos do usuário.");
+  }
+};
+
+module.exports = { getChatHistory, saveChatHistory, getChatHistoryByDatabase, getEmpresaData, getUserEvents };
