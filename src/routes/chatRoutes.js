@@ -66,29 +66,11 @@ router.post("/chat", async (req, res) => {
         // Obtém o histórico de conversas do usuário
         const chatHistory = await getChatHistory(user.email, user.empresa);
 
-        // Obtém os eventos do banco de dados da empresa
-        const companyEvents = await getCompanyEvents(user.empresa, { email: user.email });
-        const companyEventsContext = companyEvents.length
-            ? companyEvents.map(event => `Evento: ${event.title}, Data: ${event.date}, Horário: ${event.startTime} - ${event.endTime}, Descrição: ${event.description}`).join("\n")
-            : "Nenhum evento encontrado no banco da empresa.";
-
-        // Obtém os agendamentos do usuário
-        const userEvents = await getUserEvents(user.email, user.empresa);
-        const todayEvents = await getTodayEvents(user.email, user.empresa);
-
-        const eventsContext = userEvents.length
-            ? userEvents.map(event => `Evento: ${event.title}, Data: ${event.date}, Horário: ${event.startTime} - ${event.endTime}, Descrição: ${event.description}`).join("\n")
-            : "Nenhum evento encontrado.";
-
-        const todayEventsContext = todayEvents.length
-            ? todayEvents.map(event => `Evento: ${event.title}, Horário: ${event.startTime} - ${event.endTime}, Descrição: ${event.description}`).join("\n")
-            : "Nenhum evento para hoje.";
-
         // Cria um contexto para o modelo entender quem está falando
         const userContext = `Dados do usuário do sistema: Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
 
-        // Adiciona o histórico de conversas e eventos ao contexto
-        const historyContext = `${chatHistory ? chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n") : ""}\n\nEventos do Banco da Empresa:\n${companyEventsContext}\n\nAgendamentos do Usuário:\n${eventsContext}\n\nAgendamentos de Hoje:\n${todayEventsContext}`;
+        // Adiciona apenas o histórico de conversas ao contexto
+        const historyContext = `${chatHistory ? chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n") : ""}`;
 
         // Obtém as instruções e restrições do AuroraCore
         const auroraCoreData = await getAuroraCoreData();

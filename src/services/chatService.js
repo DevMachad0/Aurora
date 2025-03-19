@@ -139,60 +139,9 @@ const getEmpresaData = async (empresa, tipo) => {
   }
 };
 
-const getUserEvents = async (email, database) => {
-  try {
-    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-    const empresaDb = mongoose.connection.useDb(sanitizedDatabase);
-    const EventoModel = empresaDb.model("Evento", require("../models/eventoModel").schema); // Usa o schema correto
-
-    // Busca eventos associados ao e-mail do usuário
-    const events = await EventoModel.find({ email });
-    return events;
-  } catch (error) {
-    console.error("Erro ao buscar eventos do usuário:", error);
-    throw new Error("Erro ao buscar eventos do usuário.");
-  }
-};
-
-// Nova função para buscar eventos do dia
-const getTodayEvents = async (email, database) => {
-  try {
-    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-    const empresaDb = mongoose.connection.useDb(sanitizedDatabase);
-    const EventoModel = empresaDb.model("Evento", require("../models/eventoModel").schema); // Usa o schema correto
-
-    const today = new Date().toISOString().split("T")[0];
-
-    // Busca eventos do dia associados ao e-mail do usuário
-    const events = await EventoModel.find({ email, date: today });
-    return events;
-  } catch (error) {
-    console.error("Erro ao buscar eventos do dia:", error);
-    throw new Error("Erro ao buscar eventos do dia.");
-  }
-};
-
-const getCompanyEvents = async (database, query) => {
-  try {
-    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-    const empresaDb = mongoose.connection.useDb(sanitizedDatabase);
-    const EventoModel = empresaDb.model("Evento", require("../models/eventoModel").schema);
-
-    // Busca eventos na coleção "Evento" com base no query fornecido
-    const events = await EventoModel.find(query);
-    return events;
-  } catch (error) {
-    console.error("Erro ao buscar eventos no banco da empresa:", error);
-    throw new Error("Erro ao buscar eventos no banco da empresa.");
-  }
-};
-
 module.exports = { 
   getChatHistory, 
   saveChatHistory, 
   getChatHistoryByDatabase, 
-  getEmpresaData, 
-  getUserEvents, 
-  getTodayEvents, 
-  getCompanyEvents 
+  getEmpresaData 
 };
