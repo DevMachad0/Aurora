@@ -3,6 +3,7 @@ const router = express.Router();
 const Evento = require("../models/eventoModel");
 const LembreteEvento = require("../models/lembreteEventoModel");
 const mongoose = require("mongoose");
+const { sendDailyReminders } = require("../services/lembreteService");
 
 router.post("/events", async (req, res) => {
     const { title, date, startTime, endTime, description, email, notifyEmail, database } = req.body;
@@ -29,6 +30,16 @@ router.post("/events", async (req, res) => {
     } catch (error) {
         console.error("Erro ao registrar evento:", error);
         res.status(500).json({ error: "Erro ao registrar evento." });
+    }
+});
+
+router.post("/send-reminders", async (req, res) => {
+    try {
+        await sendDailyReminders();
+        res.status(200).json({ message: "Lembretes enviados com sucesso!" });
+    } catch (error) {
+        console.error("Erro ao enviar lembretes:", error);
+        res.status(500).json({ error: "Erro ao enviar lembretes." });
     }
 });
 
