@@ -143,7 +143,7 @@ const getUserEvents = async (email, database) => {
   try {
     const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
     const empresaDb = mongoose.connection.useDb(sanitizedDatabase);
-    const EventoModel = empresaDb.model("Evento", LembreteEvento.schema);
+    const EventoModel = empresaDb.model("Evento", require("../models/eventoModel").schema); // Usa o schema correto
 
     // Busca eventos associados ao e-mail do usuário
     const events = await EventoModel.find({ email });
@@ -154,4 +154,22 @@ const getUserEvents = async (email, database) => {
   }
 };
 
-module.exports = { getChatHistory, saveChatHistory, getChatHistoryByDatabase, getEmpresaData, getUserEvents };
+// Nova função para buscar eventos do dia
+const getTodayEvents = async (email, database) => {
+  try {
+    const sanitizedDatabase = database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+    const empresaDb = mongoose.connection.useDb(sanitizedDatabase);
+    const EventoModel = empresaDb.model("Evento", require("../models/eventoModel").schema); // Usa o schema correto
+
+    const today = new Date().toISOString().split("T")[0];
+
+    // Busca eventos do dia associados ao e-mail do usuário
+    const events = await EventoModel.find({ email, date: today });
+    return events;
+  } catch (error) {
+    console.error("Erro ao buscar eventos do dia:", error);
+    throw new Error("Erro ao buscar eventos do dia.");
+  }
+};
+
+module.exports = { getChatHistory, saveChatHistory, getChatHistoryByDatabase, getEmpresaData, getUserEvents, getTodayEvents };

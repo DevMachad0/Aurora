@@ -1,6 +1,6 @@
 const express = require("express");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { getChatHistory, saveChatHistory, getEmpresaData, getUserEvents } = require("../services/chatService");
+const { getChatHistory, saveChatHistory, getEmpresaData, getUserEvents, getTodayEvents } = require("../services/chatService");
 const { getAuroraCoreData } = require("../services/auroraCoreService");
 const AuroraCore = require("../models/auroraCoreModel");
 require("dotenv").config();
@@ -68,15 +68,21 @@ router.post("/chat", async (req, res) => {
 
         // Obtém os agendamentos do usuário
         const userEvents = await getUserEvents(user.email, user.empresa);
+        const todayEvents = await getTodayEvents(user.email, user.empresa);
+
         const eventsContext = userEvents.length
             ? userEvents.map(event => `Evento: ${event.title}, Data: ${event.date}, Horário: ${event.startTime} - ${event.endTime}, Descrição: ${event.description}`).join("\n")
             : "Nenhum evento encontrado.";
+
+        const todayEventsContext = todayEvents.length
+            ? todayEvents.map(event => `Evento: ${event.title}, Horário: ${event.startTime} - ${event.endTime}, Descrição: ${event.description}`).join("\n")
+            : "Nenhum evento para hoje.";
 
         // Cria um contexto para o modelo entender quem está falando
         const userContext = `Dados do usuário do sistema: Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
 
         // Adiciona o histórico de conversas e eventos ao contexto
-        const historyContext = `${chatHistory ? chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n") : ""}\n\nAgendamentos do Usuário:\n${eventsContext}`;
+        const historyContext = `${chatHistory ? chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n") : ""}\n\nAgendamentos do Usuário:\n${eventsContext}\n\nAgendamentos de Hoje:\n${todayEventsContext}`;
 
         // Obtém as instruções e restrições do AuroraCore
         const auroraCoreData = await getAuroraCoreData();
