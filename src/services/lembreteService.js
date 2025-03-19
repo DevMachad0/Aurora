@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const moment = require("moment-timezone");
 const LembreteEvento = require("../models/lembreteEventoModel");
 
 const transporter = nodemailer.createTransport({
@@ -10,35 +11,28 @@ const transporter = nodemailer.createTransport({
 });
 
 function getHoraBrasil() {
-    return new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-}
-
-function getDataHoraBrasil(date, time) {
-    const [hour, minute] = time.split(":");
-    const [year, month, day] = date.split("-");
-    return new Date(Date.UTC(year, month - 1, day, hour, minute)).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+    return moment().tz("America/Sao_Paulo").format("YYYY-MM-DD HH:mm:ss");
 }
 
 async function verificarLembretes() {
     try {
-        const agora = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-        const agoraDataHora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-        console.log(`[${agora}] Iniciando verificação de lembretes...`);
-        console.log(`[${agora}] Data e hora atual no Brasil: ${agora}`);
+        const agora = moment().tz("America/Sao_Paulo");
+        console.log(`[${agora.format("YYYY-MM-DD HH:mm:ss")}] Iniciando verificação de lembretes...`);
+        console.log(`[${agora.format("YYYY-MM-DD HH:mm:ss")}] Data e hora atual no Brasil: ${agora.format("YYYY-MM-DD HH:mm:ss")}`);
 
         const eventos = await LembreteEvento.find({
             notifyEmail: true,
             status: { $in: ["evento criado", "lembrete enviado"] },
         });
 
-        console.log(`[${agora}] Eventos encontrados para verificação: ${eventos.length}`);
+        console.log(`[${agora.format("YYYY-MM-DD HH:mm:ss")}] Eventos encontrados para verificação: ${eventos.length}`);
 
         for (const evento of eventos) {
-            const eventoDataHora = new Date(`${evento.date}T${evento.startTime}:00`);
-            const diffMinutos = Math.floor((eventoDataHora - agoraDataHora) / (1000 * 60));
+            const eventoDataHora = moment.tz(`${evento.date} ${evento.startTime}`, "YYYY-MM-DD HH:mm", "America/Sao_Paulo");
+            const diffMinutos = eventoDataHora.diff(agora, "minutes");
 
-            console.log(`[${agora}] Verificando evento: ${evento.title}`);
-            console.log(`[${agora}] Diferença em minutos para o evento: ${diffMinutos}`);
+            console.log(`[${agora.format("YYYY-MM-DD HH:mm:ss")}] Verificando evento: ${evento.title}`);
+            console.log(`[${agora.format("YYYY-MM-DD HH:mm:ss")}] Diferença em minutos para o evento: ${diffMinutos}`);
 
             let mailOptions;
 
@@ -92,12 +86,12 @@ async function verificarLembretes() {
 
             if (mailOptions) {
                 try {
-                    console.log(`[${agora}] Enviando e-mail para ${evento.email} sobre o evento ${evento.title}`);
+                    console.log(`[${agora.format("YYYY-MM-DD HH:mm:ss")}] Enviando e-mail para ${evento.email} sobre o evento ${evento.title}`);
                     await transporter.sendMail(mailOptions);
-                    console.log(`[${agora}] E-mail enviado com sucesso para ${evento.email}`);
+                    console.log(`[${agora.format("YYYY-MM-DD HH:mm:ss")}] E-mail enviado com sucesso para ${evento.email}`);
                     await evento.save();
                 } catch (error) {
-                    console.error(`[${agora}] Erro ao enviar e-mail para ${evento.email}:`, error);
+                    console.error(`[${agora.format("YYYY-MM-DD HH:mm:ss")}] Erro ao enviar e-mail para ${evento.email}:`, error);
                 }
             }
         }
