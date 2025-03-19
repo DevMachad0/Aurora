@@ -14,6 +14,7 @@ const domainRoutes = require("./src/routes/domainRoutes");
 const eventRoutes = require("./src/routes/eventRoutes");
 const fs = require('fs');
 const helmet = require('helmet');
+const { verificarLembretes } = require("./src/services/lembreteService");
 
 // Carregar domínios permitidos de um arquivo JSON
 const allowedDomains = JSON.parse(fs.readFileSync('./allowedDomains.json', 'utf8'));
@@ -74,6 +75,9 @@ app.use("/api", chatHistoryRoutes);
 app.use("/api", storageRoutes);
 app.use("/api", domainRoutes);
 app.use("/api", eventRoutes);
+
+// Executar o serviço de lembretes a cada 5 minutos
+setInterval(verificarLembretes, 5 * 60 * 1000);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
