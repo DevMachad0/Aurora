@@ -5,7 +5,7 @@
 
 <!-- Caixa de Chat -->
 <div id="chat-box">
-  <div id="chat-header">Suporte</div>
+  <div id="chat-header">Olá Como podemos ajudar?</div>
   <div id="chat-messages"></div>
   <div id="chat-input">
       <input type="text" id="chat-message-input" placeholder="Digite sua mensagem...">
@@ -162,6 +162,25 @@
   #chat-send-button:hover {
     background: linear-gradient(135deg, #5b0bb5, #1b6fe0);
   }
+.chat-button:hover {
+background: #5b0bb5;
+}
+
+.chat-message-button-container {
+display: flex;
+justify-content: flex-start;
+align-items: center;
+gap: 10px;
+}
+.chat-button {
+background: #6a11cb;
+color: white;
+padding: 10px 20px;
+border-radius: 6px;
+cursor: pointer;
+margin: 5px;
+transition: background 0.3s ease;
+  }
   </style>
   
 
@@ -172,7 +191,7 @@ let userInfo = {
     lastName: "",
     cpf: "",
     email: "",
-    perfil_email: "finalo@gmail.com" //inseira o e-mail para atendimento
+    perfil_email: "finalo@gmail.com"
 };
 
 // Estado do formulário (para controlar as etapas do questionário)
@@ -185,7 +204,7 @@ document.getElementById('chat-toggle').addEventListener('click', function() {
 });
 
 // Função para adicionar mensagens ao chat com animação
-function addMessage(sender, message) {
+function addMessage(sender, message, buttons = []) {
   var messagesContainer = document.getElementById('chat-messages');
   var msgElem = document.createElement('div');
   msgElem.classList.add('chat-message');
@@ -198,6 +217,20 @@ function addMessage(sender, message) {
 
   msgElem.textContent = message;
   messagesContainer.appendChild(msgElem);
+
+  // Adicionar botões, se houver
+  if (buttons.length > 0) {
+    var buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('chat-message-button-container');
+    buttons.forEach(button => {
+      var btn = document.createElement('button');
+      btn.classList.add('chat-button');
+      btn.textContent = button.text;
+      btn.addEventListener('click', () => handleConfirmationResponse(button.value));
+      buttonContainer.appendChild(btn);
+    });
+    messagesContainer.appendChild(buttonContainer);
+  }
 
   // Scroll automático para a última mensagem
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -225,16 +258,46 @@ function handleQuestionnaire(message) {
     } else if (formStep === 3) {
         userInfo.email = message;
         formStep++;
-        // Agradece e envia os dados para a API após o preenchimento completo
-        addMessage('bot', `Obrigado, ${userInfo.firstName}! Em breve iniciaremos o atendimento.`);
-        sendUserDataToAPI();
+        showConfirmation();
     }
 }
 
-// Modifica a função sendUserDataToAPI para não exibir mensagem extra no frontend
+// Função para mostrar a confirmação antes de enviar os dados
+function showConfirmation() {
+    const confirmationMessage = `Seus dados são:\nNome: ${userInfo.firstName} ${userInfo.lastName}\nCPF: ${userInfo.cpf}\nE-mail: ${userInfo.email}\n\nVocê confirma?`;
+    addMessage('bot', confirmationMessage, [
+        { text: 'Sim', value: 'yes' },
+        { text: 'Não', value: 'no' }
+    ]);
+}
+
+// Função para lidar com a resposta de confirmação
+function handleConfirmationResponse(response) {
+    if (response === 'yes') {
+        addMessage('bot', 'Obrigado pela confirmação! Em breve iniciaremos o atendimento.');
+        sendUserDataToAPI();
+    } else {
+        addMessage('bot', 'Entendido, vamos começar novamente. Qual é o seu nome?');
+        resetForm();
+    }
+}
+
+// Função para resetar o formulário
+function resetForm() {
+    userInfo = {
+        firstName: "",
+        lastName: "",
+        cpf: "",
+        email: "",
+        perfil_email: "finalo@gmail.com"
+    };
+    formStep = 0;
+}
+
+// Função para enviar os dados para a API
 function sendUserDataToAPI() {
     if (userInfo.firstName && userInfo.lastName && userInfo.cpf && userInfo.email && userInfo.perfil_email) {
-        const domain = window.location.hostname; // Obtém o domínio do site
+        const domain = window.location.hostname;
 
         const dataToSend = {
             ...userInfo,
@@ -249,7 +312,7 @@ function sendUserDataToAPI() {
         .then(response => response.json())
         .then(data => {
             if (data.reply) {
-                addMessage('bot', data.reply); // Exibe a resposta do backend
+                addMessage('bot', data.reply);
             }
         })
         .catch(error => {
@@ -259,7 +322,7 @@ function sendUserDataToAPI() {
     }
 }
 
-// Modifica a função sendMessage para sempre enviar a mensagem ao backend após o formulário ser preenchido
+// Função para enviar mensagens do usuário ao backend
 function sendMessage() {
     var input = document.getElementById('chat-message-input');
     var message = input.value.trim();
@@ -286,7 +349,7 @@ function sendMessageToAPI(message) {
     .then(response => response.json())
     .then(data => {
         if (data.reply) {
-            addMessage('bot', data.reply); // Exibe a resposta da IA vinda do backend
+            addMessage('bot', data.reply);
         }
     })
     .catch(error => {

@@ -14,7 +14,7 @@ const chat = model.startChat({
         },
         {
             role: "model",
-            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as nescessidades do meu usuario com textos planos, sem usar HTML ou Markdown e respeitando o limite de 6000 caracteres." }]
+            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as nescessidades do meu usuario com textos planos, sem usar HTML ou Markdown e respeitando o limite de 6000 caracteres. também não fornecerei informações dos dados dos perfis para os clientes; utilizarei essas informações apenas para lidar com os clientes." }]
         }
     ],
     generationConfig: {
