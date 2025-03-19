@@ -12,6 +12,7 @@ const storageRoutes = require("./src/routes/storageRoutes");
 const chatSupportRoutes = require('./src/routes/chat_support'); 
 const domainRoutes = require("./src/routes/domainRoutes");
 const eventRoutes = require("./src/routes/eventRoutes");
+const userEventsRoutes = require("./src/routes/userEventsRoutes");
 const fs = require('fs');
 const helmet = require('helmet');
 const { scheduleDailyReminders } = require("./src/services/lembreteService");
@@ -75,6 +76,7 @@ app.use("/api", chatHistoryRoutes);
 app.use("/api", storageRoutes);
 app.use("/api", domainRoutes);
 app.use("/api", eventRoutes);
+app.use("/api", userEventsRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

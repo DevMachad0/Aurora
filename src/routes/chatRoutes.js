@@ -66,17 +66,23 @@ router.post("/chat", async (req, res) => {
         // Obtém o histórico de conversas do usuário
         const chatHistory = await getChatHistory(user.email, user.empresa);
 
+        // Obtém os agendamentos do usuário
+        const userEvents = await getUserEvents(user.email, user.empresa);
+        const eventsContext = userEvents.length
+            ? userEvents.map(event => `Evento: ${event.title}, Data: ${event.date}, Horário: ${event.startTime} - ${event.endTime}, Descrição: ${event.description}`).join("\n")
+            : "Nenhum evento encontrado.";
+
+        // Cria um contexto para o modelo entender quem está falando
+        const userContext = `Dados do usuário do sistema: Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
+
+        // Adiciona o histórico de conversas e eventos ao contexto
+        const historyContext = `${chatHistory ? chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n") : ""}\n\nAgendamentos do Usuário:\n${eventsContext}`;
+
         // Obtém as instruções e restrições do AuroraCore
         const auroraCoreData = await getAuroraCoreData();
 
         // Obtém os dados da empresa com base no tipo "documento"
         const empresaData = await getEmpresaData(user.empresa, "documento");
-
-        // Cria um contexto para o modelo entender quem está falando
-        const userContext = `Dados do usuário do sistema: Nome: ${user.nome}, E-mail: ${user.email}, Empresa: ${user.empresa}, Licença: ${user.licenca}, Plano: ${user.plano}, Dados: ${JSON.stringify(user.dados)}, Criado em: ${user.createdAt}, Atualizado em: ${user.updatedAt}.`;
-
-        // Adiciona o histórico de conversas ao contexto
-        const historyContext = chatHistory ? chatHistory.map(chat => `${chat.timestamp} - ${chat.sender}: ${chat.message}`).join("\n") : "";
 
         // Verifica o limite de caracteres baseado no plano do usuário
         const charLimit = planLimits[user.plano] || 1000;
