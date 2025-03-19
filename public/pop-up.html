@@ -41,6 +41,39 @@
             </div>
         </div>
     </div>
+    <div id="event-form-popup" class="overlay" style="display: none;">
+        <div class="container">
+            <form id="event-form">
+                <h2>Registrar Evento</h2>
+                <label for="event-title">Título:</label>
+                <input type="text" id="event-title" required>
+                
+                <label for="event-date">Data:</label>
+                <input type="date" id="event-date" required>
+                
+                <label for="start-time">Hora de Início:</label>
+                <input type="time" id="start-time" required>
+                
+                <label for="end-time">Hora de Fim:</label>
+                <input type="time" id="end-time" required>
+                
+                <label for="description">Descrição:</label>
+                <textarea id="description" required></textarea>
+                
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" required>
+                
+                <label>
+                    <input type="checkbox" id="notify-email"> Notificar por e-mail?
+                </label>
+                
+                <div class="event-actions">
+                    <button type="submit" id="save-event">Salvar</button>
+                    <button type="button" id="cancel-event">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <script src="scripts/popup.js"></script>
 </body>
 </html>

@@ -57,4 +57,44 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     updateCalendar();
+
+    const eventFormPopup = document.getElementById("event-form-popup");
+    const registerEventButton = document.getElementById("register-event");
+    const cancelEventButton = document.getElementById("cancel-event");
+    const eventForm = document.getElementById("event-form");
+
+    registerEventButton.addEventListener("click", () => {
+        eventFormPopup.style.display = "flex";
+    });
+
+    cancelEventButton.addEventListener("click", () => {
+        eventFormPopup.style.display = "none";
+    });
+
+    eventForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const eventData = {
+            title: document.getElementById("event-title").value,
+            date: document.getElementById("event-date").value,
+            startTime: document.getElementById("start-time").value,
+            endTime: document.getElementById("end-time").value,
+            description: document.getElementById("description").value,
+            email: document.getElementById("email").value,
+            notifyEmail: document.getElementById("notify-email").checked,
+        };
+
+        try {
+            await fetch("/api/events", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(eventData),
+            });
+            alert("Evento registrado com sucesso!");
+            eventFormPopup.style.display = "none";
+        } catch (error) {
+            console.error("Erro ao registrar evento:", error);
+            alert("Erro ao registrar evento.");
+        }
+    });
 });
