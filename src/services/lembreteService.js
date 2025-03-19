@@ -3,10 +3,12 @@ const moment = require("moment-timezone");
 const LembreteEvento = require("../models/lembreteEventoModel");
 
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.office365.com", // Servidor SMTP do Hotmail/Outlook
+    port: 587,
+    secure: false, // Usar TLS
     auth: {
-        user: "lembrete.agendamento.aurora@gmail.com",
-        pass: process.env.EMAIL_PASSWORD, // Definir a senha no arquivo .env
+        user: process.env.HOTMAIL_USER, // E-mail do Hotmail
+        pass: process.env.HOTMAIL_PASSWORD, // Senha de aplicativo do Hotmail
     },
 });
 
@@ -31,7 +33,7 @@ async function verificarLembretes() {
             console.log(`[${dataAtual}] Enviando lembrete para o evento: ${evento.title}`);
 
             const mailOptions = {
-                from: "lembrete.agendamento.aurora@gmail.com",
+                from: process.env.HOTMAIL_USER, // E-mail do remetente
                 to: evento.email,
                 subject: `Lembrete de Evento: ${evento.title} - ${evento.date}`,
                 text: `
