@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const calendarBody = document.getElementById("calendar-body-agendamento");
-    const currentMonthLabel = document.getElementById("current-month-agendamento");
-    const prevMonthButton = document.getElementById("prev-month-agendamento");
-    const nextMonthButton = document.getElementById("next-month-agendamento");
+    const calendarBody = document.getElementById("calendar-body");
+    const currentMonthLabel = document.getElementById("current-month");
+    const prevMonthButton = document.getElementById("prev-month");
+    const nextMonthButton = document.getElementById("next-month");
 
     if (!calendarBody || !currentMonthLabel || !prevMonthButton || !nextMonthButton) {
-        console.error("Elementos do calendário de agendamento não encontrados.");
+        console.error("Elementos do calendário não encontrados.");
         return;
     }
 
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     break;
                 } else {
                     cell.textContent = date;
-                    cell.classList.add("calendar-day-agendamento");
+                    cell.classList.add("calendar-day");
                     date++;
                 }
 
@@ -58,10 +58,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     updateCalendar();
 
-    const eventFormPopup = document.getElementById("event-form-popup-agendamento");
-    const registerEventButton = document.getElementById("register-event-agendamento");
-    const cancelEventButton = document.getElementById("cancel-event-agendamento");
-    const eventForm = document.getElementById("event-form-agendamento");
+    const eventFormPopup = document.getElementById("event-form-popup");
+    const registerEventButton = document.getElementById("register-event");
+    const cancelEventButton = document.getElementById("cancel-event");
+    const eventForm = document.getElementById("event-form");
 
     registerEventButton.addEventListener("click", () => {
         eventFormPopup.style.display = "flex";
@@ -75,13 +75,13 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
 
         const eventData = {
-            title: document.getElementById("event-title-agendamento").value,
-            date: document.getElementById("event-date-agendamento").value,
-            startTime: document.getElementById("start-time-agendamento").value,
-            endTime: document.getElementById("end-time-agendamento").value,
-            description: document.getElementById("description-agendamento").value,
-            email: document.getElementById("email-agendamento").value,
-            notifyEmail: document.getElementById("notify-email-agendamento").checked,
+            title: document.getElementById("event-title").value,
+            date: document.getElementById("event-date").value,
+            startTime: document.getElementById("start-time").value,
+            endTime: document.getElementById("end-time").value,
+            description: document.getElementById("description").value,
+            email: document.getElementById("email").value,
+            notifyEmail: document.getElementById("notify-email").checked,
             database: localStorage.getItem("userDatabase"), // Obtém o banco de dados da empresa
         };
 
