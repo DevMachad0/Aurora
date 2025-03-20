@@ -22,22 +22,47 @@ const chat = model.startChat({
     },
 });
 
-async function getResponse(message) {
+const chatHistory = {}; // Armazena o histórico de mensagens por número de protocolo
+
+async function getResponse({ userMessage, context, protocolNumber }) {
     try {
-        if (message.length > 10000) {
+        if (userMessage.length > 10000) {
             return "Erro: A mensagem ultrapassou o limite de 10000 caracteres.";
         }
-        const timestamp = new Date().toLocaleString(); // Obtém a data e hora atuais
-        let additionalContext = "";
-        if (message.toLowerCase().includes("que horas são") || message.toLowerCase().includes("que dia é hoje")) {
-            additionalContext = `A data e hora atuais são: ${timestamp}.`;
+
+        // Inicializa o histórico se não existir
+        if (!chatHistory[protocolNumber]) {
+            chatHistory[protocolNumber] = [
+                {
+                    role: "user",
+                    parts: [{ text: context }],
+                },
+            ];
         }
-        const result = await chat.sendMessage(`Data e Hora: ${timestamp}\n\n${additionalContext}\n\n${message}`);
+
+        // Adiciona a mensagem do usuário ao histórico
+        chatHistory[protocolNumber].push({
+            role: "user",
+            parts: [{ text: userMessage }],
+        });
+
+        const result = await chat.sendMessage({
+            history: chatHistory[protocolNumber],
+        });
+
         const response = await result.response;
         let responseText = response.text();
+
+        // Adiciona a resposta da Aurora ao histórico
+        chatHistory[protocolNumber].push({
+            role: "model",
+            parts: [{ text: responseText }],
+        });
+
         if (responseText.length > 6000) {
             responseText = responseText.substring(0, 6000) + "...";
         }
+
         return responseText;
     } catch (error) {
         console.error("Erro ao conectar com Gemini:", error);
