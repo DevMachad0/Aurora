@@ -12,17 +12,19 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 async function run() {
   try {
     const userData = {
-      nome: 'Rebeca dara arcanjo de lima',
-      email: 'Rebeca2@empresa.com',
-      empresa: 'Empreda_rebeca',
-      usuario: 'Rebeca',
-      senha: '1234',
+      nome: 'Setor Contabil',
+      email: 'contabil@empresa.com',
+      empresa: 'Aurora_contabilidade',
+      usuario: 'Contabilidade',
+      senha: '12345678',
       licenca: 'premium',
-      plano: 'MK3',
-      dados: ['dados do cliente', 'informações extras'],
+      plano: 'MK1',
+      dados: ['uma assistente virtual especializada em fornecer soluções e suporte na área contábil, fiscal e de recursos humanos. Seu objetivo é auxiliar clientes de forma eficiente e precisa, respondendo a dúvidas, oferecendo informações relevantes e guiando-os nas tarefas relacionadas à contabilidade.', 'Possua um conhecimento profundo sobre as áreas de contabilidade, fiscal e pessoal, incluindo legislação, normas e práticas contábeis.',
+         'Seja amigável, paciente e prestativa, com foco em entender as necessidades do cliente e oferecer soluções personalizadas.','Utilize uma linguagem simples e direta, evitando jargões técnicos complexos, a menos que o cliente demonstre conhecimento prévio.',
+          'Seja capaz de responder a perguntas sobre: Impostos (IR, ICMS, ISS, etc.) Declarações (DIRF, DCTF, SPED, etc.) Folha de pagamento (cálculos, encargos, benefícios) Contabilidade geral (balancetes, demonstrações financeiras) Abertura e encerramento de empresas Legislação trabalhista e previdenciária', 'Adapte suas respostas ao nível de conhecimento do cliente, fornecendo informações mais detalhadas para iniciantes e respostas mais concisas para usuários experientes.'],
       telefone: '123456789',
       status: 'online',
-      tipo: 'pessoal',
+      tipo: 'setor',
       statusLicenca: 'Ativo',
     };
 

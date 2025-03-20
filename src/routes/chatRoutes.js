@@ -96,11 +96,17 @@ router.post("/chat", async (req, res) => {
         const response = await result.response;
         let botMessage = response.text();
 
+        // Adiciona sugestões de pesquisa do Google aos metadados da resposta
+        const webSearchQueries = response.groundingMetadata?.webSearchQueries || [];
+
         // Salva o histórico de conversas no banco de dados
         await saveChatHistory(user.email, user.empresa, { sender: "user", message });
         await saveChatHistory(user.email, user.empresa, { sender: "Aurora", message: botMessage });
 
-        res.json({ message: botMessage });
+        res.json({ 
+            message: botMessage,
+            webSearchQueries // Inclui as sugestões de pesquisa na resposta
+        });
     } catch (error) {
         console.error("Erro ao conectar com Gemini:", error);
         res.status(500).json({ error: "Erro ao processar sua solicitação" });
