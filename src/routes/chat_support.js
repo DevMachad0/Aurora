@@ -4,7 +4,7 @@ const Domain = require('../models/domainModel'); // Modelo de domínio
 const SupportClient = require('../models/supportClientModel'); // Modelo de suporte ao cliente
 const mongoose = require('mongoose');
 const aurora = require('./chat_support_bot'); // IA Aurora
-const { getPerfilFromAuroraDB } = require('../services/userService'); // Importar serviço de perfil
+const { getPerfilFromAuroraDB } = require('../services/userService'); // Importar corretamente a função
 
 // Função para gerar um número de protocolo único
 async function generateProtocolNumber() {
