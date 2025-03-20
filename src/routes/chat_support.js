@@ -62,7 +62,7 @@ async function generateProtocolNumber() {
 }
 
 router.post('/chat-support', async (req, res) => {
-    const { message, firstName, lastName, cpf, email, perfil_email, domain } = req.body; // Adicionado perfil_email
+    const { message, firstName, lastName, cpf, email, perfil_email, domain } = req.body;
 
     try {
         // Obter o perfil no banco de dados aurora_db
@@ -71,6 +71,7 @@ router.post('/chat-support', async (req, res) => {
             if (userProfile) {
                 userInfo.empresa = userProfile.empresa;
                 userInfo.database = userProfile.database;
+                userInfo.dados = userProfile.dados; // Adiciona os dados do perfil
                 console.log(`Perfil encontrado: Empresa - ${userInfo.empresa}, Database - ${userInfo.database}`);
             } else {
                 console.log('Perfil associado ao perfil_email não encontrado.');
@@ -78,79 +79,9 @@ router.post('/chat-support', async (req, res) => {
             }
         }
 
-        // Se for uma mensagem do usuário após o formulário, apenas responde normalmente
-        if (message && email) {
-            console.log(`Nova mensagem de ${email}: ${message}`);
-            
-            // Envia a mensagem com os dados do usuário para a IA Aurora
-            const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
-            const empresaData = await getEmpresaData(userInfo.empresa, "documento");
-            const empresaContext = empresaData ? `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}` : "Dados da empresa não encontrados.";
-            const userProfileData = await getUserProfileData(userInfo.perfil_email);
-            const profileContext = userProfileData ? `Ultilizar dados do perfil: ${userProfileData.join(", ")}, que se referem ao atendimento ao cliente via (API)` : "Dados do perfil não encontrados.";
-            const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${profileContext}\n\n${message}`);
-
-            // Sanitizar o nome do banco de dados
-            const sanitizedDatabaseName = `data_${userInfo.empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
-            const atendimentoCollection = "atendimento";
-
-            // Salvar a mensagem trocada entre o cliente e a AURORA
-            if (message) {
-                try {
-                    const empresaDb = mongoose.connection.useDb(sanitizedDatabaseName);
-                    const atendimento = await empresaDb.collection(atendimentoCollection).findOne({ protocolNumber: userInfo.protocolNumber });
-
-                    if (!atendimento) {
-                        return res.status(404).json({ error: "Atendimento não encontrado." });
-                    }
-
-                    const newMessage = {
-                        sender: email ? "cliente" : "AURORA",
-                        message,
-                        timestamp: new Date(),
-                    };
-
-                    await empresaDb.collection(atendimentoCollection).updateOne(
-                        { protocolNumber: userInfo.protocolNumber },
-                        { $push: { messages: newMessage } }
-                    );
-
-                    console.log('Mensagem salva com sucesso no atendimento.');
-                } catch (error) {
-                    console.error('Erro ao salvar a mensagem no atendimento:', error);
-                    return res.status(500).json({ error: "Erro ao salvar a mensagem no banco de dados." });
-                }
-            }
-
-            return res.json({ reply: botResponse });
-        }
-
-        // Obter a empresa correta com base no perfil_email
-        if (perfil_email) {
-            const empresa = await getEmpresaByPerfilEmail(perfil_email);
-            if (empresa) {
-                userInfo.empresa = empresa;
-                console.log(`Empresa associada ao perfil_email: ${empresa}`);
-            } else {
-                console.log('Empresa associada ao perfil_email não encontrada.');
-                return res.json({ reply: "Perfil_email não registrado no sistema." });
-            }
-        }
-
-        // Se ainda não temos um domínio armazenado, buscamos a empresa associada
-        if (domain) {
-            console.log(`Domínio recebido: ${domain}`);
-            
-            // Obter a empresa com base no domínio
-            const empresa = await getEmpresaByDomain(domain);
-            
-            if (empresa) {
-                userInfo.empresa = empresa;
-                console.log(`Empresa associada ao domínio: ${empresa}`);
-            } else {
-                console.log('Empresa associada ao domínio não encontrada.');
-                return res.json({ reply: "Domínio não registrado no sistema." });
-            }
+        // Verifica se todas as informações necessárias foram coletadas
+        if (!userInfo.empresa || !userInfo.database) {
+            return res.json({ reply: "Não foi possível determinar a empresa ou o banco de dados associado." });
         }
 
         // Armazena os dados do usuário caso ainda não estejam preenchidos
@@ -158,7 +89,7 @@ router.post('/chat-support', async (req, res) => {
         if (lastName) userInfo.lastName = lastName;
         if (cpf) userInfo.cpf = cpf;
         if (email) userInfo.email = email;
-        if (perfil_email) userInfo.perfil_email = perfil_email; // Adicionando o perfil_email
+        if (perfil_email) userInfo.perfil_email = perfil_email;
         userInfo.domain = domain;
 
         // Verifica se todas as informações foram coletadas antes de responder
@@ -173,8 +104,9 @@ router.post('/chat-support', async (req, res) => {
         // Sanitizar o nome do banco de dados
         const sanitizedDatabaseName = userInfo.database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
         const atendimentoCollection = "atendimento";
+        const documentosCollection = "documentos";
 
-        // Cria um novo documento na coleção "atendimento" da empresa
+        // Cria ou acessa a coleção "atendimento" e salva o atendimento
         const atendimentoData = {
             protocolNumber,
             firstName: userInfo.firstName,
@@ -189,38 +121,36 @@ router.post('/chat-support', async (req, res) => {
 
         try {
             const empresaDb = mongoose.connection.useDb(sanitizedDatabaseName);
-            const collections = await empresaDb.db.listCollections({ name: atendimentoCollection }).toArray();
-            if (collections.length === 0) {
+
+            // Verifica ou cria a coleção "atendimento"
+            const atendimentoCollections = await empresaDb.db.listCollections({ name: atendimentoCollection }).toArray();
+            if (atendimentoCollections.length === 0) {
                 await empresaDb.createCollection(atendimentoCollection);
             }
             await empresaDb.collection(atendimentoCollection).insertOne(atendimentoData);
             console.log('Atendimento salvo com sucesso na coleção "atendimento".');
+
+            // Obtém os dados da coleção "documentos"
+            const documentosData = await empresaDb.collection(documentosCollection).findOne({ tipo: "documento" });
+            const empresaContext = documentosData
+                ? `Dados da empresa: Nome: ${documentosData.nome}, Conteúdo: ${documentosData.conteudo.join(", ")}`
+                : "Dados da empresa não encontrados.";
+
+            // Adiciona os dados do perfil como instruções adicionais
+            const dadosContext = userInfo.dados
+                ? `Instruções adicionais: ${userInfo.dados.join(", ")}`
+                : "Instruções adicionais não encontradas.";
+
+            // Envia a mensagem inicial para a IA Aurora
+            const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${userInfo.protocolNumber}. Como posso te ajudar?`;
+            const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
+            const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${dadosContext}\n\n${initialMessage}`);
+
+            return res.json({ reply: botResponse });
         } catch (error) {
-            console.error('Erro ao salvar o atendimento na coleção "atendimento":', error);
-            return res.status(500).json({ error: "Erro ao salvar o atendimento no banco de dados da empresa." });
+            console.error('Erro ao acessar ou salvar dados no banco de dados:', error);
+            return res.status(500).json({ error: "Erro ao acessar ou salvar dados no banco de dados." });
         }
-
-        // Responde com o número de protocolo
-        res.json({
-            reply: `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${protocolNumber}. Como posso te ajudar?`,
-            userInfo
-        });
-
-        // Obter as instruções e restrições do Aurora Core
-        const auroraCoreData = await getAuroraCoreData();
-        const coreInstructions = auroraCoreData.instructions.join("\n");
-        const coreRestrictions = auroraCoreData.restrictions.join("\n");
-
-        // Envia a mensagem inicial para o modelo Aurora com os dados do usuário, da empresa, do perfil e do Aurora Core
-        const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${userInfo.protocolNumber}. Como posso te ajudar?`;
-        const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
-        const empresaData = await getEmpresaData(userInfo.empresa, "documento");
-        const empresaContext = empresaData ? `Dados da empresa: Nome: ${empresaData.nome}, Conteúdo: ${empresaData.conteudo.join(", ")}` : "Dados da empresa não encontrados.";
-        const userProfileData = await getUserProfileData(userInfo.perfil_email);
-        const profileContext = userProfileData ? `Dados do perfil: ${userProfileData.join(", ")}` : "Dados do perfil não encontrados.";
-
-        await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${profileContext}\n\nInstruções do Aurora Core:\n${coreInstructions}\n\nRestrições do Aurora Core:\n${coreRestrictions}\n\n${initialMessage}`);
-
     } catch (error) {
         console.error('Erro ao processar a requisição:', error);
         return res.status(500).json({ error: "Erro interno no servidor." });
