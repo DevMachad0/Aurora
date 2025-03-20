@@ -90,10 +90,6 @@ router.post('/chat-support', async (req, res) => {
         if (perfil_email) userInfo.perfil_email = perfil_email;
         userInfo.domain = domain;
 
-        // Verifica se todas as informações foram coletadas antes de responder
-        if (!userInfo.firstName || !userInfo.lastName || !userInfo.cpf || !userInfo.email || !userInfo.empresa || !userInfo.perfil_email) {
-            return res.json({ reply: "Por favor, forneça todas as informações antes de continuar." });
-        }
 
         // Gera um número de protocolo único
         const protocolNumber = await generateProtocolNumber();
