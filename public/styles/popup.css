@@ -15,8 +15,10 @@
 /* Contêiner principal com tamanho fixo */
 .container {
     display: flex;
+    flex-direction: column; /* Alinha os elementos verticalmente */
     width: 700px; /* Tamanho fixo */
-    height: 350px; /* Altura fixa */
+    max-height: 90vh; /* Limita a altura máxima */
+    overflow-y: auto; /* Adiciona barra de rolagem se necessário */
     background-color: #6c7192;
     border-radius: 10px;
     padding: 20px;
@@ -112,19 +114,22 @@
 /* Organizando os campos em duas linhas */
 .field-row {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap; /* Permite que os campos quebrem linha se necessário */
     gap: 10px;
+    justify-content: space-between;
 }
 
 /* Cada campo ocupa um terço da linha */
 .field-row div {
     flex: 1;
+    min-width: 150px; /* Define uma largura mínima */
 }
 
 /* Campo de descrição ocupa a largura total */
 textarea {
     resize: none;
-    height: 60px;
+    height: 80px;
+    width: 100%;
 }
 
 /* Organização dos botões */
@@ -132,11 +137,11 @@ textarea {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 .event-actions button {
-    padding: 8px 15px;
+    padding: 10px 15px;
     border: none;
     border-radius: 4px;
     font-size: 14px;
@@ -162,11 +167,15 @@ textarea {
 @media (max-width: 768px) {
     .container {
         width: 90%;
-        height: auto;
+        max-height: 80vh; /* Ajusta a altura máxima para telas menores */
     }
 
     .field-row {
-        flex-direction: column;
+        flex-direction: column; /* Empilha os campos verticalmente */
+    }
+
+    .event-actions {
+        justify-content: center; /* Centraliza os botões */
     }
 }
 /* Estilização do formulário */
@@ -174,7 +183,7 @@ form {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px; /* Espaçamento entre os campos */
 }
 
 /* Título */

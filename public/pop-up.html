@@ -7,13 +7,13 @@
     <link rel="stylesheet" href="styles/popup.css">
 </head>
 <body>
-    <div id="overlay" class="overlay">
+    <div id="overlay-agendamento" class="overlay">
         <div class="container">
             <div class="calendar-container">
                 <div class="calendar-header">
-                    <button id="prev-month" class="nav-button">&#9665;</button>
-                    <span id="current-month"></span>
-                    <button id="next-month" class="nav-button">&#9655;</button>
+                    <button id="prev-month-agendamento" class="nav-button">&#9665;</button>
+                    <span id="current-month-agendamento"></span>
+                    <button id="next-month-agendamento" class="nav-button">&#9655;</button>
                 </div>
                 <table class="calendar-table">
                     <thead>
@@ -27,67 +27,67 @@
                             <th>Sáb</th>
                         </tr>
                     </thead>
-                    <tbody id="calendar-body">
+                    <tbody id="calendar-body-agendamento">
                         <!-- Preenchido pelo JS -->
                     </tbody>
                 </table>
             </div>
             <div class="menu-container">
                 <div class="event-actions">
-                    <button id="register-event">Registrar evento</button>
-                    <button id="edit-event">Editar evento</button>
-                    <button id="cancela-event">Cancelar evento</button>
+                    <button id="register-event-agendamento">Registrar evento</button>
+                    <button id="edit-event-agendamento">Editar evento</button>
+                    <button id="cancela-event-agendamento">Cancelar evento</button>
                 </div>
             </div>
         </div>
     </div>
-    <div id="event-form-popup" class="overlay" style="display: none;">
+    <div id="event-form-popup-agendamento" class="overlay" style="display: none;">
         <div class="container2">
-            <form id="event-form">
+            <form id="event-form-agendamento">
                 <h2>Registrar Evento</h2>
         
                 <!-- Primeira linha com 3 campos -->
                 <div class="field-row">
                     <div>
-                        <label for="event-title">Título:</label>
-                        <input type="text" id="event-title" required>
+                        <label for="event-title-agendamento">Título:</label>
+                        <input type="text" id="event-title-agendamento" required>
                     </div>
                     <div>
-                        <label for="email">E-mail:</label>
-                        <input type="email" id="email" required>
+                        <label for="email-agendamento">E-mail:</label>
+                        <input type="email" id="email-agendamento" required>
                     </div>
 
                     <div>
-                        <label for="start-time">Hora de Início:</label>
-                        <input type="time" id="start-time" required>
+                        <label for="start-time-agendamento">Hora de Início:</label>
+                        <input type="time" id="start-time-agendamento" required>
                     </div>
                 </div>
         
                 <!-- Segunda linha com 3 campos -->
                 <div class="field-row">
                     <div>
-                        <label for="end-time">Hora de Fim:</label>
-                        <input type="time" id="end-time" required>
+                        <label for="end-time-agendamento">Hora de Fim:</label>
+                        <input type="time" id="end-time-agendamento" required>
                     </div>
                     <div>
-                        <label for="event-date">Data:</label>
-                        <input type="date" id="event-date" required>
+                        <label for="event-date-agendamento">Data:</label>
+                        <input type="date" id="event-date-agendamento" required>
                     </div>
                     <div>
                         <label>
-                            <input type="checkbox" id="notify-email"> Notificar por e-mail?
+                            <input type="checkbox" id="notify-email-agendamento"> Notificar por e-mail?
                         </label>
                     </div>
                 </div>
         
                 <!-- Campo de descrição ocupa toda a largura -->
-                <label for="description">Descrição:</label>
-                <textarea id="description" required></textarea>
+                <label for="description-agendamento">Descrição:</label>
+                <textarea id="description-agendamento" required></textarea>
         
                 <!-- Botões alinhados no canto -->
                 <div class="event-actions">
-                    <button type="submit" id="save-event">Salvar</button>
-                    <button type="button" id="cancel-event">Cancelar</button>
+                    <button type="submit" id="save-event-agendamento">Salvar</button>
+                    <button type="button" id="cancel-event-agendamento">Cancelar</button>
                 </div>
             </form>
         </div>        
