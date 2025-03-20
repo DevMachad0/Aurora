@@ -22,6 +22,17 @@ async function getEmpresaByDomain(domain) {
     }
 }
 
+// Função para obter empresa pelo perfil_email
+async function getEmpresaByPerfilEmail(perfil_email) {
+    try {
+        const domainData = await Domain.findOne({ emails: { $in: [perfil_email] } }); // Busca no array de emails
+        return domainData ? domainData.empresa : null;
+    } catch (error) {
+        console.error("Erro ao obter informações pelo perfil_email:", error.message);
+        return null;
+    }
+}
+
 // Função para gerar um número de protocolo único
 async function generateProtocolNumber() {
     const date = new Date();
@@ -87,6 +98,18 @@ router.post('/chat-support', async (req, res) => {
             }
 
             return res.json({ reply: botResponse });
+        }
+
+        // Obter a empresa correta com base no perfil_email
+        if (perfil_email) {
+            const empresa = await getEmpresaByPerfilEmail(perfil_email);
+            if (empresa) {
+                userInfo.empresa = empresa;
+                console.log(`Empresa associada ao perfil_email: ${empresa}`);
+            } else {
+                console.log('Empresa associada ao perfil_email não encontrada.');
+                return res.json({ reply: "Perfil_email não registrado no sistema." });
+            }
         }
 
         // Se ainda não temos um domínio armazenado, buscamos a empresa associada

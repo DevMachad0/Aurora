@@ -12,10 +12,10 @@ async function run() {
   try {
     const empresaData = {
         tipo: "documento",
-        empresa: "Empresa X",
+        empresa: "Aurora_contabilidade",
         nome: "Termos e Condições de Uso",
         conteudo: [
-          "Bem-vindo à Empresa X! Ao acessar e utilizar nossos serviços, você concorda com os seguintes termos e condições.",
+          "Bem-vindo à Aurora_contabilidade! Ao acessar e utilizar nossos serviços, você concorda com os seguintes termos e condições.",
           "1. Aceitação dos Termos: Ao utilizar nossos serviços, você concorda em cumprir os termos e condições aqui descritos.",
           "2. Uso dos Serviços: Você concorda em usar os serviços de forma responsável e dentro dos limites da lei.",
           "3. Responsabilidade: A Empresa X não se responsabiliza por danos diretos ou indiretos que possam surgir do uso inadequado dos serviços.",
