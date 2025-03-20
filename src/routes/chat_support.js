@@ -115,7 +115,7 @@ router.post('/chat-support', async (req, res) => {
             email: userInfo.email,
             domain: userInfo.domain,
             status: "Em atendimento(Aurora)",
-            messages: [],
+            messages: [{ sender: "user", text: message }], // Armazena a mensagem inicial do usuário
             createdAt: new Date(),
         };
 
@@ -144,7 +144,13 @@ router.post('/chat-support', async (req, res) => {
             // Envia a mensagem inicial para a IA Aurora
             const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${userInfo.protocolNumber}. Como posso te ajudar?`;
             const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
-            const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${dadosContext}\n\n${initialMessage}`);
+            const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${dadosContext}\n\n${message}\n\n${initialMessage}`);
+
+            // Adiciona a resposta da IA Aurora ao atendimento
+            await empresaDb.collection(atendimentoCollection).updateOne(
+                { protocolNumber },
+                { $push: { messages: { sender: "bot", text: botResponse } } }
+            );
 
             return res.json({ reply: botResponse });
         } catch (error) {
