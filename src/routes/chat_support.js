@@ -64,6 +64,9 @@ async function generateProtocolNumber() {
 router.post('/chat-support', async (req, res) => {
     const { message, firstName, lastName, cpf, email, perfil_email, domain } = req.body;
 
+    // Inicializa userInfo como um objeto vazio para evitar dados residuais
+    userInfo = {};
+
     try {
         // Obter o perfil no banco de dados aurora_db
         if (perfil_email) {
