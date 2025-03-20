@@ -22,6 +22,16 @@ async function getEmpresaByDomain(domain) {
     }
 }
 
+// Função para obter empresa pelo perfil_email
+async function getEmpresaByPerfilEmail(perfil_email) {
+    try {
+        const domainData = await Domain.findOne({ emails: { $in: [perfil_email] } }); // Busca no array de emails
+        return domainData ? domainData.empresa : null;
+    } catch (error) {
+        console.error("Erro ao obter informações pelo perfil_email:", error.message);
+        return null;
+    }
+}
 
 // Função para obter informações do perfil no banco de dados aurora_db
 async function getPerfilFromAuroraDB(perfil_email) {
@@ -134,11 +144,7 @@ router.post('/chat-support', async (req, res) => {
             // Envia a mensagem inicial para a IA Aurora
             const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${userInfo.protocolNumber}. Como posso te ajudar?`;
             const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
-            const botResponse = await aurora.getResponse({
-                userMessage: message,
-                context: `${userContext}\n\n${empresaContext}\n\n${dadosContext}`,
-                protocolNumber: userInfo.protocolNumber,
-            });
+            const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${dadosContext}\n\n${initialMessage}`);
 
             return res.json({ reply: botResponse });
         } catch (error) {

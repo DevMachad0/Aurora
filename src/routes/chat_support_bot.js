@@ -24,38 +24,24 @@ const chat = model.startChat({
 
 async function getResponse(message) {
     try {
-        if (typeof message !== "string") {
-            console.error("Erro: A mensagem fornecida não é uma string.");
-            return "Erro: A mensagem enviada é inválida. Por favor, envie uma mensagem de texto.";
-        }
-
         if (message.length > 10000) {
             return "Erro: A mensagem ultrapassou o limite de 10000 caracteres.";
         }
-
         const timestamp = new Date().toLocaleString(); // Obtém a data e hora atuais
         let additionalContext = "";
         if (message.toLowerCase().includes("que horas são") || message.toLowerCase().includes("que dia é hoje")) {
             additionalContext = `A data e hora atuais são: ${timestamp}.`;
         }
-
         const result = await chat.sendMessage(`Data e Hora: ${timestamp}\n\n${additionalContext}\n\n${message}`);
         const response = await result.response;
-
-        if (!response) {
-            console.error("Erro: Resposta inválida ou ausente da API Gemini.");
-            return "Erro: Não foi possível processar sua solicitação no momento. Tente novamente mais tarde.";
-        }
-
         let responseText = response.text();
         if (responseText.length > 6000) {
             responseText = responseText.substring(0, 6000) + "...";
         }
-
         return responseText;
     } catch (error) {
         console.error("Erro ao conectar com Gemini:", error);
-        return "Erro ao processar sua solicitação. Por favor, tente novamente mais tarde.";
+        return "Erro ao processar sua solicitação";
     }
 }
 
