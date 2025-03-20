@@ -65,8 +65,13 @@ router.post('/chat-support', async (req, res) => {
     const { message, firstName, lastName, cpf, email, perfil_email, domain } = req.body;
 
     try {
+        // Verifica se a mensagem foi enviada
+        if (!message) {
+            return res.status(400).json({ reply: "Por favor, envie uma mensagem para continuar." });
+        }
+
         // Obter o perfil no banco de dados aurora_db
-        if (perfil_email) {
+        if (perfil_email && (!userInfo.empresa || !userInfo.database)) {
             const userProfile = await getPerfilFromAuroraDB(perfil_email);
             if (userProfile) {
                 userInfo.empresa = userProfile.empresa;
@@ -92,43 +97,18 @@ router.post('/chat-support', async (req, res) => {
         if (perfil_email) userInfo.perfil_email = perfil_email;
         userInfo.domain = domain;
 
-        // Verifica se todas as informações foram coletadas antes de responder
-        if (!userInfo.firstName || !userInfo.lastName || !userInfo.cpf || !userInfo.email || !userInfo.empresa || !userInfo.perfil_email) {
-            return res.json({ reply: "Por favor, forneça todas as informações antes de continuar." });
+        // Gera um número de protocolo único apenas se ainda não existir
+        if (!userInfo.protocolNumber) {
+            userInfo.protocolNumber = await generateProtocolNumber();
         }
-
-        // Gera um número de protocolo único
-        const protocolNumber = await generateProtocolNumber();
-        userInfo.protocolNumber = protocolNumber;
 
         // Sanitizar o nome do banco de dados
         const sanitizedDatabaseName = userInfo.database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
         const atendimentoCollection = "atendimento";
         const documentosCollection = "documentos";
 
-        // Cria ou acessa a coleção "atendimento" e salva o atendimento
-        const atendimentoData = {
-            protocolNumber,
-            firstName: userInfo.firstName,
-            lastName: userInfo.lastName,
-            cpf: userInfo.cpf,
-            email: userInfo.email,
-            domain: userInfo.domain,
-            status: "Em atendimento(Aurora)",
-            messages: [],
-            createdAt: new Date(),
-        };
-
         try {
             const empresaDb = mongoose.connection.useDb(sanitizedDatabaseName);
-
-            // Verifica ou cria a coleção "atendimento"
-            const atendimentoCollections = await empresaDb.db.listCollections({ name: atendimentoCollection }).toArray();
-            if (atendimentoCollections.length === 0) {
-                await empresaDb.createCollection(atendimentoCollection);
-            }
-            await empresaDb.collection(atendimentoCollection).insertOne(atendimentoData);
-            console.log('Atendimento salvo com sucesso na coleção "atendimento".');
 
             // Obtém os dados da coleção "documentos"
             const documentosData = await empresaDb.collection(documentosCollection).findOne({ tipo: "documento" });
@@ -141,10 +121,38 @@ router.post('/chat-support', async (req, res) => {
                 ? `Instruções adicionais: ${userInfo.dados.join(", ")}`
                 : "Instruções adicionais não encontradas.";
 
-            // Envia a mensagem inicial para a IA Aurora
-            const initialMessage = `Obrigado por esperar, ${userInfo.firstName}. Me chamo Aurora, segue o número de protocolo do seu chamado: ${userInfo.protocolNumber}. Como posso te ajudar?`;
+            // Envia a mensagem para a IA Aurora
             const userContext = `Nome: ${userInfo.firstName}, Sobrenome: ${userInfo.lastName}, CPF: ${userInfo.cpf}, Email: ${userInfo.email}`;
+            const initialMessage = `Protocolo: ${userInfo.protocolNumber}. Mensagem do usuário: ${message}`;
             const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaContext}\n\n${dadosContext}\n\n${initialMessage}`);
+
+            // Salva a mensagem no banco de dados
+            const atendimento = await empresaDb.collection(atendimentoCollection).findOne({ protocolNumber: userInfo.protocolNumber });
+            if (!atendimento) {
+                const atendimentoData = {
+                    protocolNumber: userInfo.protocolNumber,
+                    firstName: userInfo.firstName,
+                    lastName: userInfo.lastName,
+                    cpf: userInfo.cpf,
+                    email: userInfo.email,
+                    domain: userInfo.domain,
+                    status: "Em atendimento(Aurora)",
+                    messages: [{ sender: "cliente", message, timestamp: new Date() }],
+                    createdAt: new Date(),
+                };
+                await empresaDb.collection(atendimentoCollection).insertOne(atendimentoData);
+            } else {
+                await empresaDb.collection(atendimentoCollection).updateOne(
+                    { protocolNumber: userInfo.protocolNumber },
+                    { $push: { messages: { sender: "cliente", message, timestamp: new Date() } } }
+                );
+            }
+
+            // Adiciona a resposta da IA ao histórico
+            await empresaDb.collection(atendimentoCollection).updateOne(
+                { protocolNumber: userInfo.protocolNumber },
+                { $push: { messages: { sender: "Aurora", message: botResponse, timestamp: new Date() } } }
+            );
 
             return res.json({ reply: botResponse });
         } catch (error) {
