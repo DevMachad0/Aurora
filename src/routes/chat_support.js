@@ -82,11 +82,6 @@ router.post('/chat-support', async (req, res) => {
             }
         }
 
-        // Verifica se todas as informações necessárias foram coletadas
-        if (!userInfo.empresa || !userInfo.database) {
-            return res.json({ reply: "Não foi possível determinar a empresa ou o banco de dados associado." });
-        }
-
         // Armazena os dados do usuário caso ainda não estejam preenchidos
         if (firstName) userInfo.firstName = firstName;
         if (lastName) userInfo.lastName = lastName;
