@@ -75,15 +75,4 @@ const updateUserTokenAdmin = async (email, tokenAdmin) => {
     }
 };
 
-async function getPerfilFromAuroraDB(perfil_email) {
-    try {
-        const auroraDb = mongoose.connection.useDb("aurora_db");
-        const user = await auroraDb.collection("users").findOne({ email: perfil_email });
-        return user;
-    } catch (error) {
-        console.error("Erro ao buscar perfil no banco aurora_db:", error.message);
-        return null;
-    }
-}
-
-module.exports = { createUser, getUserByEmail, getUserById, getUserProfileData, updateUserDados, updateUserTokenAdmin, getPerfilFromAuroraDB };
+module.exports = { createUser, getUserByEmail, getUserById, getUserProfileData, updateUserDados, updateUserTokenAdmin };
