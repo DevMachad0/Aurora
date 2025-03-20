@@ -34,6 +34,10 @@ async function getResponse(message) {
         }
         const result = await chat.sendMessage(`Data e Hora: ${timestamp}\n\n${additionalContext}\n\n${message}`);
         const response = await result.response;
+        if (!response || typeof response.text !== "function") {
+            console.error("Erro: Resposta inválida recebida da API Gemini.");
+            return "Erro ao processar sua solicitação";
+        }
         let responseText = response.text();
         if (responseText.length > 6000) {
             responseText = responseText.substring(0, 6000) + "...";
