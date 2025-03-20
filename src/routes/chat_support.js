@@ -33,6 +33,18 @@ async function getEmpresaByPerfilEmail(perfil_email) {
     }
 }
 
+// Função para obter informações do perfil no banco de dados aurora_db
+async function getPerfilFromAuroraDB(perfil_email) {
+    try {
+        const auroraDb = mongoose.connection.useDb("aurora_db");
+        const user = await auroraDb.collection("users").findOne({ email: perfil_email });
+        return user;
+    } catch (error) {
+        console.error("Erro ao buscar perfil no banco aurora_db:", error.message);
+        return null;
+    }
+}
+
 // Função para gerar um número de protocolo único
 async function generateProtocolNumber() {
     const date = new Date();
@@ -53,6 +65,19 @@ router.post('/chat-support', async (req, res) => {
     const { message, firstName, lastName, cpf, email, perfil_email, domain } = req.body; // Adicionado perfil_email
 
     try {
+        // Obter o perfil no banco de dados aurora_db
+        if (perfil_email) {
+            const userProfile = await getPerfilFromAuroraDB(perfil_email);
+            if (userProfile) {
+                userInfo.empresa = userProfile.empresa;
+                userInfo.database = userProfile.database;
+                console.log(`Perfil encontrado: Empresa - ${userInfo.empresa}, Database - ${userInfo.database}`);
+            } else {
+                console.log('Perfil associado ao perfil_email não encontrado.');
+                return res.json({ reply: "Perfil_email não registrado no sistema." });
+            }
+        }
+
         // Se for uma mensagem do usuário após o formulário, apenas responde normalmente
         if (message && email) {
             console.log(`Nova mensagem de ${email}: ${message}`);
@@ -146,7 +171,7 @@ router.post('/chat-support', async (req, res) => {
         userInfo.protocolNumber = protocolNumber;
 
         // Sanitizar o nome do banco de dados
-        const sanitizedDatabaseName = `data_${userInfo.empresa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')}`;
+        const sanitizedDatabaseName = userInfo.database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
         const atendimentoCollection = "atendimento";
 
         // Cria um novo documento na coleção "atendimento" da empresa
