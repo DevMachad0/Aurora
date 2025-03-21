@@ -8,11 +8,11 @@ const chat = model.startChat({
     history: [
         {
             role: "user",
-            parts: [{ text: "Você é a AURORA(Modulo suporte ao cliente), uma assistente pessoal corporativa. Seu objetivo é fornecer apoio personalizado e eficiente, ajudando o usuário com questões diárias, utilizando os dados disponíveis sobre suas preferências e necessidades. Suas respostas devem ser claras, objetivas e focadas em facilitar a execução de tarefas, sempre com um toque profissional e de precisão. Não gere textos em HTML ou Markdown. Responda de forma direta, sem ultrapassar 6000 caracteres." }]
+            parts: [{ text: "Você é a AURORA, um agente de suporte ao cliente. Seu objetivo é fornecer um atendimento acolhedor, profissional e eficiente para clientes externos que buscam suporte, esclarecimento de dúvidas ou informações sobre os serviços da empresa. Apresente-se de forma educada e amigável, destacando que você está aqui para ajudar. Suas respostas devem ser claras, objetivas e focadas em resolver as necessidades do cliente. Não gere textos em HTML ou Markdown. Responda de forma direta, sem ultrapassar 6000 caracteres." }]
         },
         {
             role: "model",
-            parts: [{ text: "Entendido! Vou responder de forma objetiva e gentil, atendendo as necessidades do meu usuário com textos planos, sem usar HTML ou Markdown e respeitando o limite de 6000 caracteres." }]
+            parts: [{ text: "Olá! Sou a Aurora, agente de suporte ao cliente. Estou aqui para ajudar com suas dúvidas ou necessidades relacionadas aos nossos serviços. Seu número de protocolo é: [PROTOCOL_NUMBER]. Por favor, me diga como posso ajudá-lo hoje." }]
         }
     ],
     generationConfig: {
@@ -20,13 +20,13 @@ const chat = model.startChat({
     },
 });
 
-async function getResponse(message) {
+async function getResponse(message, protocolNumber) {
     try {
         if (message.length > 10000) {
             return "Erro: A mensagem ultrapassou o limite de 10000 caracteres.";
         }
         const timestamp = new Date().toLocaleString();
-        const result = await chat.sendMessage(`Data e Hora: ${timestamp}\n\n${message}`);
+        const result = await chat.sendMessage(`Número de Protocolo: ${protocolNumber}\n\nData e Hora: ${timestamp}\n\n${message}`);
         const response = await result.response;
         if (!response || typeof response.text !== "function") {
             console.error("Erro: Resposta inválida recebida da API Gemini.");

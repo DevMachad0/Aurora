@@ -5,6 +5,7 @@ const SupportClient = require('../models/supportClientModel');
 const mongoose = require('mongoose');
 const aurora = require('./chat_support_bot');
 const { getEmpresaData } = require('../services/chatService');
+const { getAuroraCoreData } = require('../services/auroraCoreService'); // Importar o serviço auroraCore
 
 // Função para obter informações do perfil no banco de dados aurora_db
 async function getPerfilFromAuroraDB(perfil_email) {
@@ -72,10 +73,16 @@ router.post('/chat-support', async (req, res) => {
             ? `Dados da empresa: ${userProfile.dados.join(", ")}`
             : "Dados da empresa não encontrados.";
 
+        // Obter instruções e restrições do auroraCore
+        const auroraCoreData = await getAuroraCoreData(sessionUserInfo.perfil_email);
+        const instrucoesRestricoes = auroraCoreData
+            ? `Instruções: ${auroraCoreData.instrucoes.join(", ")}. Restrições: ${auroraCoreData.restricoes.join(", ")}.`
+            : "Instruções e restrições não encontradas.";
+
         // Caso seja uma mensagem para a IA
         if (message) {
             const userContext = `Nome: ${sessionUserInfo.firstName}, Sobrenome: ${sessionUserInfo.lastName}, CPF: ${sessionUserInfo.cpf}, Email: ${sessionUserInfo.email}`;
-            const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaDados}\n\n${message}`);
+            const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaDados}\n\n${instrucoesRestricoes}\n\n${message}`, sessionUserInfo.protocolNumber);
             return res.json({ reply: botResponse });
         }
 
@@ -105,7 +112,7 @@ router.post('/chat-support', async (req, res) => {
         }
         await empresaDb.collection(atendimentoCollection).insertOne(atendimentoData);
 
-        return res.json({ reply: "Dados iniciais salvos com sucesso. Você pode começar a enviar mensagens." });
+        return res.json({ reply: "Atendimento iniciado! Como podemos ajudar você?." });
     } catch (error) {
         console.error('Erro ao processar a requisição:', error);
         return res.status(500).json({ error: "Erro interno no servidor." });
