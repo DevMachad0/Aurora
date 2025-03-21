@@ -75,9 +75,9 @@ router.post('/chat-support', async (req, res) => {
 
         // Obter instruções e restrições do auroraCore
         const auroraCoreData = await getAuroraCoreData(sessionUserInfo.perfil_email);
-        const instrucoesRestricoes = auroraCoreData
-            ? `Instruções: ${auroraCoreData.instrucoes.join(", ")}. Restrições: ${auroraCoreData.restricoes.join(", ")}.`
-            : "Instruções e restrições não encontradas.";
+        const instrucoes = Array.isArray(auroraCoreData?.instrucoes) ? auroraCoreData.instrucoes.join(", ") : "Nenhuma instrução encontrada.";
+        const restricoes = Array.isArray(auroraCoreData?.restricoes) ? auroraCoreData.restricoes.join(", ") : "Nenhuma restrição encontrada.";
+        const instrucoesRestricoes = `Instruções: ${instrucoes}. Restrições: ${restricoes}.`;
 
         // Caso seja uma mensagem para a IA
         if (message) {
