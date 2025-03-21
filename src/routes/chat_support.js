@@ -31,6 +31,21 @@ async function generateProtocolNumber() {
 router.post('/chat-support', async (req, res) => {
     const { message, firstName, lastName, cpf, email, perfil_email, domain } = req.body;
 
+    // Verificar campos obrigatórios
+    const missingFields = [];
+    if (!message) missingFields.push("message");
+    if (!firstName) missingFields.push("firstName");
+    if (!lastName) missingFields.push("lastName");
+    if (!cpf) missingFields.push("cpf");
+    if (!email) missingFields.push("email");
+    if (!perfil_email) missingFields.push("perfil_email");
+    if (!domain) missingFields.push("domain");
+
+    if (missingFields.length > 0) {
+        console.error(`Campos ausentes na requisição: ${missingFields.join(", ")}`);
+        return res.status(400).json({ error: `Campos ausentes: ${missingFields.join(", ")}` });
+    }
+
     try {
         // Obter informações do perfil
         let userInfo = {};
