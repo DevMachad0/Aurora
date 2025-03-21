@@ -62,22 +62,26 @@ router.post('/chat-support', async (req, res) => {
             domain: domain || sessionUserInfo.domain,
         };
 
+        // Obter informações do perfil e dados da empresa
+        const userProfile = await getPerfilFromAuroraDB(sessionUserInfo.perfil_email);
+        if (!userProfile || !userProfile.database) {
+            return res.status(400).json({ error: "Nome do banco de dados não encontrado." });
+        }
+
+        const empresaDados = userProfile.dados
+            ? `Dados da empresa: ${userProfile.dados.join(", ")}`
+            : "Dados da empresa não encontrados.";
+
         // Caso seja uma mensagem para a IA
         if (message) {
             const userContext = `Nome: ${sessionUserInfo.firstName}, Sobrenome: ${sessionUserInfo.lastName}, CPF: ${sessionUserInfo.cpf}, Email: ${sessionUserInfo.email}`;
-            const botResponse = await aurora.getResponse(`${userContext}\n\n${message}`);
+            const botResponse = await aurora.getResponse(`${userContext}\n\n${empresaDados}\n\n${message}`);
             return res.json({ reply: botResponse });
         }
 
         // Caso seja o envio inicial, gerar o protocolo e salvar no banco
         const protocolNumber = await generateProtocolNumber();
         sessionUserInfo.protocolNumber = protocolNumber;
-
-        // Verificar se o nome do banco de dados está definido
-        const userProfile = await getPerfilFromAuroraDB(sessionUserInfo.perfil_email);
-        if (!userProfile || !userProfile.database) {
-            return res.status(400).json({ error: "Nome do banco de dados não encontrado." });
-        }
 
         const sanitizedDatabaseName = userProfile.database.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
         const atendimentoCollection = "atendimento";
